@@ -1,0 +1,13 @@
+**/catkin*
+CATKIN*
+/lib
+/atomic*
+/bin
+CMakeFiles
+cmake*
+/gtest
+CMakeCache.txt
+CTest*
+Makefile
+**/build
+**/devel
