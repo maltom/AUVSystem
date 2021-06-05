@@ -3,7 +3,10 @@
 #include <memory>
 
 #include "jsonxx/jsonxx.h"
+
 #include <ros/ros.h>
+
+#include "StateStack.h"
 
 class StateMachine final
 {
@@ -15,6 +18,7 @@ public:
 	}
 	~StateMachine() {}
 
+protected:
 private:
 	std::shared_ptr< ros::NodeHandle >& rosNode;
 	std::fstream& configFile;
