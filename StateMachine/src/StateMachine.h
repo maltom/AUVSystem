@@ -8,21 +8,19 @@
 class StateMachine final
 {
 public:
-    StateMachine(std::shared_ptr<ros::NodeHandle> &node, std::fstream &config):rosNode(node), configFile(config)
-    {
-        file.parse(configFile);
-
-    }
-    ~StateMachine()
-    {}
+	StateMachine( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config )
+	    : rosNode( node ), configFile( config )
+	{
+		file.parse( configFile );
+	}
+	~StateMachine() {}
 
 private:
-    std::shared_ptr<ros::NodeHandle> &rosNode;
-    std::fstream &configFile;
-    jsonxx::Object file;
-    
+	std::shared_ptr< ros::NodeHandle >& rosNode;
+	std::fstream& configFile;
+	jsonxx::Object file;
 
-    void subscribeTopics() const;
-    void advertiseTopics() const;
-    void connectServices() const;
+	void subscribeTopics() const;
+	void advertiseTopics() const;
+	void connectServices() const;
 };
