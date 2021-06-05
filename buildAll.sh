@@ -6,7 +6,7 @@ fi
 cd build
 
 cmake ../.
-make
+make -j12
 unset GLOBIGNORE
 
 for index in ${modulesList[@]}; do
@@ -14,14 +14,14 @@ for index in ${modulesList[@]}; do
     GLOBIGNORE=$GLOBIGNORE:$ignored
 done
 
-rm -rv *
+rm -r *
 
 GLOBIGNORE=build
 
 for index in ${modulesList[@]}; do
     if [ -d $index ]; then
         cd $index
-        rm -rv *
+        rm -r *
         cd ..
     fi
 done
