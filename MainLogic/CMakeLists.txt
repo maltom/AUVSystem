@@ -2,6 +2,10 @@ set(NODENAME MainLogic)
 
 include_directories(../external)
 
+set(MODULES 
+    StateMachine
+)
+
 set(SOURCES
     src/main.cpp
     src/MainLogic.cpp
@@ -21,4 +25,4 @@ add_subdirectory(src)
 add_executable(${NODENAME} ${SOURCES} ${HEADERS})
 set_target_properties( ${NODENAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY build )
 
-target_link_libraries(${NODENAME} ${catkin_LIBRARIES})
+target_link_libraries(${NODENAME} ${catkin_LIBRARIES} ${MODULES})

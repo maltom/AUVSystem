@@ -1,3 +1,5 @@
+#define CONFIG_FILE_PATH "../../../MetaParams.json"
+
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -16,11 +18,12 @@ int main( int argc, char** argv )
 	std::shared_ptr< ros::NodeHandle > mainLogicNodePtr = std::make_shared< ros::NodeHandle >();
 
 	std::fstream configFile;
-	configFile.open( "../../../MetaParams.json", std::fstream::in );
+	configFile.open( CONFIG_FILE_PATH, std::fstream::in );
 	if( !configFile.is_open() )
 	{
 		throw "Can't open config file!";
 	}
 
 	MainLogic mainLogic( mainLogicNodePtr, configFile );
+    mainLogic.startMainLoop();
 }

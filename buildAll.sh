@@ -16,12 +16,20 @@ done
 
 rm -r *
 
-GLOBIGNORE=build
+GLOBIGNORE=build:src:*.so
 
 for index in ${modulesList[@]}; do
     if [ -d $index ]; then
+
         cd $index
+        if [ -d "src" ]; then
+            cd src
+            rm -r *
+            cd ..
+        fi
         rm -r *
         cd ..
     fi
 done
+
+unset GLOBIGNORE
