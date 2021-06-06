@@ -24,6 +24,7 @@ public:
 	void setStateInsteadOfCurrent( StateEnums stateEnum );
 	void pushStateOnTop( StateEnums stateEnum );
 	void popState();
+	void popMultipleStates( unsigned number );
 	void clearStateStack();
 
 private:
@@ -69,6 +70,23 @@ void StateStack< T >::popState()
 		throw "StateStack can't be empty!";
 	}
 }
+
+template< typename T >
+void StateStack< T >::popMultipleStates( unsigned number )
+{
+	if( this->stateStack.size() > number )
+	{
+		for( auto i = 0u; i < number; ++i )
+		{
+			this->stateStack.pop();
+		}
+	}
+	else
+	{
+		throw "Too few states on stack to pop!";
+	}
+}
+
 template< typename T >
 void StateStack< T >::pushStateOnTop( StateEnums stateEnum )
 {
