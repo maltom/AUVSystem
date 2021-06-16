@@ -11,7 +11,6 @@ void MainLogic::startMainLoop() const
 		stateMachine->process();
         r.sleep();
 	}
-	return;
 }
 
 void MainLogic::subscribeTopics()
