@@ -1,6 +1,6 @@
 #include "StateIdle.h"
-#include <cstdio>
+#include <iostream>
 void StateIdle::process()
 {
-    printf("I am Idle ");
+    std::cout<<"I am Idle ";
 }

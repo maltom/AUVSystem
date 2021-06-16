@@ -28,6 +28,8 @@ protected:
 private:
 	std::unique_ptr< StateMachine > stateMachine;
 	std::shared_ptr< ros::NodeHandle >& rosNode;
+	ros::Publisher globalEstimatedPositionPublisher;
+	ros::Subscriber globalEstimatedPositionSubscriber;
 
 	std::fstream& configFile;
 	jsonxx::Object file;

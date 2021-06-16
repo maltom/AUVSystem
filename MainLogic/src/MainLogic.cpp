@@ -4,23 +4,25 @@
 
 void MainLogic::startMainLoop() const
 {
-    ros::Rate r(1);
+	ros::Rate r( 1000 );
 	while( ros::ok() )
 	{
 		ros::spinOnce();
 		stateMachine->process();
-        r.sleep();
+		r.sleep();
 	}
 }
 
 void MainLogic::subscribeTopics()
 {
 	printf( "kiszka" );
-	this->rosNode->advertise< std_msgs::Float32 >( TopicsAndServicesNames::Topics::globalEstimatedPosition, 1000 );
-	this->rosNode->subscribe( TopicsAndServicesNames::Topics::globalEstimatedPosition,
-	                          1000,
-	                          &MainLogic::globalEstimatedPositionObtained,
-	                          this );
+	// this->globalEstimatedPositionPublisher =  this->rosNode->advertise< std_msgs::Float32 >(
+	// TopicsAndServicesNames::Topics::globalEstimatedPosition, 1000 );
+	this->globalEstimatedPositionSubscriber
+	    = this->rosNode->subscribe( TopicsAndServicesNames::Topics::globalEstimatedPosition,
+	                                1000,
+	                                &MainLogic::globalEstimatedPositionObtained,
+	                                this );
 }
 void MainLogic::advertiseTopics() const {}
 void MainLogic::connectServices() const {}
