@@ -1,10 +1,14 @@
 #pragma once
 
+class MainLogic;
+
 class StateBase
 {
 private:
 protected:
+	MainLogic* MainLogicParentNode;
+
 public:
-	StateBase()            = default;
+	StateBase( MainLogic* logicParentNode = nullptr ) : MainLogicParentNode( logicParentNode ) {}
 	virtual void process() = 0;
 };

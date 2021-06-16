@@ -2,7 +2,9 @@
 
 #include <memory>
 
+#include <geometry_msgs/Twist.h>
 #include <ros/ros.h>
+#include <std_msgs/Float32.h>
 
 #include "jsonxx/jsonxx.h"
 
@@ -15,6 +17,8 @@ public:
 	{
 		this->stateMachine = std::make_unique< StateMachine >();
 		file.parse( configFile );
+
+        subscribeTopics();
 	}
 	~MainLogic() {}
 
@@ -24,11 +28,13 @@ protected:
 private:
 	std::unique_ptr< StateMachine > stateMachine;
 	std::shared_ptr< ros::NodeHandle >& rosNode;
+
 	std::fstream& configFile;
 	jsonxx::Object file;
 
-	void subscribeTopics() const;
+	void subscribeTopics();
 	void advertiseTopics() const;
 	void connectServices() const;
 
+	void globalEstimatedPositionObtained( const geometry_msgs::Twist& position );
 };

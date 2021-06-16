@@ -1,107 +1,44 @@
 {
-    "ROSTopics":
-    {
-        "Subscribe":
-        {
-            "StateMachine":
-            [],
-            "Logic":
-            [],
-            "SLAM":
-            [],
-            "HydroPhoneProcessor":
-            [],
-            "VideoProcessor":
-            [],
-            "ZEDProcessor":
-            [],
-            "ObjectRecognition":
-            [],
-            "TorpedoLaunching":
-            [],
-            "EffectorPositioning":
-            [],
-            "TrajectoryPlanning":
-            [],
-            "ThrusterRegulator":
-            [],
-            "ManipulatorRegulator":
-            [],
-            "ThrusterControler":
-            [],
-            "ManipulatorControler":
-            [],
-            "Debug":
-            []
-        },
-        "Advertise":
-        {
-            "StateMachine":
-            [],
-            "Logic":
-            [],
-            "SLAM":
-            [],
-            "HydroPhoneProcessor":
-            [],
-            "VideoProcessor":
-            [],
-            "ZEDProcessor":
-            [],
-            "ObjectRecognition":
-            [],
-            "TorpedoLaunching":
-            [],
-            "EffectorPositioning":
-            [],
-            "TrajectoryPlanning":
-            [],
-            "ThrusterRegulator":
-            [],
-            "ManipulatorRegulator":
-            [],
-            "ThrusterControler":
-            [],
-            "ManipulatorControler":
-            [],
-            "Debug":
-            []
-        }
-    },
-    "ROSServices":
-    {
-        "StateMachine":
-            [],
-            "Logic":
-            [],
-            "SLAM":
-            [],
-            "HydroPhoneProcessor":
-            [],
-            "VideoProcessor":
-            [],
-            "ZEDProcessor":
-            [],
-            "ObjectRecognition":
-            [],
-            "TorpedoLaunching":
-            [],
-            "EffectorPositioning":
-            [],
-            "TrajectoryPlanning":
-            [],
-            "ThrusterRegulator":
-            [],
-            "ManipulatorRegulator":
-            [],
-            "ThrusterControler":
-            [],
-            "ManipulatorControler":
-            [],
-            "Debug":
-            []
+    "ROSTopics": {
+        "AUVInternalSystem": {
+            "Camera": {},
+            "Position": 
+            [
+                {
+                    "globalEstimatedPosition": {
+                        "type": "geometry_msgs/Twist",
+                        "interestedNodes": [
+                            "MainLogic",
+                            "PostitioningSLAM"
+                        ]
+                    }
+                }
+            ],
+                
 
+            "Torpedo": [
+                {
+                    "launchLeft": {
+                        "type": "std_msgs/bool",
+                        "interestedNodes": [
+                            "MainLogic",
+                            "TorpedoLaunch"
+                        ]
+                    }
+                },
+                {
+                    "launchRight": {
+                        "type": "std_msgs/bool",
+                        "interestedNodes": [
+                            "MainLogic",
+                            "TorpedoLaunch"
+                        ]
+                    }
+                }
+            ]
+        },
+        "Debug": {}
     },
-    "ROSMessageCode":
-    {}
+    "ROSServices": {},
+    "ROSMessageCode": {}
 }

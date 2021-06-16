@@ -2,5 +2,5 @@
 #include <cstdio>
 void StateIdle::process()
 {
-    printf("I am Idle");
+    printf("I am Idle ");
 }

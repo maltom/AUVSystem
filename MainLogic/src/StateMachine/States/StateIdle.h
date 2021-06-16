@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StateBase.h"
+class MainLogic;
 
 class StateIdle : public StateBase
 {
@@ -9,6 +10,6 @@ class StateIdle : public StateBase
     protected:
 
     public:
-    StateIdle()=default;
+    StateIdle(){}
     void process() override;
 };

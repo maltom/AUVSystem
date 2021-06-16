@@ -13,7 +13,7 @@
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "Machine" );
+	ros::init( argc, argv, "MainLogic" );
 
 	std::shared_ptr< ros::NodeHandle > mainLogicNodePtr = std::make_shared< ros::NodeHandle >();
 
@@ -23,7 +23,10 @@ int main( int argc, char** argv )
 	{
 		throw "Can't open config file!";
 	}
+printf("kaszanka ");
 
 	MainLogic mainLogic( mainLogicNodePtr, configFile );
+    printf("miszuk");
     mainLogic.startMainLoop();
+    printf("joho");
 }
