@@ -15,7 +15,6 @@ void MainLogic::startMainLoop() const
 
 void MainLogic::subscribeTopics()
 {
-	printf( "kiszka" );
 	// this->globalEstimatedPositionPublisher =  this->rosNode->advertise< std_msgs::Float32 >(
 	// TopicsAndServicesNames::Topics::globalEstimatedPosition, 1000 );
 	this->globalEstimatedPositionSubscriber
@@ -29,5 +28,4 @@ void MainLogic::connectServices() const {}
 
 void MainLogic::globalEstimatedPositionObtained( const geometry_msgs::Twist& position )
 {
-	printf( "JUHU" );
 }

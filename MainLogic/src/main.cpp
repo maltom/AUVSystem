@@ -23,10 +23,7 @@ int main( int argc, char** argv )
 	{
 		throw "Can't open config file!";
 	}
-printf("kaszanka ");
 
 	MainLogic mainLogic( mainLogicNodePtr, configFile );
-    printf("miszuk");
     mainLogic.startMainLoop();
-    printf("joho");
 }

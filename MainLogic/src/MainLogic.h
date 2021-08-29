@@ -16,7 +16,7 @@ public:
 	MainLogic( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : rosNode( node ), configFile( config )
 	{
 		this->stateMachine = std::make_unique< StateMachine >();
-		file.parse( configFile );
+		this->file.parse( configFile );
 
         subscribeTopics();
 	}
