@@ -1,5 +1,3 @@
-#include <string>
-
 #include "MainLogic.h"
 #include "../jsonCommonFunctions.h"
 #include "../ROSEnums.h"

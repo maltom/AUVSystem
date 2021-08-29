@@ -2,20 +2,19 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <sstream>
 
 #include <ros/ros.h>
 
 #include "../jsonCommonFunctions.h"
 
-#include "MainLogic.h"
+#include "TrajectoryPlanner.h"
 
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "MainLogic" );
+	ros::init( argc, argv, "TrajectoryPlanner" );
 
-	std::shared_ptr< ros::NodeHandle > mainLogicNode = std::make_shared< ros::NodeHandle >();
+	std::shared_ptr< ros::NodeHandle > trajectoryPlannerNode = std::make_shared< ros::NodeHandle >();
 
 	std::fstream configFile;
 	configFile.open( CONFIG_FILE_PATH, std::fstream::in );
@@ -24,6 +23,6 @@ int main( int argc, char** argv )
 		throw "Can't open config file!";
 	}
 
-	MainLogic mainLogic( mainLogicNode, configFile );
-    mainLogic.startMainLoop();
+	TrajectoryPlanner trajectoryPlanner( trajectoryPlannerNode, configFile );
+    trajectoryPlanner.startMainLoop();
 }

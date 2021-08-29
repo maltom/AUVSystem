@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <memory>
 
 #include <geometry_msgs/Twist.h>
@@ -13,12 +14,13 @@
 class MainLogic final
 {
 public:
-	MainLogic( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : rosNode( node ), rawConfigFile( config )
+	MainLogic( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config )
+	    : rosNode( node ), rawConfigFile( config )
 	{
 		this->stateMachine = std::make_unique< StateMachine >();
 		this->configFile.parse( rawConfigFile );
-		
-        subscribeTopics();
+
+		subscribeTopics();
 	}
 	~MainLogic() {}
 
