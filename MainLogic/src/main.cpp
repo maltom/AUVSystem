@@ -1,5 +1,3 @@
-#define CONFIG_FILE_PATH "../../../auvConfig/auvConfig.json"
-
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -7,6 +5,8 @@
 #include <sstream>
 
 #include <ros/ros.h>
+
+#include "../jsonCommonFunctions.h"
 
 #include "MainLogic.h"
 

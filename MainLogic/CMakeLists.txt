@@ -10,12 +10,14 @@ set(SOURCES
     src/main.cpp
     src/MainLogic.cpp
     ../external/jsonxx/jsonxx.cc
+    ../jsonCommonFunctions.cpp
     ../ROSEnums.cpp
 )
 
 set(HEADERS
     src/MainLogic.h
     ../external/jsonxx/jsonxx.h
+    ../jsonCommonFunctions.h
     ../ROSEnums.h
 )
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)

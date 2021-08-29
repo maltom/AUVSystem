@@ -19,7 +19,6 @@ public:
 		this->configFile.parse( rawConfigFile );
 		
         subscribeTopics();
-		readRosRate();
 	}
 	~MainLogic() {}
 
@@ -31,7 +30,6 @@ private:
 	std::shared_ptr< ros::NodeHandle >& rosNode;
 	ros::Publisher globalEstimatedPositionPublisher;
 	ros::Subscriber globalEstimatedPositionSubscriber;
-	double rosContactRate{0.0};
 
 	std::fstream& rawConfigFile;
 	jsonxx::Object configFile;
@@ -39,7 +37,6 @@ private:
 	void subscribeTopics();
 	void advertiseTopics() const;
 	void connectServices() const;
-	void readRosRate();
 
 	void globalEstimatedPositionObtained( const geometry_msgs::Twist& position );
 };
