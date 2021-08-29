@@ -1,15 +1,16 @@
+#include <string>
 
 #include "MainLogic.h"
 #include "../ROSEnums.h"
 
 void MainLogic::startMainLoop() const
 {
-	ros::Rate r( 1000 );
+	ros::Rate rosRate( rosContactRate );
 	while( ros::ok() )
 	{
 		ros::spinOnce();
 		stateMachine->process();
-		r.sleep();
+		rosRate.sleep();
 	}
 }
 
@@ -25,7 +26,10 @@ void MainLogic::subscribeTopics()
 }
 void MainLogic::advertiseTopics() const {}
 void MainLogic::connectServices() const {}
-
-void MainLogic::globalEstimatedPositionObtained( const geometry_msgs::Twist& position )
+void MainLogic::readRosRate()
 {
+	auto rosConfig       = this->configFile.get< jsonxx::Object >( "ROS" );
+	this->rosContactRate = rosConfig.get< jsonxx::Number >( "rate" );
 }
+
+void MainLogic::globalEstimatedPositionObtained( const geometry_msgs::Twist& position ) {}

@@ -1,0 +1,3 @@
+[submodule "auvConfig"]
+	path = auvConfig
+	url = git@github.com:maltom/auvConfig.git

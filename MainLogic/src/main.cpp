@@ -1,4 +1,4 @@
-#define CONFIG_FILE_PATH "../../../MetaParams.json"
+#define CONFIG_FILE_PATH "../../../auvConfig/auvConfig.json"
 
 #include <exception>
 #include <fstream>

@@ -13,12 +13,13 @@
 class MainLogic final
 {
 public:
-	MainLogic( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : rosNode( node ), configFile( config )
+	MainLogic( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : rosNode( node ), rawConfigFile( config )
 	{
 		this->stateMachine = std::make_unique< StateMachine >();
-		this->file.parse( configFile );
-
+		this->configFile.parse( rawConfigFile );
+		
         subscribeTopics();
+		readRosRate();
 	}
 	~MainLogic() {}
 
@@ -30,13 +31,15 @@ private:
 	std::shared_ptr< ros::NodeHandle >& rosNode;
 	ros::Publisher globalEstimatedPositionPublisher;
 	ros::Subscriber globalEstimatedPositionSubscriber;
+	double rosContactRate{0.0};
 
-	std::fstream& configFile;
-	jsonxx::Object file;
+	std::fstream& rawConfigFile;
+	jsonxx::Object configFile;
 
 	void subscribeTopics();
 	void advertiseTopics() const;
 	void connectServices() const;
+	void readRosRate();
 
 	void globalEstimatedPositionObtained( const geometry_msgs::Twist& position );
 };
