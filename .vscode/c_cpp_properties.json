@@ -3,9 +3,10 @@
         {
             "name": "Linux",
             "includePath": [
+                "${workspaceFolder}/",
                 "${workspaceFolder}/**",
                 "/usr/include/",
-                "/usr/include/c++/9",
+                "/usr/include/c++/9/",
                 "/usr/include/libevdev-1.0/",
                 "/usr/include/gazebo-11/",
                 "/usr/include/ignition/math6/",
@@ -14,7 +15,8 @@
                 "/usr/include/ignition/common3/",
                 "/usr/include/ignition/fuel_tools4",
                 "/usr/include/sdformat-9.5/",
-                "/opt/ros/noetic/include/"
+                "/opt/ros/noetic/include/",
+                "/usr/include/boost/asio/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

@@ -5,11 +5,9 @@ class MainLogic;
 
 class StateIdle : public StateBase
 {
-    private:
-
-    protected:
-
-    public:
-    StateIdle(){}
-    void process() override;
+private:
+protected:
+public:
+	StateIdle() : StateBase() {}
+	void process() override;
 };

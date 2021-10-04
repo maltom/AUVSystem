@@ -1,6 +1,6 @@
 #include "MainLogic.h"
-#include "../jsonCommonFunctions.h"
-#include "../ROSEnums.h"
+#include "jsonCommonFunctions.h"
+#include "ROSEnums.h"
 
 void MainLogic::startMainLoop() const
 {

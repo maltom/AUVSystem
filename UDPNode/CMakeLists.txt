@@ -1,11 +1,11 @@
-set(NODENAME TrajectoryPlanner)
+set(NODENAME UDPNode)
 
 include_directories(../external)
 include_directories(../)
 
 set(SOURCES
     src/main.cpp
-    src/TrajectoryPlanner.cpp
+    src/UDPNode.cpp
     ../external/jsonxx/jsonxx.cc
     ../jsonCommonFunctions.cpp
     ../NodeBase.cpp
@@ -13,7 +13,7 @@ set(SOURCES
 )
 
 set(HEADERS
-    src/TrajectoryPlanner.h
+    src/UDPNode.h
     ../external/jsonxx/jsonxx.h
     ../jsonCommonFunctions.h
     ../NodeBase.h

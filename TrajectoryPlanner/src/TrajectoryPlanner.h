@@ -9,15 +9,14 @@
 
 #include "jsonxx/jsonxx.h"
 
+#include "NodeBase.h"
 
-class TrajectoryPlanner final
+class TrajectoryPlanner final : public NodeBase
 {
 public:
-	TrajectoryPlanner( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : rosNode( node ), rawConfigFile( config )
+	TrajectoryPlanner( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase( node, config )
 	{
-		this->configFile.parse(rawConfigFile);
-		
-        subscribeTopics();
+		subscribeTopics();
 	}
 	~TrajectoryPlanner() {}
 
@@ -25,10 +24,6 @@ public:
 
 protected:
 private:
-	std::shared_ptr< ros::NodeHandle >& rosNode;
-
-	std::fstream& rawConfigFile;
-	jsonxx::Object configFile;
 
 	void subscribeTopics();
 	void advertiseTopics() const;

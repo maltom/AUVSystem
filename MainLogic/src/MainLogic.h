@@ -9,36 +9,31 @@
 
 #include "jsonxx/jsonxx.h"
 
+#include "NodeBase.h"
 #include "StateMachine/StateMachine.h"
 
-class MainLogic final
+class MainLogic final : public NodeBase
 {
 public:
-	MainLogic( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config )
-	    : rosNode( node ), rawConfigFile( config )
+	MainLogic( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase( node, config )
 	{
 		this->stateMachine = std::make_unique< StateMachine >();
-		this->configFile.parse( rawConfigFile );
 
 		subscribeTopics();
 	}
-	~MainLogic() {}
+	~MainLogic() = default;
 
-	void startMainLoop() const;
+	void startMainLoop() const override;
 
 protected:
+	void subscribeTopics() override;
+	void advertiseTopics() const override;
+	void connectServices() const override;
+
 private:
 	std::unique_ptr< StateMachine > stateMachine;
-	std::shared_ptr< ros::NodeHandle >& rosNode;
 	ros::Publisher globalEstimatedPositionPublisher;
 	ros::Subscriber globalEstimatedPositionSubscriber;
-
-	std::fstream& rawConfigFile;
-	jsonxx::Object configFile;
-
-	void subscribeTopics();
-	void advertiseTopics() const;
-	void connectServices() const;
 
 	void globalEstimatedPositionObtained( const geometry_msgs::Twist& position );
 };

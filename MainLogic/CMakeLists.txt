@@ -1,6 +1,7 @@
 set(NODENAME MainLogic)
 
 include_directories(../external)
+include_directories(../)
 
 set(MODULES 
     StateMachine
@@ -11,6 +12,7 @@ set(SOURCES
     src/MainLogic.cpp
     ../external/jsonxx/jsonxx.cc
     ../jsonCommonFunctions.cpp
+    ../NodeBase.cpp
     ../ROSEnums.cpp
 )
 
@@ -18,6 +20,7 @@ set(HEADERS
     src/MainLogic.h
     ../external/jsonxx/jsonxx.h
     ../jsonCommonFunctions.h
+    ../NodeBase.h
     ../ROSEnums.h
 )
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
