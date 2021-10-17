@@ -23,7 +23,7 @@ public:
 	}
 	~MainLogic() = default;
 
-	void startMainLoop() const override;
+	void startMainLoop()  override;
 
 protected:
 	void subscribeTopics() override;

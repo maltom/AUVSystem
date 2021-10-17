@@ -2,6 +2,8 @@
 
 #include <fstream>
 #include <memory>
+#include <queue>
+#include <string>
 
 #include <boost/asio.hpp>
 
@@ -12,34 +14,33 @@
 #include "jsonxx/jsonxx.h"
 
 #include "NodeBase.h"
-
-using boost::asio::ip::udp;
+#include "UDPServer.h"
 
 class UDPNode final : public NodeBase
 {
-	enum Targets
-	{
-		jetson = 0,
-		dvl,
-	};
-public:
-	UDPNode( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase(node , config )
-	{
-		socket = std::make_shared< udp::socket >( io_context );
 
+public:
+	UDPNode( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase( node, config )
+	{
+		loadNetworkConfig();
 		subscribeTopics();
 	}
-	~UDPNode() {}
+	~UDPNode() = default;
 
-	void startMainLoop() const override;
+	void startMainLoop() override;
 
 protected:
-
 private:
+	std::queue< std::string > incomingMessages;
+	std::queue< std::string > outgoingMessages;
 
-	boost::asio::io_context io_context;
-	std::shared_ptr< udp::socket > socket;
+	std::unique_ptr< UDPServer> udpServer;
 
+
+	//std::thread receivingThread;
+	// jetson is the udp server
+	uint16_t serverPort;
+	uint16_t clientPort;
 
 	void subscribeTopics() override;
 	void advertiseTopics() const override;

@@ -20,7 +20,7 @@ public:
 	}
 	~ThrusterRegulator() {}
 
-	void startMainLoop() const override;
+	void startMainLoop()  override;
 
 protected:
 private:

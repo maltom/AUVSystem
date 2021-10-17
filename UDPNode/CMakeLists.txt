@@ -6,6 +6,7 @@ include_directories(../)
 set(SOURCES
     src/main.cpp
     src/UDPNode.cpp
+    src/UDPServer.cpp
     ../external/jsonxx/jsonxx.cc
     ../jsonCommonFunctions.cpp
     ../NodeBase.cpp
@@ -14,6 +15,7 @@ set(SOURCES
 
 set(HEADERS
     src/UDPNode.h
+    src/UDPServer.h
     ../external/jsonxx/jsonxx.h
     ../jsonCommonFunctions.h
     ../NodeBase.h

@@ -20,12 +20,12 @@ public:
 	}
 	~TrajectoryPlanner() {}
 
-	void startMainLoop() const;
+	void startMainLoop() override;
 
 protected:
 private:
 
-	void subscribeTopics();
-	void advertiseTopics() const;
-	void connectServices() const;
+	void subscribeTopics() override;
+	void advertiseTopics() const override;
+	void connectServices() const override;
 };

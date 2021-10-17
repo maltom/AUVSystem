@@ -16,7 +16,7 @@ public:
 	}
 	~NodeBase() = default;
 
-	virtual void startMainLoop() const = 0;
+	virtual void startMainLoop() = 0;
 
 protected:
 	std::shared_ptr< ros::NodeHandle >& rosNode;

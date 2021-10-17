@@ -1,14 +1,13 @@
 #pragma once
 
-#include <string>
-
 namespace network
 {
-enum target
+enum Device
 {
 	jetson          = -1,
 	microcontroller = 0,
-	dvl,
+	DVL,
 	devPC
-}
+};
+
 }

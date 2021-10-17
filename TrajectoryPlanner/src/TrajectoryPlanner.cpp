@@ -2,9 +2,9 @@
 #include "../jsonCommonFunctions.h"
 #include "../ROSEnums.h"
 
-void TrajectoryPlanner::startMainLoop() const
+void TrajectoryPlanner::startMainLoop()
 {
-	ros::Rate rosRate( jsonFunctions::readRosRate( configFile ) );
+	ros::Rate rosRate( jsonFunctions::ROS::readRosRate( configFile ) );
 	while( ros::ok() )
 	{
 		ros::spinOnce();
