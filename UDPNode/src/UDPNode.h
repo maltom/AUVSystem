@@ -13,11 +13,18 @@
 
 #include "jsonxx/jsonxx.h"
 
+#include "auvConfig/CommunicationCodes.h"
 #include "NodeBase.h"
 #include "UDPServer.h"
 
 class UDPNode final : public NodeBase
 {
+	struct Frame
+	{
+		Command commandCode;
+		uint8_t payloadSize;
+		std::array< float, network::UDPpayloadMaxSize > payload;
+	};
 
 public:
 	UDPNode( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase( node, config )
@@ -47,4 +54,6 @@ private:
 
 	void loadNetworkConfig();
 	void processIncomingMessages();
+	Frame decomposeFrame( const network::UDPincomingMessage& incMsg );
+	void processFrame( const Frame& frame );
 };

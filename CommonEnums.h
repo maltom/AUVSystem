@@ -5,9 +5,18 @@
 
 namespace network
 {
+constexpr int UDPbytesForCommand{ 1 };
+constexpr int UDPcommandPositionFrame{ 0 };
+
+constexpr int UDPbytesForPayloadSize{ 1 };
+constexpr int UDPpayloadSizePositionFrame{ UDPcommandPositionFrame + UDPbytesForCommand };
+
+constexpr int UDPpayloadStartPositionFrame{ UDPpayloadSizePositionFrame + UDPbytesForPayloadSize };
+constexpr int UDPonePayloadWordByteSize{ sizeof( float ) };
 
 constexpr int UDPincomingBufferMaxLength{ 256 };
-using UDPincomingMessage = std::array< char, UDPincomingBufferMaxLength >;
+constexpr int UDPpayloadMaxSize{ ( UDPincomingBufferMaxLength - UDPbytesForPayloadSize - UDPbytesForCommand ) / 4 };
+using UDPincomingMessage = std::array< unsigned char, UDPincomingBufferMaxLength >;
 using UDPoutgoingMessage = std::string;
 enum Device
 {
