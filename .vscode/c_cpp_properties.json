@@ -8,7 +8,8 @@
                 "${workspaceFolder}/**",
                 "/usr/include/libevdev-1.0/",
                 "/opt/ros/noetic/include/",
-                "/usr/include/boost/asio/"
+                "/usr/include/boost/asio/",
+                "/usr/include/eigen3/Eigen"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",
