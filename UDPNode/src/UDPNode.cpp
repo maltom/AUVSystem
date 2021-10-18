@@ -1,6 +1,7 @@
 #include "UDPNode.h"
 
 #include <exception>
+#include <iostream>
 
 #include "CommonEnums.h"
 #include "jsonCommonFunctions.h"
@@ -9,14 +10,17 @@
 void UDPNode::startMainLoop()
 {
 	ros::Rate rosRate( jsonFunctions::ROS::readRosRate( configFile ) );
-	std::cout << "wstalem";
-	this->udpServer = std::make_unique< UDPServer >(this->serverPort );
+	udpServer->startServer();
 
 	while( ros::ok() )
 	{
 		ros::spinOnce();
+
+		udpServer->sendOutgoingMessages( outgoingMessages );
+		udpServer->getIncomingMessages( incomingMessages );
+		this->processIncomingMessages();
 		rosRate.sleep();
-		std::cout << "zyje ";
+		// std::cout << "zyje \n\n";
 	}
 }
 
@@ -39,6 +43,13 @@ void UDPNode::loadNetworkConfig()
 	{
 		std::cerr << e.what() << '\n';
 	}
-
 }
 
+void UDPNode::processIncomingMessages()
+{
+	while( !incomingMessages.empty() )
+	{
+		incomingMessages.front();
+		incomingMessages.pop();
+	}
+}

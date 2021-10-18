@@ -24,6 +24,7 @@ public:
 	{
 		loadNetworkConfig();
 		subscribeTopics();
+		this->udpServer = std::make_unique< UDPServer >( this->serverPort, 53060 );
 	}
 	~UDPNode() = default;
 
@@ -31,13 +32,11 @@ public:
 
 protected:
 private:
-	std::queue< std::string > incomingMessages;
-	std::queue< std::string > outgoingMessages;
+	std::queue< network::UDPincomingMessage > incomingMessages;
+	std::queue< network::UDPoutgoingMessage > outgoingMessages;
 
-	std::unique_ptr< UDPServer> udpServer;
+	std::unique_ptr< UDPServer > udpServer;
 
-
-	//std::thread receivingThread;
 	// jetson is the udp server
 	uint16_t serverPort;
 	uint16_t clientPort;
@@ -47,4 +46,5 @@ private:
 	void connectServices() const override;
 
 	void loadNetworkConfig();
+	void processIncomingMessages();
 };
