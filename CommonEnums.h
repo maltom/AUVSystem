@@ -15,7 +15,7 @@ constexpr int UDPpayloadStartPositionFrame{ UDPpayloadSizePositionFrame + UDPbyt
 constexpr int UDPonePayloadWordByteSize{ sizeof( float ) };
 
 constexpr int UDPincomingBufferMaxLength{ 256 };
-constexpr int UDPpayloadMaxSize{ ( UDPincomingBufferMaxLength - UDPbytesForPayloadSize - UDPbytesForCommand ) / 4 };
+constexpr int UDPpayloadMaxSize{ ( UDPincomingBufferMaxLength - UDPbytesForPayloadSize - UDPbytesForCommand ) / UDPonePayloadWordByteSize };
 using UDPincomingMessage = std::array< unsigned char, UDPincomingBufferMaxLength >;
 using UDPoutgoingMessage = std::string;
 enum Device
