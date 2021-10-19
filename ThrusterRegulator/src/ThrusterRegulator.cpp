@@ -1,6 +1,6 @@
 #include "ThrusterRegulator.h"
-#include "../jsonCommonFunctions.h"
-#include "../ROSEnums.h"
+#include "jsonCommonFunctions.h"
+#include "ROSEnums.h"
 
 void ThrusterRegulator::startMainLoop()
 {

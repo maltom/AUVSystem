@@ -5,8 +5,6 @@
 
 #include <Eigen/Dense>
 
-#include "jsonxx/jsonxx.h"
-
 using namespace Eigen;
 
 class VehiclePhysicalModel final

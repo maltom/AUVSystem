@@ -1,6 +1,7 @@
 set(NODENAME ThrusterRegulator)
 
 include_directories(../)
+include_directories(../external/EigenQP/)
 
 set(MODULES 
     Commons
@@ -9,13 +10,11 @@ set(MODULES
 
 set(SOURCES
     src/main.cpp
-    src/EigenQP.cpp
     src/ThrusterRegulator.cpp
     src/VehiclePhysicalModel.cpp
 )
 
 set(HEADERS
-    src/EigenQP.h
     src/ThrusterRegulator.h
     src/VehiclePhysicalModel.h
 )

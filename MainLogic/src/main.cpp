@@ -1,12 +1,10 @@
 #include <exception>
 #include <fstream>
-#include <iostream>
 #include <memory>
-#include <sstream>
 
 #include <ros/ros.h>
 
-#include "jsonCommonFunctions.h"
+#include "CommonEnums.h"
 
 #include "MainLogic.h"
 

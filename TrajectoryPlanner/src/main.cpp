@@ -5,7 +5,7 @@
 
 #include <ros/ros.h>
 
-#include "../jsonCommonFunctions.h"
+#include "jsonCommonFunctions.h"
 
 #include "TrajectoryPlanner.h"
 

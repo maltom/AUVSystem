@@ -3,7 +3,6 @@ set(NODENAME TrajectoryPlanner)
 include_directories(../)
 
 set(MODULES 
-    StateMachine
     Commons
     Externals
 )
