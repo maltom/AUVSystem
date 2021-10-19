@@ -1,5 +1,6 @@
 #include "UDPNode.h"
 
+#include <array>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
@@ -51,7 +52,7 @@ void UDPNode::processIncomingMessages()
 	while( !incomingMessages.empty() )
 	{
 		auto income = incomingMessages.front();
-		processFrame( decomposeFrame( income ) );
+		processCommand( decomposeFrame( income ) );
 		incomingMessages.pop();
 	}
 }
@@ -73,7 +74,7 @@ UDPNode::Frame UDPNode::decomposeFrame( const network::UDPincomingMessage& incMs
 	return result;
 }
 
-void UDPNode::processFrame( const Frame& frame )
+void UDPNode::processCommand( const Frame& frame )
 {
 	// std::cout << "KOMENDA NR: " << frame.commandCode << "\n";
 	// std::cout << "ROZMIAR: " << frame.payloadSize << "\n";
@@ -84,9 +85,35 @@ void UDPNode::processFrame( const Frame& frame )
 	// std::cout << "\n";
 	switch( frame.commandCode )
 	{
-		case Command::HEARTBEAT:
+	case Command::HEARTBEAT:
 		break;
-		default:
+	default:
 		break;
 	}
+}
+
+void UDPNode::processOutgoingMessages( const Frame& frame )
+{
+	network::UDPoutgoingMessage message;
+
+	message.push_back( static_cast< char >( frame.commandCode ) );
+	message.push_back( static_cast< char >( frame.payloadSize ) );
+
+	for( auto i = 0u; i < frame.payloadSize; ++i )
+	{
+		const char* bytePointer = reinterpret_cast< const char* >( &( frame.payload[ i ] ) );
+		std::array< char, network::UDPonePayloadWordByteSize > byteArray;
+
+		for( auto j = 0u; j < network::UDPonePayloadWordByteSize; ++j )
+		{
+			byteArray.at( j ) = *bytePointer;
+			++bytePointer;
+		}
+		// going from end to beginning because of little endian
+		for( auto it = byteArray.rbegin(); it != byteArray.rend(); ++it )
+		{
+			message.push_back( *it );
+		}
+	}
+	this->outgoingMessages.push( message );
 }

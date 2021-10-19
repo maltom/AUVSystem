@@ -3,6 +3,8 @@
 #include <fstream>
 #include <memory>
 
+#include <ct/optcon/optcon.h>
+
 #include "NodeBase.h"
 
 class ThrusterRegulator final : public NodeBase
@@ -15,6 +17,7 @@ public:
 	~ThrusterRegulator() {}
 
 	void startMainLoop()  override;
+	ct::optcon::LQR< 6, 6 > lqrSolver;
 
 protected:
 private:

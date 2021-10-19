@@ -52,6 +52,7 @@ private:
 
 	void loadNetworkConfig();
 	void processIncomingMessages();
+	void processOutgoingMessages( const Frame& frameToSend );
 	Frame decomposeFrame( const network::UDPincomingMessage& incMsg );
-	void processFrame( const Frame& frame );
+	void processCommand( const Frame& frame );
 };

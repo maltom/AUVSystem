@@ -23,7 +23,7 @@ set(HEADERS
 )
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 
-include_directories(include ${catkin_INCLUDE_DIRS} )
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_subdirectory(MainLogic)
 add_subdirectory(TrajectoryPlanner)
