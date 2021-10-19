@@ -11,8 +11,6 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 
-#include "jsonxx/jsonxx.h"
-
 #include "auvConfig/CommunicationCodes.h"
 #include "NodeBase.h"
 #include "UDPServer.h"

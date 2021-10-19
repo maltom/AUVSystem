@@ -14,6 +14,10 @@ for index in ${modulesList[@]}; do
     GLOBIGNORE=$GLOBIGNORE:$ignored
 done
 
+additional=($(ls *.so))
+
+GLOBIGNORE=$GLOBIGNORE:$additional
+
 rm -r *
 
 GLOBIGNORE=build:src:*.so

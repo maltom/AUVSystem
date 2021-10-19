@@ -7,8 +7,6 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 
-#include "jsonxx/jsonxx.h"
-
 #include "NodeBase.h"
 #include "StateMachine/StateMachine.h"
 

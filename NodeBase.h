@@ -5,14 +5,12 @@
 
 #include <ros/ros.h>
 
-#include "jsonxx/jsonxx.h"
-
 class NodeBase
 {
 public:
-	NodeBase( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : rosNode( node ), rawConfigFile( config )
+	NodeBase( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config )
+	    : rosNode( node ), configFile( config )
 	{
-		this->configFile.parse( rawConfigFile );
 	}
 	~NodeBase() = default;
 
@@ -21,10 +19,9 @@ public:
 protected:
 	std::shared_ptr< ros::NodeHandle >& rosNode;
 
-	std::fstream& rawConfigFile;
-	jsonxx::Object configFile;
+	std::fstream& configFile;
 
-	virtual void subscribeTopics() = 0;
+	virtual void subscribeTopics()       = 0;
 	virtual void advertiseTopics() const = 0;
 	virtual void connectServices() const = 0;
 };

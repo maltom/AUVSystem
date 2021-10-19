@@ -1,6 +1,8 @@
 #pragma once
 #define CONFIG_FILE_PATH "../../../auvConfig/auvConfig.json"
 
+#include <fstream>
+
 #include "jsonxx/jsonxx.h"
 
 #include "CommonEnums.h"
@@ -11,11 +13,11 @@ namespace jsonFunctions
 {
 namespace ROS
 {
-double readRosRate( const jsonxx::Object& file );
+double readRosRate( std::fstream& rawFile );
 }
 namespace network
 {
-uint16_t readDevicePortNumber( const jsonxx::Object& file, Device device);
+uint16_t readDevicePortNumber( std::fstream& rawFile, Device device);
 
 }
 } // namespace jsonFunctions

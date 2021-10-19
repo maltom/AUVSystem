@@ -6,16 +6,20 @@ namespace jsonFunctions
 {
 namespace ROS
 {
-double readRosRate( const jsonxx::Object& file )
+double readRosRate( std::fstream& rawFile )
 {
+	jsonxx::Object file;
+	file.parse( rawFile );
 	auto rosConfig = file.get< jsonxx::Object >( "ROS" );
 	return rosConfig.get< jsonxx::Number >( "rate" );
 }
 } // namespace ROS
 namespace network
 {
-uint16_t readDevicePortNumber( const jsonxx::Object& file, Device device )
+uint16_t readDevicePortNumber( std::fstream& rawFile, Device device )
 {
+	jsonxx::Object file;
+	file.parse( rawFile );
 	auto devicesConfig = file.get< jsonxx::Object >( "network" ).get< jsonxx::Object >( "devices" );
 	jsonxx::Object deviceObj;
 	switch( device )

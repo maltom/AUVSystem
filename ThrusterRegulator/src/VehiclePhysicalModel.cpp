@@ -1,6 +1,6 @@
 #include "VehiclePhysicalModel.h"
 
-void VehiglcePhysicalModel::loadParameters(std::fstream& config)
+void VehiclePhysicalModel::loadPhysicalParameters(std::fstream& config)
 {
 
 }
