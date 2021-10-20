@@ -7,37 +7,35 @@
 
 namespace jsonFunctions
 {
-	
+
 inline std::mutex busy;
 namespace ROS
 {
 
-double readRosRate( std::fstream& rawFile )
+double readRosRate( configFiles::fileID configID )
 {
-	std::fstream config;
 	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
 
-	config.open(CONFIG_FILE_PATH, std::ios::in);
-	jsonxx::Object file;
-	file.parse( config );
-	auto rosConfig = file.get< jsonxx::Object >( "ROS" );
+	auto rosConfig = desiredConfigFile->parsedFile.get< jsonxx::Object >( "ROS" );
 
+	delete desiredConfigFile;
 	busy.unlock();
 	return rosConfig.get< jsonxx::Number >( "rate" );
 }
 } // namespace ROS
 namespace network
 {
-uint16_t readDevicePortNumber( std::fstream& rawFile, Device device )
+uint16_t readDevicePortNumber( configFiles::fileID configID, Device device )
 {
-	std::fstream config;
+
 	busy.lock();
-	jsonxx::Object file;
-	file.parse( config );
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
 	jsonxx::Object networkConfig;
-	if( file.has< jsonxx::Object >( "network" ) )
+	if( desiredConfigFile->parsedFile.has< jsonxx::Object >( "network" ) )
 	{
-		networkConfig = file.get< jsonxx::Object >( "network" );
+		networkConfig = desiredConfigFile->parsedFile.get< jsonxx::Object >( "network" );
 	}
 	else
 	{
@@ -91,8 +89,10 @@ uint16_t readDevicePortNumber( std::fstream& rawFile, Device device )
 		break;
 	}
 	auto result = deviceObj.get< jsonxx::Number >( "port" );
+
+	delete desiredConfigFile;
 	busy.unlock();
-	return static_cast< uint16_t >( 50000 );
+	return static_cast< uint16_t >( result );
 }
 } // namespace network
 } // namespace jsonFunctions

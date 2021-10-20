@@ -12,15 +12,13 @@ class configFile;
 
 namespace jsonFunctions
 {
-extern jsonxx::Object mainConfigFile;
-
 namespace ROS
 {
-extern double readRosRate( std::fstream& rawFile );
+extern double readRosRate( configFiles::fileID configID );
 }
 namespace network
 {
-extern uint16_t readDevicePortNumber( std::fstream& rawFile, Device device );
+extern uint16_t readDevicePortNumber( configFiles::fileID configID, Device device );
 
 }
 } // namespace jsonFunctions
@@ -28,10 +26,20 @@ extern uint16_t readDevicePortNumber( std::fstream& rawFile, Device device );
 class ConfigFile
 {
 public:
-	ConfigFile( configFiles::fileID )
-    {
-        configF
-    }
-
-	std::fstream configFile;
+	ConfigFile( configFiles::fileID configID )
+	{
+		configFileFstream.open( configFiles::filePaths.at( configID ) );
+		if( configFileFstream.is_open() )
+		{
+			parsedFile.parse( configFileFstream );
+		}
+	}
+	~ConfigFile()
+	{
+		configFileFstream.close();
+	}
+public:
+	jsonxx::Object parsedFile;
+private:
+	std::fstream configFileFstream;
 };

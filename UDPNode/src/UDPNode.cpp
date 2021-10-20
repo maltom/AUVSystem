@@ -36,8 +36,8 @@ void UDPNode::loadNetworkConfig()
 {
 	try
 	{
-		this->serverPort = jsonFunctions::network::readDevicePortNumber( configFile, network::Device::jetson );
-		this->clientPort = jsonFunctions::network::readDevicePortNumber( configFile, network::Device::microcontroller );
+		this->serverPort = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::jetson );
+		this->clientPort = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::microcontroller );
 	}
 	catch( const std::exception& e )
 	{

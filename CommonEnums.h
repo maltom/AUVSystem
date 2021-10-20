@@ -1,5 +1,5 @@
 #pragma once
-#define CONFIG_FILE_PATH "../../auvConfig/auvConfig.json"
+#define MAIN_CONFIG_FILE_PATH "../../auvConfig/auvConfig.json"
 
 #include <array>
 #include <string>
@@ -10,7 +10,9 @@ enum fileID
 {
 	main_file = 0
 };
-}
+constexpr int configFilesCount = 1;
+static std::array< std::string, 1 > filePaths = { MAIN_CONFIG_FILE_PATH };
+} // namespace configFiles
 
 namespace network
 {
