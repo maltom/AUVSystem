@@ -23,8 +23,6 @@ set(HEADERS
 )
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 
-include_directories(include ${catkin_INCLUDE_DIRS})
-
 add_subdirectory(Debug)
 add_subdirectory(MainLogic)
 add_subdirectory(TCPNode)
@@ -34,8 +32,8 @@ add_subdirectory(UDPNode)
 add_subdirectory(external)
 
 add_library(${NAME} ${SOURCES} ${HEADERS})
-set_target_properties( ${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY . )
+set_target_properties( ${NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${NAME}/" )
 
-target_link_libraries(${NAME} ${catkin_LIBRARIES})
+target_link_libraries(${NAME})
 
 

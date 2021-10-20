@@ -22,4 +22,6 @@ int main( int argc, char** argv )
 
 	ThrusterRegulator thrusterRegulator( thrusterRegulatorNode, configFile );
     thrusterRegulator.startMainLoop();
+	
+	configFile.close();
 }

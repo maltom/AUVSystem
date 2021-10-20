@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <fstream>
 #include <memory>
 
@@ -12,7 +13,9 @@ class NodeBase
 public:
 	NodeBase( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : rosNode( node ), configFile( config )
 	{
-		rosLoopRate = std::make_unique< ros::Rate >( jsonFunctions::ROS::readRosRate( config ) );
+		auto rate   = jsonFunctions::ROS::readRosRate( config );
+		rosLoopRate = std::make_unique< ros::Rate >( rate );
+		
 	}
 	~NodeBase() = default;
 

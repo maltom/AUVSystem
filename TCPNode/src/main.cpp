@@ -22,4 +22,6 @@ int main( int argc, char** argv )
 
 	TCPNode tcpNode( tcpNodeNode, configFile );
     tcpNode.startMainLoop();
+
+	configFile.close();
 }

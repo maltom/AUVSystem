@@ -14,23 +14,18 @@ for index in ${modulesList[@]}; do
     GLOBIGNORE=$GLOBIGNORE:$ignored
 done
 
-additional=($(ls *.so))
+additional+="Commons"
 
 GLOBIGNORE=$GLOBIGNORE:$additional
 
 rm -r *
 
-GLOBIGNORE=build:src:*.so
+GLOBIGNORE=$GLOBIGNORE:*.so
 
 for index in ${modulesList[@]}; do
     if [ -d $index ]; then
 
         cd $index
-        if [ -d "src" ]; then
-            cd src
-            rm -r *
-            cd ..
-        fi
         rm -r *
         cd ..
     fi

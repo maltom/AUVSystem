@@ -4,6 +4,7 @@
 
 #include <ros/ros.h>
 
+#include "CommonEnums.h"
 #include "UDPNode.h"
 
 int main( int argc, char** argv )
@@ -22,4 +23,6 @@ int main( int argc, char** argv )
 
 	UDPNode udpNode( udpNodeNode, configFile );
     udpNode.startMainLoop();
+
+	configFile.close();
 }

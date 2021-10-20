@@ -1,5 +1,5 @@
 #pragma once
-#define CONFIG_FILE_PATH "../../../auvConfig/auvConfig.json"
+#define CONFIG_FILE_PATH "../../auvConfig/auvConfig.json"
 
 #include <array>
 #include <string>

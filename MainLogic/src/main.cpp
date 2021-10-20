@@ -5,7 +5,6 @@
 #include <ros/ros.h>
 
 #include "CommonEnums.h"
-
 #include "MainLogic.h"
 
 int main( int argc, char** argv )
@@ -24,4 +23,6 @@ int main( int argc, char** argv )
 
 	MainLogic mainLogic( mainLogicNode, configFile );
     mainLogic.startMainLoop();
+
+	configFile.close();
 }

@@ -22,4 +22,6 @@ int main( int argc, char** argv )
 
 	TrajectoryPlanner trajectoryPlanner( trajectoryPlannerNode, configFile );
     trajectoryPlanner.startMainLoop();
+
+	configFile.close();
 }

@@ -1,9 +1,8 @@
 #pragma once
-#define CONFIG_FILE_PATH "../../../auvConfig/auvConfig.json"
 
 #include <fstream>
 
-#include "jsonxx/jsonxx.h"
+#include "external/jsonxx/jsonxx.h"
 
 #include "CommonEnums.h"
 

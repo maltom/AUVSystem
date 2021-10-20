@@ -22,4 +22,6 @@ int main( int argc, char** argv )
 
 	Debug debug( debugNode, configFile );
     debug.startMainLoop();
+
+	configFile.close();
 }
