@@ -95,4 +95,21 @@ uint16_t readDevicePortNumber( configFiles::fileID configID, Device device )
 	return static_cast< uint16_t >( result );
 }
 } // namespace network
+
+namespace vehicle
+{
+	VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID )
+	{
+
+	}
+    VehiclePhysicalModel::ThrustersData readThrusterPositions( configFiles::fileID configID )
+	{
+
+	}
+    int readThrusterAmount( configFiles::fileID configID )
+	{
+
+	}
+
+}
 } // namespace jsonFunctions

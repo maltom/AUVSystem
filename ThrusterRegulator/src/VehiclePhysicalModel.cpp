@@ -1,6 +1,8 @@
 #include "VehiclePhysicalModel.h"
 
-void VehiclePhysicalModel::loadPhysicalParameters(std::fstream& config)
-{
+#include "jsonCommonFunctions.h"
 
+void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID )
+{
+	
 }

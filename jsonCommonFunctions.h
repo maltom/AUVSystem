@@ -5,6 +5,7 @@
 #include "external/jsonxx/jsonxx.h"
 
 #include "CommonEnums.h"
+#include "ThrusterRegulator/src/VehiclePhysicalModel.h"
 
 using namespace network;
 
@@ -19,7 +20,13 @@ extern double readRosRate( configFiles::fileID configID );
 namespace network
 {
 extern uint16_t readDevicePortNumber( configFiles::fileID configID, Device device );
+}
 
+namespace vehicle
+{
+    extern VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID );
+    extern VehiclePhysicalModel::ThrustersData readThrusterPositions( configFiles::fileID configID );
+    extern int readThrusterAmount( configFiles::fileID configID );
 }
 } // namespace jsonFunctions
 

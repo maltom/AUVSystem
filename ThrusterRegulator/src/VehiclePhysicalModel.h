@@ -3,6 +3,7 @@
 #include <fstream>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <Eigen/Dense>
 
@@ -23,27 +24,31 @@ public:
 		double weight{ 0.0 };
 		double buoyancy{ 0.0 };
 	};
-	struct ThrusterPositions
+	struct ThrustersData
 	{
-		MatrixXd T  = MatrixXd::Zero( 6, 5 );
-		VectorXd t1 = VectorXd::Zero( 6, 1 );
-		VectorXd t2 = VectorXd::Zero( 6, 1 );
-		VectorXd t3 = VectorXd::Zero( 6, 1 );
-		VectorXd t4 = VectorXd::Zero( 6, 1 );
-		VectorXd t5 = VectorXd::Zero( 6, 1 );
-		VectorXd u  = VectorXd::Zero( 5, 1 );
+		// position = location and rotation, {x, y, z, roll, pitch, yaw}
+		MatrixXd AllThrustersPositionMatrix = MatrixXd::Zero( 6, 5 );
+
+		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
+		std::vector< VectorXd > thrusterPositions;
+
+		// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
+		VectorXd u;
+
+		int thrustersAmount;
 	};
 
 	struct Servo
-	{};
-
-	VehiclePhysicalModel( std::fstream& config )
 	{
-		loadPhysicalParameters( config );
+	};
+
+	VehiclePhysicalModel( configFiles::fileID configID )
+	{
+		loadPhysicalParameters( configID );
 	}
 
 private:
-	void loadPhysicalParameters( std::fstream& config );
+	void loadPhysicalParameters( configFiles::fileID configID );
 
 	// Thrust configuration matrix;
 
@@ -75,20 +80,20 @@ private:
 	// Rate of angular acceleration of thruster. Used in thrust allocation
 	double deltaU = 0.0;
 
-// 	static Matrix3d Smtrx( Vector3d r ); // Function creating a special kind of matrix
-// 	void init_geometry();                // Initializing mass, inertia moments, rg
-// 	void init_drag();                    // initializing drag matrices
-// 	void init_thrust();
-// 	VectorXd getRestoringForces( VectorXd currentState ); // Getting restoring forces vector
+	// 	static Matrix3d Smtrx( Vector3d r ); // Function creating a special kind of matrix
+	// 	void init_geometry();                // Initializing mass, inertia moments, rg
+	// 	void init_drag();                    // initializing drag matrices
+	// 	void init_thrust();
+	// 	VectorXd getRestoringForces( VectorXd currentState ); // Getting restoring forces vector
 
-// public:
-// 	// VectorXd states = VectorXd::Zero(12);
-// 	Matrix< double, 6, 6 > coriolis_matrix( VectorXd cur_state );
-// 	Matrix< double, 12, 12 > A_state_matrix( VectorXd cur_state );
-// 	Matrix< double, 12, 6 > B_state_matrix();
-// 	void thrust_allocation( VectorXd tau );
-// 	VectorXd getThrustSignal() const;
-// 	VectorXd getAzimuth() const;
-// 	VectorXd getFutureState( VectorXd currentState, Matrix1212 A, Matrix126 B, double deltaT );
-// 	MatrixXd getNbar( Matrix1212 A, Matrix126 B, Matrix612 K );
+	// public:
+	// 	// VectorXd states = VectorXd::Zero(12);
+	// 	Matrix< double, 6, 6 > coriolis_matrix( VectorXd cur_state );
+	// 	Matrix< double, 12, 12 > A_state_matrix( VectorXd cur_state );
+	// 	Matrix< double, 12, 6 > B_state_matrix();
+	// 	void thrust_allocation( VectorXd tau );
+	// 	VectorXd getThrustSignal() const;
+	// 	VectorXd getAzimuth() const;
+	// 	VectorXd getFutureState( VectorXd currentState, Matrix1212 A, Matrix126 B, double deltaT );
+	// 	MatrixXd getNbar( Matrix1212 A, Matrix126 B, Matrix612 K );
 };
