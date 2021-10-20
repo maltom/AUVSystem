@@ -11,6 +11,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 
+#include "CommonEnums.h"
 #include "auvConfig/CommunicationCodes.h"
 #include "NodeBase.h"
 
@@ -24,7 +25,7 @@ struct Frame
 };
 
 public:
-	TCPNode( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase( node, config )
+	TCPNode( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID ) : NodeBase( node, configID )
 	{
 		// loadNetworkConfig();
 		// subscribeTopics();

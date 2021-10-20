@@ -7,12 +7,13 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 
+#include "CommonEnums.h"
 #include "NodeBase.h"
 
 class TrajectoryPlanner final : public NodeBase
 {
 public:
-	TrajectoryPlanner( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase( node, config )
+	TrajectoryPlanner( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID ) : NodeBase( node, configID )
 	{
 		subscribeTopics();
 	}

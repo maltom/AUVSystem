@@ -7,13 +7,14 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 
+#include "CommonEnums.h"
 #include "NodeBase.h"
 #include "StateMachine/StateMachine.h"
 
 class MainLogic final : public NodeBase
 {
 public:
-	MainLogic( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase( node, config )
+	MainLogic( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID ) : NodeBase( node, configID )
 	{
 		this->stateMachine = std::make_unique< StateMachine >();
 

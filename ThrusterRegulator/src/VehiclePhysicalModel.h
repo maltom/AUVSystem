@@ -6,6 +6,8 @@
 
 #include <Eigen/Dense>
 
+#include "CommonEnums.h"
+
 using namespace Eigen;
 
 class VehiclePhysicalModel final

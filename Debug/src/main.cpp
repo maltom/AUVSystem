@@ -1,9 +1,8 @@
-#include <exception>
-#include <fstream>
 #include <memory>
 
 #include <ros/ros.h>
 
+#include "CommonEnums.h"
 #include "Debug.h"
 
 int main( int argc, char** argv )
@@ -13,15 +12,6 @@ int main( int argc, char** argv )
 
 	std::shared_ptr< ros::NodeHandle > debugNode = std::make_shared< ros::NodeHandle >();
 
-	std::fstream configFile;
-	configFile.open( CONFIG_FILE_PATH, std::fstream::in );
-	if( !configFile.is_open() )
-	{
-		throw "Can't open config file!";
-	}
-
-	Debug debug( debugNode, configFile );
-    debug.startMainLoop();
-
-	configFile.close();
+	Debug debug( debugNode, configFiles::fileID::main_file );
+	debug.startMainLoop();
 }

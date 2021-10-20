@@ -6,14 +6,15 @@
 
 #include <ros/ros.h>
 
+#include "CommonEnums.h"
 #include "jsonCommonFunctions.h"
 
 class NodeBase
 {
 public:
-	NodeBase( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : rosNode( node ), configFile( config )
+	NodeBase( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID ) : rosNode( node ), configFileID( configID )
 	{
-		auto rate   = jsonFunctions::ROS::readRosRate( config );
+		auto rate   = jsonFunctions::ROS::readRosRate( configFileID );
 		rosLoopRate = std::make_unique< ros::Rate >( rate );
 		
 	}
@@ -24,7 +25,7 @@ public:
 protected:
 	std::shared_ptr< ros::NodeHandle >& rosNode;
 
-	std::fstream& configFile;
+	configFiles::fileID configFileID;
 	std::unique_ptr< ros::Rate > rosLoopRate;
 
 	virtual void subscribeTopics()       = 0;

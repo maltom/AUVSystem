@@ -1,9 +1,8 @@
-#include <exception>
-#include <fstream>
 #include <memory>
 
 #include <ros/ros.h>
 
+#include "CommonEnums.h"
 #include "TrajectoryPlanner.h"
 
 int main( int argc, char** argv )
@@ -13,15 +12,6 @@ int main( int argc, char** argv )
 
 	std::shared_ptr< ros::NodeHandle > trajectoryPlannerNode = std::make_shared< ros::NodeHandle >();
 
-	std::fstream configFile;
-	configFile.open( CONFIG_FILE_PATH, std::fstream::in );
-	if( !configFile.is_open() )
-	{
-		throw "Can't open config file!";
-	}
-
-	TrajectoryPlanner trajectoryPlanner( trajectoryPlannerNode, configFile );
+	TrajectoryPlanner trajectoryPlanner( trajectoryPlannerNode, configFiles::fileID::main_file );
     trajectoryPlanner.startMainLoop();
-
-	configFile.close();
 }

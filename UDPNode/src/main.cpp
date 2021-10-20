@@ -1,5 +1,3 @@
-#include <exception>
-#include <fstream>
 #include <memory>
 
 #include <ros/ros.h>
@@ -14,15 +12,6 @@ int main( int argc, char** argv )
 
 	std::shared_ptr< ros::NodeHandle > udpNodeNode = std::make_shared< ros::NodeHandle >();
 
-	std::fstream configFile;
-	configFile.open( CONFIG_FILE_PATH, std::fstream::in );
-	if( !configFile.is_open() )
-	{
-		throw "Can't open config file!";
-	}
-
-	UDPNode udpNode( udpNodeNode, configFile );
+	UDPNode udpNode( udpNodeNode, configFiles::fileID::main_file );
     udpNode.startMainLoop();
-
-	configFile.close();
 }

@@ -12,6 +12,7 @@
 #include <std_msgs/Float32.h>
 
 #include "auvConfig/CommunicationCodes.h"
+#include "CommonEnums.h"
 #include "NodeBase.h"
 #include "UDPServer.h"
 
@@ -25,7 +26,7 @@ class UDPNode final : public NodeBase
 	};
 
 public:
-	UDPNode( std::shared_ptr< ros::NodeHandle >& node, std::fstream& config ) : NodeBase( node, config )
+	UDPNode( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID ) : NodeBase( node, configID )
 	{
 		loadNetworkConfig();
 		subscribeTopics();

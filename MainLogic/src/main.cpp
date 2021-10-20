@@ -1,5 +1,3 @@
-#include <exception>
-#include <fstream>
 #include <memory>
 
 #include <ros/ros.h>
@@ -14,15 +12,6 @@ int main( int argc, char** argv )
 
 	std::shared_ptr< ros::NodeHandle > mainLogicNode = std::make_shared< ros::NodeHandle >();
 
-	std::fstream configFile;
-	configFile.open( CONFIG_FILE_PATH, std::fstream::in );
-	if( !configFile.is_open() )
-	{
-		throw "Can't open config file!";
-	}
-
-	MainLogic mainLogic( mainLogicNode, configFile );
+	MainLogic mainLogic( mainLogicNode, configFiles::fileID::main_file );
     mainLogic.startMainLoop();
-
-	configFile.close();
 }

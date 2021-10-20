@@ -8,15 +8,30 @@
 
 using namespace network;
 
+class configFile;
+
 namespace jsonFunctions
 {
+extern jsonxx::Object mainConfigFile;
+
 namespace ROS
 {
-double readRosRate( std::fstream& rawFile );
+extern double readRosRate( std::fstream& rawFile );
 }
 namespace network
 {
-uint16_t readDevicePortNumber( std::fstream& rawFile, Device device);
+extern uint16_t readDevicePortNumber( std::fstream& rawFile, Device device );
 
 }
 } // namespace jsonFunctions
+
+class ConfigFile
+{
+public:
+	ConfigFile( configFiles::fileID )
+    {
+        configF
+    }
+
+	std::fstream configFile;
+};

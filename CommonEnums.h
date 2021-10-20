@@ -4,6 +4,14 @@
 #include <array>
 #include <string>
 
+namespace configFiles
+{
+enum fileID
+{
+	main_file = 0
+};
+}
+
 namespace network
 {
 constexpr int UDPbytesForCommand{ 1 };
@@ -16,7 +24,8 @@ constexpr int UDPpayloadStartPositionFrame{ UDPpayloadSizePositionFrame + UDPbyt
 constexpr int UDPonePayloadWordByteSize{ sizeof( float ) };
 
 constexpr int UDPincomingBufferMaxLength{ 256 };
-constexpr int UDPpayloadMaxSize{ ( UDPincomingBufferMaxLength - UDPbytesForPayloadSize - UDPbytesForCommand ) / UDPonePayloadWordByteSize };
+constexpr int UDPpayloadMaxSize{ ( UDPincomingBufferMaxLength - UDPbytesForPayloadSize - UDPbytesForCommand )
+	                             / UDPonePayloadWordByteSize };
 using UDPincomingMessage = std::array< unsigned char, UDPincomingBufferMaxLength >;
 using UDPoutgoingMessage = std::string;
 enum Device
