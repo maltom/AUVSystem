@@ -25,7 +25,9 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
+add_subdirectory(Debug)
 add_subdirectory(MainLogic)
+add_subdirectory(TCPNode)
 add_subdirectory(TrajectoryPlanner)
 add_subdirectory(ThrusterRegulator)
 add_subdirectory(UDPNode)

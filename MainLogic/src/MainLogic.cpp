@@ -1,15 +1,13 @@
 #include "MainLogic.h"
-#include "jsonCommonFunctions.h"
 #include "ROSEnums.h"
 
 void MainLogic::startMainLoop()
 {
-	ros::Rate rosRate( jsonFunctions::ROS::readRosRate( configFile ) );
 	while( ros::ok() )
 	{
 		ros::spinOnce();
 		stateMachine->process();
-		rosRate.sleep();
+		this->rosLoopRate->sleep();
 	}
 }
 

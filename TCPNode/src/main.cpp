@@ -1,20 +1,17 @@
 #include <exception>
 #include <fstream>
-#include <iostream>
 #include <memory>
 
 #include <ros/ros.h>
 
-#include "../jsonCommonFunctions.h"
-
-#include "UDPNode.h"
+#include "TCPNode.h"
 
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "UDPNode" );
+	ros::init( argc, argv, "TCPNode" );
 
-	std::shared_ptr< ros::NodeHandle > udpNodeNode = std::make_shared< ros::NodeHandle >();
+	std::shared_ptr< ros::NodeHandle > tcpNodeNode = std::make_shared< ros::NodeHandle >();
 
 	std::fstream configFile;
 	configFile.open( CONFIG_FILE_PATH, std::fstream::in );
@@ -23,6 +20,6 @@ int main( int argc, char** argv )
 		throw "Can't open config file!";
 	}
 
-	UDPNode udpNode( udpNodeNode, configFile );
-    udpNode.startMainLoop();
+	TCPNode tcpNode( tcpNodeNode, configFile );
+    tcpNode.startMainLoop();
 }

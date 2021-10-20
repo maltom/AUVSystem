@@ -1,14 +1,12 @@
 #include "TCPNode.h"
-#include "../jsonCommonFunctions.h"
-#include "../ROSEnums.h"
+#include "ROSEnums.h"
 
-void TCPNode::startMainLoop() const
+void TCPNode::startMainLoop()
 {
-	ros::Rate rosRate( jsonFunctions::readRosRate( configFile ) );
 	while( ros::ok() )
 	{
 		ros::spinOnce();
-		rosRate.sleep();
+		this->rosLoopRate->sleep();
 	}
 }
 

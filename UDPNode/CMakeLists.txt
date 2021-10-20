@@ -3,7 +3,6 @@ set(NODENAME UDPNode)
 include_directories(../)
 
 set(MODULES 
-    StateMachine
     Commons
     Externals
 )

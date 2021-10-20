@@ -6,12 +6,10 @@
 #include <iostream>
 
 #include "CommonEnums.h"
-#include "jsonCommonFunctions.h"
 #include "ROSEnums.h"
 
 void UDPNode::startMainLoop()
 {
-	ros::Rate rosRate( jsonFunctions::ROS::readRosRate( configFile ) );
 	udpServer->startServer();
 
 	while( ros::ok() )
@@ -21,7 +19,7 @@ void UDPNode::startMainLoop()
 		udpServer->sendOutgoingMessages( outgoingMessages );
 		udpServer->getIncomingMessages( incomingMessages );
 		this->processIncomingMessages();
-		rosRate.sleep();
+		rosLoopRate->sleep();
 		// std::cout << "zyje \n\n";
 	}
 }
