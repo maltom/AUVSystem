@@ -25,8 +25,7 @@ extern uint16_t readDevicePortNumber( configFiles::fileID configID, Device devic
 namespace vehicle
 {
     extern VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID );
-    extern VehiclePhysicalModel::ThrustersData readThrusterPositions( configFiles::fileID configID );
-    extern int readThrusterAmount( configFiles::fileID configID );
+    extern VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID );
 }
 } // namespace jsonFunctions
 

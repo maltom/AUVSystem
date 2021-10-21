@@ -16,15 +16,19 @@ class VehiclePhysicalModel final
 public:
 	struct Inertial
 	{
-		double m{ 0.0 };
+		double mass{ 0.0 };
 		double Ix{ 0.0 }, Iy{ 0.0 }, Iz{ 0.0 };
 		double Ixy{ 0.0 }, Iyx{ 0.0 }, Ixz{ 0.0 }, Izx{ 0.0 }, Iyz{ 0.0 }, Izy{ 0.0 };
 		Matrix3d Ib = Matrix3d::Zero( 3, 3 );
 
 		double weight{ 0.0 };
 		double buoyancy{ 0.0 };
+
+		Vector3d centerOfGravity  = Vector3d::Zero();
+		Vector3d centerOfBuoyancy = Vector3d::Zero();
 	};
-	struct ThrustersData
+
+	struct Thrusters
 	{
 		// position = location and rotation, {x, y, z, roll, pitch, yaw}
 		MatrixXd AllThrustersPositionMatrix = MatrixXd::Zero( 6, 5 );
@@ -35,6 +39,7 @@ public:
 		// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
 		VectorXd u;
 
+		double maxThrust;
 		int thrustersAmount;
 	};
 
@@ -50,17 +55,15 @@ public:
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
 
+	Inertial inertialParams;
+	Thrusters thrusterParams;
+
 	// Thrust configuration matrix;
 
 	MatrixXd KAll = MatrixXd::Zero( 5, 5 );
 
 	double alpha01 = 0.0;
 	double alpha02 = 0.0;
-
-	// Center of Gravity
-	Vector3d rg = Vector3d::Zero( 3 );
-
-	// Weight and buoyancy
 
 	// MRB and Ma
 	Matrix< double, 6, 6 > Mrb = Matrix< double, 6, 6 >::Zero( 6, 6 );

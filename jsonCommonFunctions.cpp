@@ -3,6 +3,8 @@
 #include <exception>
 #include <mutex>
 
+#include <Eigen/Dense>
+
 #include "CommonEnums.h"
 
 namespace jsonFunctions
@@ -98,18 +100,80 @@ uint16_t readDevicePortNumber( configFiles::fileID configID, Device device )
 
 namespace vehicle
 {
-	VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID )
-	{
+VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
 
-	}
-    VehiclePhysicalModel::ThrustersData readThrusterPositions( configFiles::fileID configID )
-	{
+	VehiclePhysicalModel::Inertial data;
 
-	}
-    int readThrusterAmount( configFiles::fileID configID )
-	{
+	auto inertialData
+	    = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "inertial" );
 
-	}
+	data.buoyancy = inertialData.get< jsonxx::Number >( "buoyancy" );
+	data.mass     = inertialData.get< jsonxx::Number >( "mass" );
+	data.weight   = data.mass * 9.8066;
 
+	auto moments = inertialData.get< jsonxx::Object >( "moments" );
+
+	data.Ix  = moments.get< jsonxx::Number >( "Ix" );
+	data.Iy  = moments.get< jsonxx::Number >( "Iy" );
+	data.Iz  = moments.get< jsonxx::Number >( "Iz" );
+	data.Ixy = moments.get< jsonxx::Number >( "Ixy" );
+	data.Ixz = moments.get< jsonxx::Number >( "Ixz" );
+	data.Iyx = moments.get< jsonxx::Number >( "Iyx" );
+	data.Iyz = moments.get< jsonxx::Number >( "Iyz" );
+	data.Izx = moments.get< jsonxx::Number >( "Izx" );
+	data.Izy = moments.get< jsonxx::Number >( "Izy" );
+
+	data.Ib << data.Ix, -data.Ixy, -data.Ixz, -data.Iyx, data.Iy, -data.Iyz, -data.Izx, -data.Izy, data.Iz;
+
+	auto centerOfBuoyancy = inertialData.get< jsonxx::Array >( "centerOfBuoyancy" );
+	data.centerOfBuoyancy << centerOfBuoyancy.get< jsonxx::Number >( 0 ), centerOfBuoyancy.get< jsonxx::Number >( 1 ),
+	    centerOfBuoyancy.get< jsonxx::Number >( 2 );
+
+	auto centerOfGravity = inertialData.get< jsonxx::Array >( "centerOfGravity" );
+	data.centerOfGravity << centerOfGravity.get< jsonxx::Number >( 0 ), centerOfGravity.get< jsonxx::Number >( 1 ),
+	    centerOfGravity.get< jsonxx::Number >( 2 );
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return data;
 }
+VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	VehiclePhysicalModel::Thrusters data;
+
+	auto thrustersData
+	    = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "thrusters" );
+
+	auto thrustersPosRot = thrustersData.get< jsonxx::Array >( "positionsAndRotations" );
+
+	data.maxThrust       = thrustersData.get< jsonxx::Number >( "maxThrust" );
+	
+	int thrustersAmount  = thrustersPosRot.size();
+	data.thrustersAmount = thrustersAmount;
+
+	for( auto i = 0u; i < thrustersAmount; ++i )
+	{
+		auto oneThrusterPosRot = thrustersPosRot.get< jsonxx::Array >( i );
+		VectorXd thrusterVec   = VectorXd::Zero( 6 );
+		thrusterVec << static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 0 ) ),
+		    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 1 ) ),
+		    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 2 ) ),
+		    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 3 ) ),
+		    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 4 ) ),
+		    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 5 ) );
+		data.thrusterPositions.push_back( thrusterVec );
+	}
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return data;
+}
+
+} // namespace vehicle
 } // namespace jsonFunctions
