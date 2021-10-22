@@ -24,9 +24,11 @@ extern uint16_t readDevicePortNumber( configFiles::fileID configID, Device devic
 
 namespace vehicle
 {
-    extern VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID );
-    extern VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID );
-}
+extern VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID );
+extern VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID );
+extern VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID );
+extern VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID );
+} // namespace vehicle
 } // namespace jsonFunctions
 
 class ConfigFile
@@ -44,8 +46,10 @@ public:
 	{
 		configFileFstream.close();
 	}
+
 public:
 	jsonxx::Object parsedFile;
+
 private:
 	std::fstream configFileFstream;
 };

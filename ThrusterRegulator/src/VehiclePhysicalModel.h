@@ -28,6 +28,28 @@ public:
 		Vector3d centerOfBuoyancy = Vector3d::Zero();
 	};
 
+	struct Drag
+	{
+		// Coeffs. of drag
+		struct Linear
+		{
+			double Xu{ 0.0 }, Yv{ 0.0 }, Zw{ 0.0 }, Kp{ 0.0 }, Mq{ 0.0 }, Nr{ 0.0 };
+		};
+		struct Quadratic
+		{
+			double Xuu{ 0.0 }, Yvv{ 0.0 }, Zww{ 0.0 }, Kpp{ 0.0 }, Mqq{ 0.0 }, Nrr{ 0.0 };
+		};
+		struct AddedMass
+		{
+			double Xua{ 0.0 }, Yva{ 0.0 }, Zwa{ 0.0 }, Kpa{ 0.0 }, Mqa{ 0.0 }, Nra{ 0.0 };
+		};
+		Linear linear;
+		Quadratic quadratic;
+		AddedMass addedMass;
+
+		VectorXd vl  = VectorXd::Zero( 6 );
+		VectorXd vnl = VectorXd::Zero( 6 );
+	};
 	struct Thrusters
 	{
 		// position = location and rotation, {x, y, z, roll, pitch, yaw}
@@ -43,8 +65,11 @@ public:
 		int thrustersAmount;
 	};
 
-	struct Servo
+	struct Servos
 	{
+		// int - thruster number that is attached to servo, double servo Angle
+		std::vector< std::pair< int, double > > servoNumberAngle;
+		double servoSpeed{ 0.0 };
 	};
 
 	VehiclePhysicalModel( configFiles::fileID configID )
@@ -57,24 +82,16 @@ private:
 
 	Inertial inertialParams;
 	Thrusters thrusterParams;
+	Drag dragParams;
+	Servos servos;
 
 	// Thrust configuration matrix;
 
 	MatrixXd KAll = MatrixXd::Zero( 5, 5 );
 
-	double alpha01 = 0.0;
-	double alpha02 = 0.0;
-
 	// MRB and Ma
 	Matrix< double, 6, 6 > Mrb = Matrix< double, 6, 6 >::Zero( 6, 6 );
 	Matrix< double, 6, 6 > Ma  = Matrix< double, 6, 6 >::Zero( 6, 6 );
-
-	// Coeffs. of drag
-	double Xu = 0.0, Yv = 0.0, Zw = 0.0, Kp = 0.0, Mq = 0.0, Nr = 0.0;
-	double Xuu = 0.0, Yvv = 0.0, Zww = 0.0, Kpp = 0.0, Mqq = 0.0, Nrr = 0.0;
-	double Xua = 0.0, Yva = 0.0, Zwa = 0.0, Kpa = 0.0, Mqa = 0.0, Nra = 0.0;
-	VectorXd vl  = VectorXd::Zero( 6 );
-	VectorXd vnl = VectorXd::Zero( 6 );
 
 	// Diagonal matrices of coeffs
 	MatrixXd Dl  = MatrixXd::Zero( 6, 6 );

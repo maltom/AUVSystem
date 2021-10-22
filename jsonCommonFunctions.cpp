@@ -152,8 +152,8 @@ VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID 
 
 	auto thrustersPosRot = thrustersData.get< jsonxx::Array >( "positionsAndRotations" );
 
-	data.maxThrust       = thrustersData.get< jsonxx::Number >( "maxThrust" );
-	
+	data.maxThrust = thrustersData.get< jsonxx::Number >( "maxThrust" );
+
 	int thrustersAmount  = thrustersPosRot.size();
 	data.thrustersAmount = thrustersAmount;
 
@@ -175,5 +175,75 @@ VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID 
 	return data;
 }
 
+VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	VehiclePhysicalModel::Servos data;
+
+	auto azimuthalThrusters = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" )
+	                              .get< jsonxx::Object >( "thrusters" )
+	                              .get< jsonxx::Array >( "azimuthal" );
+
+	for( auto i = 0u; i < azimuthalThrusters.size(); ++i )
+	{
+		if( azimuthalThrusters.get< jsonxx::Boolean >( i ) )
+		{
+			data.servoNumberAngle.emplace_back( i, 0.0 );
+		}
+	}
+
+	auto servoData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "servos" );
+
+	data.servoSpeed = servoData.get< jsonxx::Number >( "speed" );
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return data;
+}
+
+VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	VehiclePhysicalModel::Drag data;
+
+	auto dragData
+	    = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "dragCoefficients" );
+
+	auto linearData    = dragData.get< jsonxx::Object >( "linear" );
+	auto quadraticData = dragData.get< jsonxx::Object >( "quadratic" );
+	auto addedMassData = dragData.get< jsonxx::Object >( "addedMass" );
+
+	data.linear
+	    = VehiclePhysicalModel::Drag::Linear{ static_cast< double >( linearData.get< jsonxx::Number >( "Xu" ) ),
+		                                      static_cast< double >( linearData.get< jsonxx::Number >( "Yv" ) ),
+		                                      static_cast< double >( linearData.get< jsonxx::Number >( "Zw" ) ),
+		                                      static_cast< double >( linearData.get< jsonxx::Number >( "Kp" ) ),
+		                                      static_cast< double >( linearData.get< jsonxx::Number >( "Mq" ) ),
+		                                      static_cast< double >( linearData.get< jsonxx::Number >( "Nr" ) ) };
+	data.quadratic = VehiclePhysicalModel::Drag::Quadratic{
+		static_cast< double >( quadraticData.get< jsonxx::Number >( "Xuu" ) ),
+		static_cast< double >( quadraticData.get< jsonxx::Number >( "Yvv" ) ),
+		static_cast< double >( quadraticData.get< jsonxx::Number >( "Zww" ) ),
+		static_cast< double >( quadraticData.get< jsonxx::Number >( "Kpp" ) ),
+		static_cast< double >( quadraticData.get< jsonxx::Number >( "Mqq" ) ),
+		static_cast< double >( quadraticData.get< jsonxx::Number >( "Nrr" ) )
+	};
+	data.addedMass = VehiclePhysicalModel::Drag::AddedMass{
+		static_cast< double >( addedMassData.get< jsonxx::Number >( "Xua" ) ),
+		static_cast< double >( addedMassData.get< jsonxx::Number >( "Yva" ) ),
+		static_cast< double >( addedMassData.get< jsonxx::Number >( "Zwa" ) ),
+		static_cast< double >( addedMassData.get< jsonxx::Number >( "Kpa" ) ),
+		static_cast< double >( addedMassData.get< jsonxx::Number >( "Mqa" ) ),
+		static_cast< double >( addedMassData.get< jsonxx::Number >( "Nra" ) )
+	};
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return data;
+}
 } // namespace vehicle
 } // namespace jsonFunctions
