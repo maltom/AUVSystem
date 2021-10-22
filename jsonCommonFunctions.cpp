@@ -1,5 +1,6 @@
 #include "jsonCommonFunctions.h"
 
+#include <iostream>
 #include <exception>
 #include <mutex>
 
@@ -245,5 +246,52 @@ VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID )
 	busy.unlock();
 	return data;
 }
+
 } // namespace vehicle
+
+namespace regulator
+{
+LQRRegulator readLQRData( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	LQRRegulator data;
+
+	auto regulatorData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "regulator" );
+
+	auto QVectorData = regulatorData.get< jsonxx::Array >( "QMatrix" );
+	auto RVectorData = regulatorData.get< jsonxx::Array >( "RMatrix" );
+
+	if( QVectorData.size() != LQRRegulator::stateDim )
+	{
+		throw "Wrong number of parameters in QMatrix!";
+	}
+	if( RVectorData.size() != LQRRegulator::controlDim )
+	{
+		throw "Wrong number of parameters in RMatrix!";
+	}
+
+	VectorXd Qvec = VectorXd::Zero( LQRRegulator::stateDim );
+	VectorXd Rvec = VectorXd::Zero( LQRRegulator::controlDim );
+
+	for( auto i = 0u; i < LQRRegulator::stateDim; ++i )
+	{
+		Qvec( i ) = static_cast< double >( QVectorData.get< jsonxx::Number >( i ) );
+	}
+
+	for( auto i = 0u; i < LQRRegulator::controlDim; ++i )
+	{
+		Rvec( i ) = static_cast< double >( RVectorData.get< jsonxx::Number >( i ) );
+	}
+
+	data.Q.diagonal() << Qvec;
+	data.R.diagonal() << Rvec;
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return data;
+}
+
+} // namespace regulator
 } // namespace jsonFunctions

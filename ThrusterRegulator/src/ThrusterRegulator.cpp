@@ -17,3 +17,8 @@ void ThrusterRegulator::subscribeTopics()
 }
 void ThrusterRegulator::advertiseTopics() const {}
 void ThrusterRegulator::connectServices() const {}
+
+void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
+{
+	this->lqrRegulator = jsonFunctions::regulator::readLQRData( config );
+}

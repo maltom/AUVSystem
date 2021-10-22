@@ -5,6 +5,7 @@
 #include "external/jsonxx/jsonxx.h"
 
 #include "CommonEnums.h"
+#include "ThrusterRegulator/src/LQRRegulator.h"
 #include "ThrusterRegulator/src/VehiclePhysicalModel.h"
 
 using namespace network;
@@ -29,6 +30,12 @@ extern VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID co
 extern VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID );
 extern VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID );
 } // namespace vehicle
+
+namespace regulator
+{
+extern LQRRegulator readLQRData( configFiles::fileID configID );
+}
+
 } // namespace jsonFunctions
 
 class ConfigFile

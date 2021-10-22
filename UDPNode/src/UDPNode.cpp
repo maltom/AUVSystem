@@ -3,9 +3,9 @@
 #include <array>
 #include <cstdlib>
 #include <exception>
-#include <iostream>
 
 #include "CommonEnums.h"
+#include "jsonCommonFunctions.h"
 #include "ROSEnums.h"
 
 void UDPNode::startMainLoop()

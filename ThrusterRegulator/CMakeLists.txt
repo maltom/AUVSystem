@@ -10,11 +10,13 @@ set(MODULES
 
 set(SOURCES
     src/main.cpp
+    src/LQRRegulator.cpp
     src/ThrusterRegulator.cpp
     src/VehiclePhysicalModel.cpp
 )
 
 set(HEADERS
+    src/LQRRegulator.h
     src/ThrusterRegulator.h
     src/VehiclePhysicalModel.h
 )
