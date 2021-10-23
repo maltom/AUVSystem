@@ -14,6 +14,8 @@ void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID 
 	this->thrusterParams.u = VectorXd::Zero( this->thrusterParams.thrustersAmount, 1 );
 }
 
+void VehiclePhysicalModel::adjustParametersForWorkingFrequency( float freq ) {}
+
 void VehiclePhysicalModel::initMatrices()
 {
 	// Ib matrix

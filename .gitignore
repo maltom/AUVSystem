@@ -11,4 +11,4 @@ CTest*
 Makefile
 **/build
 **/devel
-.clang-format
+/.VSCodeCounter

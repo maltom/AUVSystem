@@ -34,8 +34,8 @@ extern VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID );
 namespace regulator
 {
 extern LQRRegulator readLQRData( configFiles::fileID configID );
-}
-
+extern double readWorkingFrequency( configFiles::fileID configID );
+} // namespace regulator
 } // namespace jsonFunctions
 
 class ConfigFile

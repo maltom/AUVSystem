@@ -53,20 +53,23 @@ public:
 		Linear linear;
 		Quadratic quadratic;
 
-		MatrixXd Dl  = MatrixXd::Zero( 6, 6 );
-		MatrixXd Dnl = MatrixXd::Zero( 6, 6 );
+		Matrix< double, 6, 6 > Dl  = Matrix< double, 6, 6 >::Zero();
+		Matrix< double, 6, 6 > Dnl = Matrix< double, 6, 6 >::Zero();
 	};
 
 	struct Thrusters
 	{
-		// position = location and rotation, {x, y, z, roll, pitch, yaw}
-		MatrixXd AllThrustersPositionMatrix = MatrixXd::Zero( 6, 5 );
+		// configuration - the  , {x, y, z, p, q, r}
+		MatrixXd AllThrustersConfigurationsMatrix = MatrixXd::Zero( 6, 5 );
 
 		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
-		std::vector< VectorXd > thrusterPositions;
+		std::vector< VectorXd > thrusterConfigurations;
 
 		// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
 		VectorXd u;
+
+		// inertia of thruster - how fast can thrusters change their generated thrust per deltaT
+		double deltaU{ 0.0 };
 
 		double maxThrust;
 		int thrustersAmount;
@@ -87,6 +90,7 @@ public:
 
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
+	void adjustParametersForWorkingFrequency(float freq);
 	void initMatrices();
 
 	Inertial inertialParams;
@@ -97,8 +101,6 @@ private:
 	// Thrust configuration matrix;
 
 	MatrixXd KAll = MatrixXd::Zero( 5, 5 );
-
-	// MRB and Ma
 
 	// Rate of angular acceleration of thruster. Used in thrust allocation
 	double deltaU = 0.0;

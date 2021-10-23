@@ -127,7 +127,7 @@ VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID )
 	data.Izx = moments.get< jsonxx::Number >( "Izx" );
 	data.Izy = moments.get< jsonxx::Number >( "Izy" );
 
-		auto centerOfBuoyancy = inertialData.get< jsonxx::Array >( "centerOfBuoyancy" );
+	auto centerOfBuoyancy = inertialData.get< jsonxx::Array >( "centerOfBuoyancy" );
 	data.centerOfBuoyancy << centerOfBuoyancy.get< jsonxx::Number >( 0 ), centerOfBuoyancy.get< jsonxx::Number >( 1 ),
 	    centerOfBuoyancy.get< jsonxx::Number >( 2 );
 
@@ -166,7 +166,7 @@ VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID 
 		    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 3 ) ),
 		    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 4 ) ),
 		    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 5 ) );
-		data.thrusterPositions.push_back( thrusterVec );
+		data.thrusterConfigurations.push_back( thrusterVec );
 	}
 
 	delete desiredConfigFile;
@@ -285,6 +285,21 @@ LQRRegulator readLQRData( configFiles::fileID configID )
 
 	data.Q.diagonal() << Qvec;
 	data.R.diagonal() << Rvec;
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return data;
+}
+double readWorkingFrequency( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	double data;
+
+	auto regulatorData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "regulator" );
+
+	data = static_cast< double >( regulatorData.get< jsonxx::Number >( "regulatorWorkingFrequency" ) );
 
 	delete desiredConfigFile;
 	busy.unlock();

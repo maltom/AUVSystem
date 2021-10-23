@@ -10,17 +10,17 @@
 #include "CommonEnums.h"
 #include "NodeBase.h"
 
-using wayPoint = geometry_msgs::Twist;
+using position = geometry_msgs::Twist;
 
-class TrajectoryPlanner final : public NodeBase
+class PositioningSLAM final : public NodeBase
 {
 public:
-	TrajectoryPlanner( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID )
+	PositioningSLAM( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID )
 	    : NodeBase( node, configID )
 	{
 		subscribeTopics();
 	}
-	~TrajectoryPlanner() {}
+	~PositioningSLAM() {}
 
 	void startMainLoop() override;
 
@@ -30,6 +30,4 @@ private:
 	void advertiseTopics() const override;
 	void connectServices() const override;
 
-	std::vector< wayPoint > plannedPath;
-	wayPoint currentPosition;
 };

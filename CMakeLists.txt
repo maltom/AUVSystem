@@ -26,6 +26,7 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_subdirectory(Debug)
 add_subdirectory(MainLogic)
+add_subdirectory(PositioningSLAM)
 add_subdirectory(TCPNode)
 add_subdirectory(TrajectoryPlanner)
 add_subdirectory(ThrusterRegulator)
@@ -36,5 +37,3 @@ add_library(${NAME} ${SOURCES} ${HEADERS})
 set_target_properties( ${NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${NAME}/" )
 
 target_link_libraries(${NAME} Eigen3::Eigen)
-
-
