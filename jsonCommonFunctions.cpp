@@ -127,9 +127,7 @@ VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID )
 	data.Izx = moments.get< jsonxx::Number >( "Izx" );
 	data.Izy = moments.get< jsonxx::Number >( "Izy" );
 
-	data.Ib << data.Ix, -data.Ixy, -data.Ixz, -data.Iyx, data.Iy, -data.Iyz, -data.Izx, -data.Izy, data.Iz;
-
-	auto centerOfBuoyancy = inertialData.get< jsonxx::Array >( "centerOfBuoyancy" );
+		auto centerOfBuoyancy = inertialData.get< jsonxx::Array >( "centerOfBuoyancy" );
 	data.centerOfBuoyancy << centerOfBuoyancy.get< jsonxx::Number >( 0 ), centerOfBuoyancy.get< jsonxx::Number >( 1 ),
 	    centerOfBuoyancy.get< jsonxx::Number >( 2 );
 

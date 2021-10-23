@@ -11,6 +11,8 @@
 
 using namespace Eigen;
 
+Matrix3d Smtrx( const Eigen::Vector3d& r );
+
 class VehiclePhysicalModel final
 {
 public:
@@ -23,6 +25,9 @@ public:
 
 		double weight{ 0.0 };
 		double buoyancy{ 0.0 };
+
+		// inertial coefficients matrix
+		Matrix< double, 6, 6 > Mrb = Matrix< double, 6, 6 >::Zero( 6, 6 );
 
 		Vector3d centerOfGravity  = Vector3d::Zero();
 		Vector3d centerOfBuoyancy = Vector3d::Zero();
@@ -42,14 +47,16 @@ public:
 		struct AddedMass
 		{
 			double Xua{ 0.0 }, Yva{ 0.0 }, Zwa{ 0.0 }, Kpa{ 0.0 }, Mqa{ 0.0 }, Nra{ 0.0 };
+			Matrix< double, 6, 6 > Ma = Matrix< double, 6, 6 >::Zero( 6, 6 );
 		};
+		AddedMass addedMass;
 		Linear linear;
 		Quadratic quadratic;
-		AddedMass addedMass;
 
-		VectorXd vl  = VectorXd::Zero( 6 );
-		VectorXd vnl = VectorXd::Zero( 6 );
+		MatrixXd Dl  = MatrixXd::Zero( 6, 6 );
+		MatrixXd Dnl = MatrixXd::Zero( 6, 6 );
 	};
+
 	struct Thrusters
 	{
 		// position = location and rotation, {x, y, z, roll, pitch, yaw}
@@ -75,10 +82,12 @@ public:
 	VehiclePhysicalModel( configFiles::fileID configID )
 	{
 		loadPhysicalParameters( configID );
+		initMatrices();
 	}
 
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
+	void initMatrices();
 
 	Inertial inertialParams;
 	Thrusters thrusterParams;
@@ -90,12 +99,6 @@ private:
 	MatrixXd KAll = MatrixXd::Zero( 5, 5 );
 
 	// MRB and Ma
-	Matrix< double, 6, 6 > Mrb = Matrix< double, 6, 6 >::Zero( 6, 6 );
-	Matrix< double, 6, 6 > Ma  = Matrix< double, 6, 6 >::Zero( 6, 6 );
-
-	// Diagonal matrices of coeffs
-	MatrixXd Dl  = MatrixXd::Zero( 6, 6 );
-	MatrixXd Dnl = MatrixXd::Zero( 6, 6 );
 
 	// Rate of angular acceleration of thruster. Used in thrust allocation
 	double deltaU = 0.0;
