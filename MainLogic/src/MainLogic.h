@@ -19,6 +19,7 @@ public:
 		this->stateMachine = std::make_unique< StateMachine >();
 
 		subscribeTopics();
+		advertiseTopics();
 	}
 	~MainLogic() = default;
 
@@ -26,8 +27,8 @@ public:
 
 protected:
 	void subscribeTopics() override;
-	void advertiseTopics() const override;
-	void connectServices() const override;
+	void advertiseTopics() override;
+	void connectServices() override;
 
 private:
 	std::unique_ptr< StateMachine > stateMachine;

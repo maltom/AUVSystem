@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdlib>
 #include <exception>
+#include <vector>
 
 #include "CommonEnums.h"
 #include "jsonCommonFunctions.h"
@@ -20,24 +21,50 @@ void UDPNode::startMainLoop()
 		udpServer->getIncomingMessages( incomingMessages );
 		this->processIncomingMessages();
 		rosLoopRate->sleep();
-		// std::cout << "zyje \n\n";
 	}
 }
 
 void UDPNode::subscribeTopics()
 {
-	// this->globalEstimatedPositionPublisher =  this->rosNode->advertise< std_msgs::Float32 >(
-	// TopicsAndServicesNames::Topics::globalEstimatedPosition, 1000 );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::HardwareSignals::signalToThrusters,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &UDPNode::sendThrustersSignalToMicroController,
+	                                                             this ) );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::HardwareSignals::signalToServos,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &UDPNode::sendServosSignalToMicroController,
+	                                                             this ) );
 }
-void UDPNode::advertiseTopics() const {}
-void UDPNode::connectServices() const {}
+void UDPNode::advertiseTopics()
+{
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ThrustersSignal >(
+	        AUVROS::Topics::DevPC::arbitrarlySetThrusters, AUVROS::QueueSize::StandardQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
+	        AUVROS::Topics::DevPC::arbitrarlySetServos, AUVROS::QueueSize::StandardQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::Position >(
+	        AUVROS::Topics::DevPC::arbitrarlySetGlobalPosition, AUVROS::QueueSize::StandardQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
+	        AUVROS::Topics::DevPC::arbitrarlySetRelativePosition, AUVROS::QueueSize::StandardQueueSize ) ) );
+	//
+	//  this->rosPublishers.emplace_back( this->rosNode->advertise<>( AUVROS::Topics::DevPC::arbitrarlySetThrusters,
+	//                                                                AUVROS::QueueSize::StandardQueueSize ) );
+}
+void UDPNode::connectServices() {}
 
 void UDPNode::loadNetworkConfig()
 {
 	try
 	{
 		this->serverPort = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::jetson );
-		this->clientPort = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::microcontroller );
+		this->clientPort
+		    = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::microcontroller );
 	}
 	catch( const std::exception& e )
 	{
@@ -114,4 +141,32 @@ void UDPNode::processOutgoingMessages( const Frame& frame )
 		}
 	}
 	this->outgoingMessages.push( message );
+}
+
+void UDPNode::sendThrustersSignalToMicroController( const AUVROS::MessageTypes::ThrustersSignal& message )
+{
+	auto length = message.layout.dim.begin()->size;
+	Frame frame;
+	frame.commandCode = NORESPREQ_SET_THRUSTERS;
+	frame.payloadSize = length;
+	for( auto i = 0u; i < length; ++i )
+	{
+		frame.payload[ i ] = message.data[ i ];
+	}
+
+	this->processOutgoingMessages( frame );
+}
+
+void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::ServosSignal& message )
+{
+	auto length = message.layout.dim.begin()->size;
+	Frame frame;
+	frame.commandCode = NORESPREQ_SET_SERVOS;
+	frame.payloadSize = length;
+	for( auto i = 0u; i < length; ++i )
+	{
+		frame.payload[ i ] = message.data[ i ];
+	}
+
+	this->processOutgoingMessages( frame );
 }

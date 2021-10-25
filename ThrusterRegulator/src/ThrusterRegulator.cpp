@@ -15,8 +15,8 @@ void ThrusterRegulator::subscribeTopics()
 	// this->globalEstimatedPositionPublisher =  this->rosNode->advertise< std_msgs::Float32 >(
 	// TopicsAndServicesNames::Topics::globalEstimatedPosition, 1000 );
 }
-void ThrusterRegulator::advertiseTopics() const {}
-void ThrusterRegulator::connectServices() const {}
+void ThrusterRegulator::advertiseTopics() {}
+void ThrusterRegulator::connectServices() {}
 
 void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 {

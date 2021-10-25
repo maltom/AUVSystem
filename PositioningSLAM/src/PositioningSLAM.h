@@ -27,7 +27,7 @@ public:
 protected:
 private:
 	void subscribeTopics() override;
-	void advertiseTopics() const override;
-	void connectServices() const override;
+	void advertiseTopics() override;
+	void connectServices() override;
 
 };

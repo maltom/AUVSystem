@@ -35,8 +35,8 @@ private:
 	float regulatorWorkingFrequency{ 10.0f };
 
 	void subscribeTopics() override;
-	void advertiseTopics() const override;
-	void connectServices() const override;
+	void advertiseTopics() override;
+	void connectServices() override;
 	void loadRegulatorParameters( configFiles::fileID configID );
 	// void allocateThrust();
 };

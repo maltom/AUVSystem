@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fstream>
 #include <memory>
 #include <queue>
 #include <string>
@@ -14,6 +13,7 @@
 #include "auvConfig/CommunicationCodes.h"
 #include "CommonEnums.h"
 #include "NodeBase.h"
+#include "ROSEnums.h"
 #include "UDPServer.h"
 
 class UDPNode final : public NodeBase
@@ -30,30 +30,35 @@ public:
 	{
 		loadNetworkConfig();
 		subscribeTopics();
+		advertiseTopics();
 		this->udpServer = std::make_unique< UDPServer >( this->serverPort, 53060 );
 	}
 	~UDPNode() = default;
 
 	void startMainLoop() override;
 
-protected:
 private:
 	std::queue< network::UDPincomingMessage > incomingMessages;
 	std::queue< network::UDPoutgoingMessage > outgoingMessages;
 
 	std::unique_ptr< UDPServer > udpServer;
 
+	ros::Publisher arbitrarlySetThrusters;
+
 	// jetson is the udp server
 	uint16_t serverPort;
 	uint16_t clientPort;
 
 	void subscribeTopics() override;
-	void advertiseTopics() const override;
-	void connectServices() const override;
+	void advertiseTopics() override;
+	void connectServices() override;
 
 	void loadNetworkConfig();
 	void processIncomingMessages();
 	void processOutgoingMessages( const Frame& frameToSend );
 	Frame decomposeFrame( const network::UDPincomingMessage& incMsg );
 	void processCommand( const Frame& frame );
+
+	void sendThrustersSignalToMicroController( const AUVROS::MessageTypes::ThrustersSignal& message );
+	void sendServosSignalToMicroController( const AUVROS::MessageTypes::ServosSignal& mesagge );
 };

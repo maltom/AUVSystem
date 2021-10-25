@@ -47,8 +47,8 @@ public:
 // 	uint16_t clientPort;
 
 	void subscribeTopics() override;
-	void advertiseTopics() const override;
-	void connectServices() const override;
+	void advertiseTopics() override;
+	void connectServices() override;
 
 // 	void loadNetworkConfig();
 // 	void processIncomingMessages();

@@ -15,5 +15,5 @@ void TrajectoryPlanner::subscribeTopics()
 	// this->globalEstimatedPositionPublisher =  this->rosNode->advertise< std_msgs::Float32 >(
 	// TopicsAndServicesNames::Topics::globalEstimatedPosition, 1000 );
 }
-void TrajectoryPlanner::advertiseTopics() const {}
-void TrajectoryPlanner::connectServices() const {}
+void TrajectoryPlanner::advertiseTopics() {}
+void TrajectoryPlanner::connectServices() {}
