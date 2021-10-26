@@ -8,6 +8,7 @@
 #include "CommonEnums.h"
 #include "NodeBase.h"
 #include "LQRRegulator.h"
+#include "ROSEnums.h"
 #include "VehiclePhysicalModel.h"
 
 using namespace Eigen;
@@ -20,6 +21,7 @@ public:
 	{
 		loadRegulatorParameters( this->configFileID );
 		subscribeTopics();
+		advertiseTopics();
 	}
 	~ThrusterRegulator() {}
 
@@ -38,5 +40,8 @@ private:
 	void advertiseTopics() override;
 	void connectServices() override;
 	void loadRegulatorParameters( configFiles::fileID configID );
+
+	void sendArbitrarlySetThrusters( const AUVROS::MessageTypes::ThrustersSignal& signal );
+	void sendArbitrarlySetServos( const AUVROS::MessageTypes::ServosSignal& signal );
 	// void allocateThrust();
 };

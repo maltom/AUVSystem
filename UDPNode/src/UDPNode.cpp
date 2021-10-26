@@ -52,9 +52,6 @@ void UDPNode::advertiseTopics()
 	this->rosPublishers.emplace_back(
 	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
 	        AUVROS::Topics::DevPC::arbitrarlySetRelativePosition, AUVROS::QueueSize::StandardQueueSize ) ) );
-	//
-	//  this->rosPublishers.emplace_back( this->rosNode->advertise<>( AUVROS::Topics::DevPC::arbitrarlySetThrusters,
-	//                                                                AUVROS::QueueSize::StandardQueueSize ) );
 }
 void UDPNode::connectServices() {}
 

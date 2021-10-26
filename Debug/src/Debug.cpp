@@ -1,11 +1,12 @@
 #include "Debug.h"
 #include "ROSEnums.h"
-
+#include <iostream>
 void Debug::startMainLoop()
 {
 	while( ros::ok() )
 	{
 		ros::spinOnce();
+		std::cout<<"git ";
 		this->rosLoopRate->sleep();
 	}
 }

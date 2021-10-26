@@ -22,7 +22,6 @@ public:
 	virtual void startMainLoop() = 0;
 
 protected:
-	// unfortunately no ros::publishers container is possible
 	std::vector< std::unique_ptr< ros::Publisher > > rosPublishers;
 	std::vector< ros::Subscriber > rosSubscribers;
 	std::shared_ptr< ros::NodeHandle >& rosNode;

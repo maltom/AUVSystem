@@ -12,15 +12,30 @@ void ThrusterRegulator::startMainLoop()
 
 void ThrusterRegulator::subscribeTopics()
 {
-	// this->globalEstimatedPositionPublisher =  this->rosNode->advertise< std_msgs::Float32 >(
-	// TopicsAndServicesNames::Topics::globalEstimatedPosition, 1000 );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrusters,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &ThrusterRegulator::sendArbitrarlySetThrusters,
+	                                                             this ) );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetServos,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &ThrusterRegulator::sendArbitrarlySetServos,
+	                                                             this ) );
 }
-void ThrusterRegulator::advertiseTopics() {}
+void ThrusterRegulator::advertiseTopics()
+{
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ThrustersSignal >(
+	        AUVROS::Topics::HardwareSignals::signalToThrusters, AUVROS::QueueSize::StandardQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
+	        AUVROS::Topics::HardwareSignals::signalToServos, AUVROS::QueueSize::StandardQueueSize ) ) );
+}
 void ThrusterRegulator::connectServices() {}
 
 void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 {
-	this->lqrRegulator = jsonFunctions::regulator::readLQRData( config );
+	this->lqrRegulator              = jsonFunctions::regulator::readLQRData( config );
 	this->regulatorWorkingFrequency = jsonFunctions::regulator::readWorkingFrequency( config );
 }
 
@@ -32,9 +47,8 @@ void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 //     MatrixXd T_azimuth
 //         = MatrixXd::Zero( 3, 2 ); // Thrust conf. matrix for 2 azimuthal thrusters, including only x,y,yaw forces
 //     VectorXd tau_desired = VectorXd::Zero( 3, 1 ); // Vector of desired forces  and moments: x,y,yaw
-//     T1 << t1( 0 ), t1( 1 ), t1( 5 );               // t1 and t2 are global thrust conf. matrices including sin and cos
-//     T2 << t2( 0 ), t2( 1 ), t2( 5 );
-//     T_azimuth << T1, T2;
+//     T1 << t1( 0 ), t1( 1 ), t1( 5 );               // t1 and t2 are global thrust conf. matrices including sin and
+//     cos T2 << t2( 0 ), t2( 1 ), t2( 5 ); T_azimuth << T1, T2;
 
 //     VectorXd uPrev;
 //     uPrev  = u;
@@ -197,3 +211,8 @@ void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 //     else if( alpha02 < -angleConstraint )
 //         alpha02 = -angleConstraint;
 // }
+
+void ThrusterRegulator::sendArbitrarlySetThrusters( const AUVROS::MessageTypes::ThrustersSignal& signal )
+{}
+void ThrusterRegulator::sendArbitrarlySetServos( const AUVROS::MessageTypes::ServosSignal& signal )
+{}

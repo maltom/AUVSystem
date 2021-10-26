@@ -8,13 +8,12 @@
 
 #include "CommonEnums.h"
 
+
 namespace jsonFunctions
 {
-
-inline std::mutex busy;
+std::mutex busy;
 namespace ROS
 {
-
 double readRosRate( configFiles::fileID configID )
 {
 	busy.lock();
@@ -195,7 +194,7 @@ VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID )
 
 	auto servoData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "servos" );
 
-	data.servoSpeed = servoData.get< jsonxx::Number >( "speed" );
+	data.servoSpeed = servoData.get< jsonxx::Number >( "angleSpeedPerSecond" );
 
 	delete desiredConfigFile;
 	busy.unlock();

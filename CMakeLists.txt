@@ -36,4 +36,4 @@ add_subdirectory(external)
 add_library(${NAME} ${SOURCES} ${HEADERS})
 set_target_properties( ${NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${NAME}/" )
 
-target_link_libraries(${NAME} Eigen3::Eigen)
+target_link_libraries(${NAME} Eigen3::Eigen )

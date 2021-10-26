@@ -1,6 +1,14 @@
 #pragma once
 
+#include <ext/stdio_filebuf.h>
+#include <chrono>
 #include <fstream>
+#include <mutex>
+#include <thread>
+extern "C"
+{
+#include <sys/file.h> //flock()
+}
 
 #include "external/jsonxx/jsonxx.h"
 
@@ -14,6 +22,8 @@ class configFile;
 
 namespace jsonFunctions
 {
+extern std::mutex busy;
+
 namespace ROS
 {
 extern double readRosRate( configFiles::fileID configID );
@@ -43,7 +53,14 @@ class ConfigFile
 public:
 	ConfigFile( configFiles::fileID configID )
 	{
-		configFileFstream.open( configFiles::filePaths.at( configID ) );
+		configFileFstream.open( configFiles::filePaths.at( configID ), std::ios::in );
+
+		this->fd = static_cast< __gnu_cxx::stdio_filebuf< char >* const >( configFileFstream.rdbuf() )->fd();
+		while( flock( fd, LOCK_EX ) != 0 )
+		{
+			std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
+		}
+
 		if( configFileFstream.is_open() )
 		{
 			parsedFile.parse( configFileFstream );
@@ -51,6 +68,7 @@ public:
 	}
 	~ConfigFile()
 	{
+		flock( fd, LOCK_UN );
 		configFileFstream.close();
 	}
 
@@ -59,4 +77,5 @@ public:
 
 private:
 	std::fstream configFileFstream;
+	int fd;
 };
