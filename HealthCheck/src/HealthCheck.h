@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bitset>
 #include <memory>
 
 #include <geometry_msgs/Twist.h>
@@ -18,8 +19,8 @@ public:
 	    : NodeBase( node, configID, nID )
 	{
 		auto healthCheckRate = jsonFunctions::ROS::readHealthCheckRate( this->configFileID );
-		healthCheckTickSpan = static_cast< unsigned >( rosRate / healthCheckRate );
-
+		healthCheckTickSpan  = static_cast< unsigned >( rosRate / healthCheckRate );
+		clearDump();
 		subscribeTopics();
 		advertiseTopics();
 	}
@@ -40,7 +41,8 @@ private:
 	void reportGlobalHealth();
 
 	void registerNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report );
-
+	void clearDump();
+	void writeDeadNodesToDump( std::bitset< AUVROS::NodeIDs::Count > nodesHealthSet );
 	std_msgs::Int32 globalHealthStatus;
 	unsigned healthCheckTickSpan{ 0u };
 };

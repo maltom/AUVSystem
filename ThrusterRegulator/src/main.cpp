@@ -9,7 +9,7 @@
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "ThrusterRegulator" );
+	ros::init( argc, argv, AUVROS::NodeNames.at( AUVROS::ThrusterController ) );
 
 	std::shared_ptr< ros::NodeHandle > thrusterRegulatorNode = std::make_shared< ros::NodeHandle >();
 

@@ -9,7 +9,7 @@
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "HealthCheck" );
+	ros::init( argc, argv, AUVROS::NodeNames.at( AUVROS::HealthCheck ) );
 
 	std::shared_ptr< ros::NodeHandle > healthCheckNode = std::make_shared< ros::NodeHandle >();
 

@@ -9,7 +9,7 @@
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "Debug" );
+	ros::init( argc, argv, AUVROS::NodeNames.at( AUVROS::Debug ) );
 
 	std::shared_ptr< ros::NodeHandle > debugNode = std::make_shared< ros::NodeHandle >();
 

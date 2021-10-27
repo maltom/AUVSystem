@@ -9,7 +9,7 @@
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "MainLogic" );
+	ros::init( argc, argv, AUVROS::NodeNames.at( AUVROS::MainLogic )  );
 
 	std::shared_ptr< ros::NodeHandle > mainLogicNode = std::make_shared< ros::NodeHandle >();
 

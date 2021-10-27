@@ -9,10 +9,10 @@
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "UDPNode" );
+	ros::init( argc, argv, AUVROS::NodeNames.at( AUVROS::UDPNode ) );
 
 	std::shared_ptr< ros::NodeHandle > udpNodeNode = std::make_shared< ros::NodeHandle >();
 
 	UDPNode udpNode( udpNodeNode, configFiles::fileID::main_file, AUVROS::NodeIDs::UDPNode );
-    udpNode.startMainLoop();
+	udpNode.startMainLoop();
 }

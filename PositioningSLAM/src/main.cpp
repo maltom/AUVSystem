@@ -9,7 +9,7 @@
 int main( int argc, char** argv )
 {
 
-	ros::init( argc, argv, "PositioningSLAM" );
+	ros::init( argc, argv, AUVROS::NodeNames.at( AUVROS::PositioningSLAM )  );
 
 	std::shared_ptr< ros::NodeHandle > positioningSLAMNode = std::make_shared< ros::NodeHandle >();
 

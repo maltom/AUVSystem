@@ -25,6 +25,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_subdirectory(Debug)
+add_subdirectory(Dummy)
 add_subdirectory(HealthCheck)
 add_subdirectory(MainLogic)
 add_subdirectory(PositioningSLAM)

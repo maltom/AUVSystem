@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <string>
 
 #include <geometry_msgs/Twist.h>
@@ -46,8 +47,8 @@ static const std::string arbitrarlySetRelativePosition = Folders::DevPCSubFolder
 
 namespace Health
 {
-static const std::string healthReportSingleNode      = Folders::HealthSubFolder + "/healthReportSingleNode";
-static const std::string healthHardwareReport        = Folders::HealthSubFolder + "/healthHardwareReport";
+static const std::string healthReportSingleNode = Folders::HealthSubFolder + "/healthReportSingleNode";
+static const std::string healthHardwareReport   = Folders::HealthSubFolder + "/healthHardwareReport";
 
 static const std::string healthReportSummary         = Folders::HealthSubFolder + "/healthReportSummary";
 static const std::string healthHardwareReportSummary = Folders::HealthSubFolder + "/healthHardwareReportSummary";
@@ -76,6 +77,7 @@ namespace Images
 }
 } // namespace QueueSize
 
+// make sure that names in NodeIDs and NodeNames match
 enum NodeIDs
 {
 	MainLogic = 0,
@@ -86,7 +88,14 @@ enum NodeIDs
 	ThrusterController,
 	TrajectoryPlanner,
 	PositioningSLAM,
-	Last = PositioningSLAM
+
+	Last = PositioningSLAM,
+	Count
+};
+
+static const std::array< std::string, NodeIDs::Count > NodeNames{
+	"MainLogic", "HealthCheck",       "UDPNode",           "TCPNode",
+	"Debug",     "ThrusterRegulator", "TrajectoryPlanner", "PositioningSLAM"
 };
 
 static constexpr int totalNodeCount = NodeIDs::Last;
