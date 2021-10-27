@@ -9,12 +9,14 @@
 
 #include "CommonEnums.h"
 #include "NodeBase.h"
+#include "ROSEnums.h"
 #include "StateMachine/StateMachine.h"
 
 class MainLogic final : public NodeBase
 {
 public:
-	MainLogic( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID ) : NodeBase( node, configID )
+	MainLogic( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID, AUVROS::NodeIDs nID )
+	    : NodeBase( node, configID, nID )
 	{
 		this->stateMachine = std::make_unique< StateMachine >();
 
@@ -23,9 +25,8 @@ public:
 	}
 	~MainLogic() = default;
 
-	void startMainLoop()  override;
-
 protected:
+	void processInLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;

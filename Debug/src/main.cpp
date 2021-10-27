@@ -4,6 +4,7 @@
 
 #include "CommonEnums.h"
 #include "Debug.h"
+#include "ROSEnums.h"
 
 int main( int argc, char** argv )
 {
@@ -12,6 +13,6 @@ int main( int argc, char** argv )
 
 	std::shared_ptr< ros::NodeHandle > debugNode = std::make_shared< ros::NodeHandle >();
 
-	Debug debug( debugNode, configFiles::fileID::main_file );
+	Debug debug( debugNode, configFiles::fileID::main_file, AUVROS::NodeIDs::Debug );
 	debug.startMainLoop();
 }

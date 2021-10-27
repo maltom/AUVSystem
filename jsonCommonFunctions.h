@@ -27,6 +27,8 @@ extern std::mutex busy;
 namespace ROS
 {
 extern double readRosRate( configFiles::fileID configID );
+extern double readHealthCheckRate( configFiles::fileID configID );
+extern double readHealthReportRate( configFiles::fileID configID );
 }
 namespace network
 {

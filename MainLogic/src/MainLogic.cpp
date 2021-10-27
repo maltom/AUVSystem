@@ -1,14 +1,9 @@
 #include "MainLogic.h"
 #include "ROSEnums.h"
 
-void MainLogic::startMainLoop()
+void MainLogic::processInLoop()
 {
-	while( ros::ok() )
-	{
-		ros::spinOnce();
-		stateMachine->process();
-		this->rosLoopRate->sleep();
-	}
+	stateMachine->process();
 }
 
 void MainLogic::subscribeTopics()

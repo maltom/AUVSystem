@@ -3,6 +3,7 @@
 #include <ros/ros.h>
 
 #include "CommonEnums.h"
+#include "ROSEnums.h"
 #include "UDPNode.h"
 
 int main( int argc, char** argv )
@@ -12,6 +13,6 @@ int main( int argc, char** argv )
 
 	std::shared_ptr< ros::NodeHandle > udpNodeNode = std::make_shared< ros::NodeHandle >();
 
-	UDPNode udpNode( udpNodeNode, configFiles::fileID::main_file );
+	UDPNode udpNode( udpNodeNode, configFiles::fileID::main_file, AUVROS::NodeIDs::UDPNode );
     udpNode.startMainLoop();
 }

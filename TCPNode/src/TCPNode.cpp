@@ -1,14 +1,7 @@
 #include "TCPNode.h"
 #include "ROSEnums.h"
 
-void TCPNode::startMainLoop()
-{
-	while( ros::ok() )
-	{
-		ros::spinOnce();
-		this->rosLoopRate->sleep();
-	}
-}
+void TCPNode::processInLoop() {}
 
 void TCPNode::subscribeTopics()
 {

@@ -1,15 +1,7 @@
 #include "ThrusterRegulator.h"
 #include "ROSEnums.h"
 
-void ThrusterRegulator::startMainLoop()
-{
-	while( ros::ok() )
-	{
-		ros::spinOnce();
-		rosLoopRate->sleep();
-	}
-}
-
+void ThrusterRegulator::processInLoop() {}
 void ThrusterRegulator::subscribeTopics()
 {
 	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrusters,

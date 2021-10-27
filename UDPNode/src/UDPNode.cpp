@@ -9,19 +9,11 @@
 #include "jsonCommonFunctions.h"
 #include "ROSEnums.h"
 
-void UDPNode::startMainLoop()
+void UDPNode::processInLoop()
 {
-	udpServer->startServer();
-
-	while( ros::ok() )
-	{
-		ros::spinOnce();
-
-		udpServer->sendOutgoingMessages( outgoingMessages );
-		udpServer->getIncomingMessages( incomingMessages );
-		this->processIncomingMessages();
-		rosLoopRate->sleep();
-	}
+	udpServer->sendOutgoingMessages( outgoingMessages );
+	udpServer->getIncomingMessages( incomingMessages );
+	this->processIncomingMessages();
 }
 
 void UDPNode::subscribeTopics()

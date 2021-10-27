@@ -1,14 +1,7 @@
 #include "PositioningSLAM.h"
 #include "ROSEnums.h"
 
-void PositioningSLAM::startMainLoop()
-{
-	while( ros::ok() )
-	{
-		ros::spinOnce();
-		rosLoopRate->sleep();
-	}
-}
+void PositioningSLAM::processInLoop() {}
 
 void PositioningSLAM::subscribeTopics()
 {

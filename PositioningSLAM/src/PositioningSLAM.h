@@ -15,19 +15,18 @@ using position = geometry_msgs::Twist;
 class PositioningSLAM final : public NodeBase
 {
 public:
-	PositioningSLAM( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID )
-	    : NodeBase( node, configID )
+	PositioningSLAM( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID, AUVROS::NodeIDs nID )
+	    : NodeBase( node, configID, nID )
 	{
 		subscribeTopics();
+		advertiseTopics();
 	}
 	~PositioningSLAM() {}
 
-	void startMainLoop() override;
-
 protected:
 private:
+	void processInLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;
-
 };

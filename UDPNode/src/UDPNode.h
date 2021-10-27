@@ -26,16 +26,16 @@ class UDPNode final : public NodeBase
 	};
 
 public:
-	UDPNode( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID ) : NodeBase( node, configID )
+	UDPNode( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID, AUVROS::NodeIDs nID )
+	    : NodeBase( node, configID, nID )
 	{
 		loadNetworkConfig();
+		this->udpServer = std::make_unique< UDPServer >( this->serverPort, 53060 );
+
 		subscribeTopics();
 		advertiseTopics();
-		this->udpServer = std::make_unique< UDPServer >( this->serverPort, 53060 );
 	}
 	~UDPNode() = default;
-
-	void startMainLoop() override;
 
 private:
 	std::queue< network::UDPincomingMessage > incomingMessages;
@@ -49,6 +49,7 @@ private:
 	uint16_t serverPort;
 	uint16_t clientPort;
 
+	void processInLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;

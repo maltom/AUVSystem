@@ -3,5 +3,5 @@
 
 void StateIdle::process()
 {
-    std::cout<<"I am Idle ";
+    // std::cout<<"I am Idle ";
 }

@@ -4,6 +4,7 @@
 
 #include "CommonEnums.h"
 #include "MainLogic.h"
+#include "ROSEnums.h"
 
 int main( int argc, char** argv )
 {
@@ -12,6 +13,6 @@ int main( int argc, char** argv )
 
 	std::shared_ptr< ros::NodeHandle > mainLogicNode = std::make_shared< ros::NodeHandle >();
 
-	MainLogic mainLogic( mainLogicNode, configFiles::fileID::main_file );
+	MainLogic mainLogic( mainLogicNode, configFiles::fileID::main_file, AUVROS::NodeIDs::MainLogic );
     mainLogic.startMainLoop();
 }

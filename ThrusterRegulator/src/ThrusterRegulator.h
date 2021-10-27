@@ -16,16 +16,15 @@ using namespace Eigen;
 class ThrusterRegulator final : public NodeBase
 {
 public:
-	ThrusterRegulator( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID )
-	    : NodeBase( node, configID ), model( configID )
+	ThrusterRegulator( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID, AUVROS::NodeIDs nID )
+	    : NodeBase( node, configID, nID ), model( configID )
 	{
 		loadRegulatorParameters( this->configFileID );
+
 		subscribeTopics();
 		advertiseTopics();
 	}
 	~ThrusterRegulator() {}
-
-	void startMainLoop() override;
 
 protected:
 private:
@@ -36,6 +35,7 @@ private:
 
 	float regulatorWorkingFrequency{ 10.0f };
 
+	void processInLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;

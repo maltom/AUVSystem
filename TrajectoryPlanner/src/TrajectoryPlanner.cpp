@@ -1,14 +1,7 @@
 #include "TrajectoryPlanner.h"
 #include "ROSEnums.h"
 
-void TrajectoryPlanner::startMainLoop()
-{
-	while( ros::ok() )
-	{
-		ros::spinOnce();
-		rosLoopRate->sleep();
-	}
-}
+void TrajectoryPlanner::processInLoop() {}
 
 void TrajectoryPlanner::subscribeTopics()
 {

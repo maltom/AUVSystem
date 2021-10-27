@@ -25,6 +25,30 @@ double readRosRate( configFiles::fileID configID )
 	busy.unlock();
 	return rosConfig.get< jsonxx::Number >( "rate" );
 }
+
+double readHealthCheckRate( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	auto rosConfig = desiredConfigFile->parsedFile.get< jsonxx::Object >( "ROS" );
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return rosConfig.get< jsonxx::Number >( "healthCheckRate" );
+}
+
+double readHealthReportRate( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	auto rosConfig = desiredConfigFile->parsedFile.get< jsonxx::Object >( "ROS" );
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return rosConfig.get< jsonxx::Number >( "healthReportRate" );
+}
 } // namespace ROS
 namespace network
 {
