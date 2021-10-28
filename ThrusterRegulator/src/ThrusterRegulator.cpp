@@ -1,7 +1,7 @@
 #include "ThrusterRegulator.h"
 #include "ROSEnums.h"
 
-void ThrusterRegulator::processInLoop() {}
+void ThrusterRegulator::processInMainLoop() {}
 void ThrusterRegulator::subscribeTopics()
 {
 	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrusters,

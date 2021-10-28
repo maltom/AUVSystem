@@ -49,7 +49,7 @@ private:
 	uint16_t serverPort;
 	uint16_t clientPort;
 
-	void processInLoop() override;
+	void processInMainLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;

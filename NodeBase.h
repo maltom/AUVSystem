@@ -29,7 +29,7 @@ public:
 	virtual void startMainLoop();
 
 protected:
-	virtual void processInLoop()   = 0;
+	virtual void processInMainLoop()   = 0;
 	virtual void subscribeTopics() = 0;
 	virtual void advertiseTopics() = 0;
 	virtual void connectServices() = 0;

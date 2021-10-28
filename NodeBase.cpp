@@ -11,7 +11,7 @@ void NodeBase::startMainLoop()
 	{
 		ros::spinOnce();
 		++ticks;
-		this->processInLoop();
+		this->processInMainLoop();
 
 		if( ticks % healthReportTickSpan == 0 )
 			this->reportHealth();

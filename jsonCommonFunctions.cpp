@@ -8,12 +8,23 @@
 
 #include "CommonEnums.h"
 
-
 namespace jsonFunctions
 {
 std::mutex busy;
 namespace ROS
 {
+double readDebugRate( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	auto rosConfig = desiredConfigFile->parsedFile.get< jsonxx::Object >( "ROS" );
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return rosConfig.get< jsonxx::Number >( "debugRate" );
+}
+
 double readRosRate( configFiles::fileID configID )
 {
 	busy.lock();

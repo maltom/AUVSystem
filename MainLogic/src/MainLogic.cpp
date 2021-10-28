@@ -1,7 +1,7 @@
 #include "MainLogic.h"
 #include "ROSEnums.h"
 
-void MainLogic::processInLoop()
+void MainLogic::processInMainLoop()
 {
 	stateMachine->process();
 }

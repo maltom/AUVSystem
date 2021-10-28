@@ -85,7 +85,7 @@ enum NodeIDs
 	UDPNode,
 	TCPNode,
 	Debug,
-	ThrusterController,
+	ThrusterRegulator,
 	TrajectoryPlanner,
 	PositioningSLAM,
 

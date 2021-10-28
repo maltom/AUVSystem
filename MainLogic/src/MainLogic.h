@@ -26,7 +26,7 @@ public:
 	~MainLogic() = default;
 
 protected:
-	void processInLoop() override;
+	void processInMainLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;

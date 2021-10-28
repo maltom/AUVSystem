@@ -1,7 +1,7 @@
 #include "TCPNode.h"
 #include "ROSEnums.h"
 
-void TCPNode::processInLoop() {}
+void TCPNode::processInMainLoop() {}
 
 void TCPNode::subscribeTopics()
 {

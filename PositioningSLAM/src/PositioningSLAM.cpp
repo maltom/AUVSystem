@@ -1,7 +1,7 @@
 #include "PositioningSLAM.h"
 #include "ROSEnums.h"
 
-void PositioningSLAM::processInLoop() {}
+void PositioningSLAM::processInMainLoop() {}
 
 void PositioningSLAM::subscribeTopics()
 {

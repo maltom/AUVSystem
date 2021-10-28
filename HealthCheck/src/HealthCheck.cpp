@@ -13,7 +13,7 @@ extern "C"
 
 #include <iostream>
 
-void HealthCheck::processInLoop()
+void HealthCheck::processInMainLoop()
 {
 	if( ticks % healthCheckTickSpan == 0 )
 		this->reportGlobalHealth();

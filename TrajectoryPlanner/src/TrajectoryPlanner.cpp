@@ -1,7 +1,7 @@
 #include "TrajectoryPlanner.h"
 #include "ROSEnums.h"
 
-void TrajectoryPlanner::processInLoop() {}
+void TrajectoryPlanner::processInMainLoop() {}
 
 void TrajectoryPlanner::subscribeTopics()
 {

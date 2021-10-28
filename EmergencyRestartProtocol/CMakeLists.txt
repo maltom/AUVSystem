@@ -1,9 +1,9 @@
-set(NODENAME Dummy)
+set(NODENAME EmergencyRestartProtocol)
 
 include_directories(../)
 
 set(SOURCES
-    Dummy.cpp
+    EmergencyRestartProtocol.cpp
 )
 
 add_executable(${NODENAME} ${SOURCES})

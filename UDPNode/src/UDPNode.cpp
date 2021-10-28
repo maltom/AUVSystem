@@ -9,7 +9,7 @@
 #include "jsonCommonFunctions.h"
 #include "ROSEnums.h"
 
-void UDPNode::processInLoop()
+void UDPNode::processInMainLoop()
 {
 	udpServer->sendOutgoingMessages( outgoingMessages );
 	udpServer->getIncomingMessages( incomingMessages );

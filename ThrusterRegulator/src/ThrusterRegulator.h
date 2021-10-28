@@ -35,7 +35,7 @@ private:
 
 	float regulatorWorkingFrequency{ 10.0f };
 
-	void processInLoop() override;
+	void processInMainLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;

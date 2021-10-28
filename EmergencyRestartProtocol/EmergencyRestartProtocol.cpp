@@ -17,7 +17,7 @@ extern "C"
 int main( int argc, char** argv )
 {
 	std::fstream dumpFile;
-		std::this_thread::sleep_for( std::chrono::milliseconds( 2000 ) );
+	std::this_thread::sleep_for( std::chrono::milliseconds( 2000 ) );
 
 	while( true )
 	{
@@ -51,7 +51,7 @@ int main( int argc, char** argv )
 				std::cout << "Reviving Node " << in << std::endl;
 				std::string command = "./../" + in + "/" + in;
 				system( command.c_str() );
-				goto endDummy;
+				goto finishProtocol;
 			}
 		}
 		dumpFile.close();
@@ -61,6 +61,6 @@ int main( int argc, char** argv )
 		flock( fd, LOCK_UN );
 		std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 	}
-endDummy:
-	return 0;
+finishProtocol:
+	exit( 0 );
 }
