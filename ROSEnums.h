@@ -12,6 +12,7 @@ namespace AUVROS
 namespace Folders
 {
 static const std::string MainFolder               = "/AUVInternalSystem";
+static const std::string MainFolderShort          = "/AUVInt";
 static const std::string PositionSubFolder        = MainFolder + "/Position";
 static const std::string CameraSubFolder          = MainFolder + "/Camera";
 static const std::string HardwareSignalsSubFolder = MainFolder + "/HardwareSignals";
