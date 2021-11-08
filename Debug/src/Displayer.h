@@ -13,15 +13,15 @@ namespace display
 {
 constexpr unsigned visibleDisplayWidth = 80;
 // include new line at the end
-constexpr unsigned labelDisplayWidth         = 20u;
-constexpr unsigned dataDisplayWidth          = 12u;
-constexpr unsigned totalNumberOfMajorColumns = 5u;
-constexpr unsigned totalDisplayHeight        = 24u;
-constexpr unsigned columnSeparatorWidth      = 1u;
-constexpr unsigned newLineSignWidth          = 1u;
-constexpr unsigned headerDisplayWidth        = labelDisplayWidth + columnSeparatorWidth + dataDisplayWidth;
-constexpr unsigned totalDisplayWidth         = columnSeparatorWidth
-    + ( labelDisplayWidth + columnSeparatorWidth + dataDisplayWidth + columnSeparatorWidth ) * totalNumberOfMajorColumns
+constexpr unsigned labelDisplayWidth               = 20u;
+constexpr unsigned dataDisplayWidth                = 12u;
+constexpr unsigned totalNumberOfMajorColumnsPerRow = 5u;
+constexpr unsigned totalDisplayHeight              = 24u;
+constexpr unsigned columnSeparatorWidth            = 1u;
+constexpr unsigned newLineSignWidth                = 1u;
+constexpr unsigned headerDisplayWidth              = labelDisplayWidth + columnSeparatorWidth + dataDisplayWidth;
+constexpr unsigned totalDisplayWidth               = columnSeparatorWidth
+    + ( labelDisplayWidth + columnSeparatorWidth + dataDisplayWidth + columnSeparatorWidth ) * totalNumberOfMajorColumnsPerRow
     + newLineSignWidth;
 constexpr unsigned rowSeparatorWidth            = totalDisplayWidth - 2 * columnSeparatorWidth;
 constexpr std::string_view sideBorderSeparator  = "┃";

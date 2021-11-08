@@ -23,6 +23,9 @@ void Debug::subscribeTopics()
 	                                                             AUVROS::QueueSize::GlobalHealthQueueSize,
 	                                                             &Debug::displayNodeHealthStatus,
 	                                                             this ) );
+																 displayer.addInfoToDisplay(
+	    "Health Info", std::vector< std::string >( AUVROS::NodeNames.begin(), AUVROS::NodeNames.end()-5 ), "init" );
+	
 }
 
 void Debug::displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report )

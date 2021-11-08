@@ -1,5 +1,6 @@
 #include "Displayer.h"
 
+#include <algorithm>
 #include <iostream>
 #include <exception>
 
@@ -67,13 +68,13 @@ std::string Displayer::createUtilityRow( display::rowType type ) const
 }
 std::string Displayer::createMajorRow( unsigned dataRowNumber ) const
 {
-	std::string dataRow;
+	std::string dataMajorRow;
 	std::string headerRow;
 	headerRow.reserve( display::totalDisplayWidth );
 
 	headerRow = display::sideBorderSeparator;
 	int bias{ -1 }; // adjusting padding for signs longer than one 1B
-	for( auto i = 0u; i < display::totalNumberOfMajorColumns; ++i )
+	for( auto i = 0u; i < display::totalNumberOfMajorColumnsPerRow; ++i )
 	{
 		if( i < dataColumns.size() )
 		{
@@ -81,7 +82,7 @@ std::string Displayer::createMajorRow( unsigned dataRowNumber ) const
 			headerRow += dataColumns.at( i ).header;
 
 			for( auto j = 0u;
-			     j < display::dataDisplayWidth + display::labelDisplayWidth - dataColumns.at( i ).header.size() - 1;
+			     j < display::dataDisplayWidth + display::labelDisplayWidth - dataColumns.at( i ).header.size();
 			     ++j )
 			{
 				headerRow += " ";
@@ -101,10 +102,84 @@ std::string Displayer::createMajorRow( unsigned dataRowNumber ) const
 	headerRow += display::sideBorderSeparator;
 	headerRow += "\n";
 
-	dataRow = headerRow;
-	dataRow.append( createUtilityRow( display::rowType::minorSeparator ) );
+	dataMajorRow = headerRow;
 
-	return dataRow;
+	dataMajorRow.append( createUtilityRow( display::rowType::minorSeparator ) );
+
+	size_t maxColumnHeight{ 0 };
+
+	for( auto i = dataRowNumber * display::totalNumberOfMajorColumnsPerRow;
+	     ( i < dataColumns.size() && i < ( dataRowNumber * display::totalNumberOfMajorColumnsPerRow + 1 ) );
+	     ++i )
+	{
+		maxColumnHeight = std::max( maxColumnHeight, dataColumns.at( i ).dataLabelsFields.size() );
+	}
+
+	for( auto subRowIndex = 0u; subRowIndex < maxColumnHeight; ++subRowIndex )
+	{
+		std::string dataSubRow;
+		dataSubRow.reserve( display::totalDisplayWidth );
+		dataSubRow = display::sideBorderSeparator;
+
+		bias = -1; // adjusting padding for signs longer than one 1B
+
+		for( auto i = 0u; i < display::totalNumberOfMajorColumnsPerRow; ++i )
+		{
+			if( i < dataColumns.size() )
+			{
+				if( subRowIndex < dataColumns.at( i ).dataLabelsFields.size() )
+				{
+					// label
+					dataSubRow += " ";
+					auto labelToAdd = dataColumns.at( i ).dataLabelsFields.at( subRowIndex ).first;
+					dataSubRow += labelToAdd;
+
+					for( auto j = 0u; j < display::labelDisplayWidth - labelToAdd.size() - 1; ++j )
+					{
+						dataSubRow += " ";
+					}
+
+					dataSubRow += display::minorColumnSeparator;
+					bias -= 2;
+					// value
+					dataSubRow += " ";
+					auto valueToAdd = dataColumns.at( i ).dataLabelsFields.at( subRowIndex ).second;
+					dataSubRow += valueToAdd;
+
+					for( auto j = 0u; j < display::dataDisplayWidth - valueToAdd.size() - 1; ++j )
+					{
+						dataSubRow += " ";
+					}
+					dataSubRow += display::majorColumnSeparator;
+					bias -= 2;
+				}
+				else
+				{
+					for( auto j = 0u;
+					     j < display::labelDisplayWidth + display::dataDisplayWidth + display::columnSeparatorWidth;
+					     ++j )
+					{
+						dataSubRow += " ";
+					}
+					dataSubRow += display::majorColumnSeparator;
+					bias -= 2;
+				}
+			}
+			else
+			{
+				for( auto j = dataSubRow.size(); j < display::totalDisplayWidth - bias; ++j )
+				{
+					dataSubRow += " ";
+				}
+				break;
+			}
+		}
+
+		dataSubRow += display::sideBorderSeparator;
+		dataSubRow += "\n";
+		dataMajorRow += dataSubRow;
+	}
+	return dataMajorRow;
 }
 
 void Displayer::displayDebugInfo( bool isNumberOfSubscribedTopicsGood ) const
@@ -121,8 +196,6 @@ void Displayer::displayDebugInfo( bool isNumberOfSubscribedTopicsGood ) const
 
 	// add some stuff
 	finalDisplay.append( createMajorRow() );
-	finalDisplay.append( createUtilityRow( display::rowType::majorSeparator ) );
-	finalDisplay.append( createUtilityRow( display::rowType::majorSeparator ) );
 
 	// bottom
 	finalDisplay.append( createUtilityRow( display::rowType::bottomBorder ) );
