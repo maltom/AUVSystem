@@ -99,6 +99,4 @@ static const std::array< std::string, NodeIDs::Count > NodeNames{
 	"Debug",     "ThrusterRegulator", "TrajectoryPlanner", "PositioningSLAM"
 };
 
-static constexpr int totalNodeCount = NodeIDs::Last;
-
 } // namespace AUVROS

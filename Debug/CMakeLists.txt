@@ -10,10 +10,12 @@ set(MODULES
 set(SOURCES
     src/main.cpp
     src/Debug.cpp
+    src/Displayer.cpp
 )
 
 set(HEADERS
     src/Debug.h
+    src/Displayer.h
 )
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 

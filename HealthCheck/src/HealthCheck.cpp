@@ -48,7 +48,6 @@ void HealthCheck::reportGlobalHealth()
 		this->writeDeadNodesToDump( nodesHealthSet );
 	}
 
-	std::cout << nodesHealthSet << "\n";
 	this->globalHealthStatus.data = 0;
 }
 
