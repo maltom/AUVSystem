@@ -36,7 +36,7 @@ void Debug::displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& r
 
 	for( int i = 0; i < nodesHealthSet.size(); ++i )
 	{
-		if( nodesHealthSet[ i ] == 1 )
+		if( nodesHealthSet[ i ] )
 		{
 			values.emplace_back( "healthy" );
 		}
