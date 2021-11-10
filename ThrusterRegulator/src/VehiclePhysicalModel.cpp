@@ -50,6 +50,8 @@ void VehiclePhysicalModel::initMatrices()
 
 	this->dragParams.Dl  = ( -vl ).asDiagonal();
 	this->dragParams.Dnl = ( -vnl ).asDiagonal();
+
+	// Thrust Matrix
 }
 
 VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState ) const
@@ -57,16 +59,16 @@ VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState 
 	double th = currentState( 4 );
 	double ph = currentState( 3 );
 
-	VectorXd RestoringForces = VectorXd::Zero( 6 );
+	VectorXd restoringForces = VectorXd::Zero( 6 );
 	// tutaj jest mnozenie przez this->inertialParams.centerOfGravity( 2 ) - kiedys to bylo rg(2) - czy nie powinnismy
 	// tez gdzies mnozyc tez przez wektor centerOfBuoyancy?
 	// z reszta chyba za malo tych mnozen jest
-	RestoringForces << ( this->inertialParams.weight - this->inertialParams.buoyancy ) * sin( th ),
+	restoringForces << ( this->inertialParams.weight - this->inertialParams.buoyancy ) * sin( th ),
 	    -( this->inertialParams.weight - this->inertialParams.buoyancy ) * cos( th ) * sin( ph ),
 	    -( this->inertialParams.weight - this->inertialParams.buoyancy ) * cos( th ) * cos( ph ),
 	    this->inertialParams.centerOfGravity( 2 ) * this->inertialParams.weight * cos( th ) * sin( ph ),
 	    this->inertialParams.centerOfGravity( 2 ) * this->inertialParams.weight * sin( th ), 0.0;
-	return RestoringForces;
+	return restoringForces;
 }
 
 Matrix< double, 6, 6 > VehiclePhysicalModel::calculateCoriolisMatrix( const VectorXd& currentState ) const
@@ -114,54 +116,18 @@ Matrix< double, 6, 6 > VehiclePhysicalModel::calculateCoriolisMatrix( const Vect
 	return Crb + Ca;
 }
 
-MatrixXd VehiclePhysicalModel::getNbar( const Matrix< double, 12, 12 >& A,
-                                        const Matrix< double, 12, 6 >& B,
-                                        const Matrix< double, 6, 12 >& K )
-{
-	MatrixXd C     = MatrixXd::Identity( 12, 12 );
-	MatrixXd scale = MatrixXd::Identity( 12, 6 );
-
-	return -( C * ( A - B * K ).inverse() * B ).bdcSvd( ComputeThinU | ComputeThinV ).solve( scale );
-}
-
-Matrix< double, 12, 12 > VehiclePhysicalModel::getAStateMatrix( const VectorXd& currentState ) const
-{
-	Matrix< double, 12, 12 > A           = MatrixXd::Zero( 12, 12 );
-	Matrix< double, 6, 1 > speed         = MatrixXd::Zero( 6, 1 );
-	Matrix< double, 6, 6 > dampingCoeffs = MatrixXd::Zero( 6, 6 );
-	MatrixXd speedDiag                   = MatrixXd::Zero( 6, 6 );
-
-	// Obtaining velocity vector and putting it as diagonal into a speed_diag matrix
-	speed     = currentState.block( 6, 0, 6, 1 );
-	speedDiag = speed.asDiagonal();
-
-	// This definition can also be found in documentation
-	// First I create damping_coeffs matrix which is the sum
-	// Of all elements which create opposing forces
-	// Then I divide it by -M matrix which comes from State Space equation
-	dampingCoeffs = this->dragParams.Dnl * speedDiag.cwiseAbs() + this->calculateCoriolisMatrix( currentState )
-	    + this->dragParams.Dl;
-	dampingCoeffs = ( this->inertialParams.Mrb + this->dragParams.addedMass.Ma ).inverse() * dampingCoeffs;
-
-	// State Space matrix
-	A << MatrixXd::Zero( 6, 6 ), MatrixXd::Identity( 6, 6 ), MatrixXd::Zero( 6, 6 ), -dampingCoeffs;
-
-	return A;
-}
-
-Matrix< double, 12, 6 > VehiclePhysicalModel::getBStateMatrix() const
-{
-	Matrix< double, 12, 6 > B = MatrixXd::Zero( 12, 6 );
-	B.block( 6, 0, 6, 6 )
-	    = ( this->inertialParams.Mrb + this->dragParams.addedMass.Ma ).inverse() * MatrixXd::Identity( 6, 6 );
-	return B;
-}
 
 // blagam o inna nazwe zamiast tego tau xD anyway, to bedzie musialo cale zostac przepisane raczej ze wzgledu na inne
-// rozlozenie pednikow
+// rozlozenie pednikow - zamiast tau - desiredForces albo desiredForces_tau
 void VehiclePhysicalModel::allocateThrust( const VectorXd& tau )
 {
 	// Initializing thrust conf. matrix for azimuthal thrusters
+	std::vector< MatrixXd > T;
+	for( auto& in : T )
+	{
+		in = MatrixXd::Zero( 3, 1 );
+	}
+
 	MatrixXd T1 = MatrixXd::Zero( 3, 1 );
 	MatrixXd T2 = MatrixXd::Zero( 3, 1 );
 	MatrixXd T_azimuth
@@ -181,6 +147,7 @@ void VehiclePhysicalModel::allocateThrust( const VectorXd& tau )
 	// Constraints
 	double delta_a = 0.03; // Speed of servo - the angle which it turns by in 1 timestep 0.015 for 0.005deltaT
 
+	// to jest to samo co deltaU, do wywalenia
 	double u_min = -0.4; // delta u which means how fast the force can grow in 1 timestep
 	double u_max = 0.4;
 
@@ -333,4 +300,47 @@ Matrix3d Smtrx( const Eigen::Vector3d& r )
 	Eigen::Matrix3d mtrx;
 	mtrx << 0.0, -r( 2 ), r( 1 ), r( 2 ), 0.0, -r( 0 ), -r( 1 ), r( 0 ), 0.0;
 	return mtrx;
+}
+
+MatrixXd calculateNbar( const Matrix< double, 12, 12 >& A,
+                                        const Matrix< double, 12, 6 >& B,
+                                        const Matrix< double, 6, 12 >& K )
+{
+	MatrixXd C     = MatrixXd::Identity( 12, 12 );
+	MatrixXd scale = MatrixXd::Identity( 12, 6 );
+
+	return -( C * ( A - B * K ).inverse() * B ).bdcSvd( ComputeThinU | ComputeThinV ).solve( scale );
+}
+
+Matrix< double, 12, 12 > calculateAStateMatrix( const VectorXd& currentState, const VehiclePhysicalModel& model )
+{
+	Matrix< double, 12, 12 > A           = MatrixXd::Zero( 12, 12 );
+	Matrix< double, 6, 1 > speed         = MatrixXd::Zero( 6, 1 );
+	Matrix< double, 6, 6 > dampingCoeffs = MatrixXd::Zero( 6, 6 );
+	MatrixXd speedDiag                   = MatrixXd::Zero( 6, 6 );
+
+	// Obtaining velocity vector and putting it as diagonal into a speed_diag matrix
+	speed     = currentState.block( 6, 0, 6, 1 );
+	speedDiag = speed.asDiagonal();
+
+	// This definition can also be found in documentation
+	// First I create damping_coeffs matrix which is the sum
+	// Of all elements which create opposing forces
+	// Then I divide it by -M matrix which comes from State Space equation
+	dampingCoeffs = model.dragParams.Dnl * speedDiag.cwiseAbs() + model.calculateCoriolisMatrix( currentState )
+	    + model.dragParams.Dl;
+	dampingCoeffs = ( model.inertialParams.Mrb + model.dragParams.addedMass.Ma ).inverse() * dampingCoeffs;
+
+	// State Space matrix
+	A << MatrixXd::Zero( 6, 6 ), MatrixXd::Identity( 6, 6 ), MatrixXd::Zero( 6, 6 ), -dampingCoeffs;
+
+	return A;
+}
+
+Matrix< double, 12, 6 > calculateBStateMatrix( const VehiclePhysicalModel& model )
+{
+	Matrix< double, 12, 6 > B = MatrixXd::Zero( 12, 6 );
+	B.block( 6, 0, 6, 6 )
+	    = ( model.inertialParams.Mrb + model.dragParams.addedMass.Ma ).inverse() * MatrixXd::Identity( 6, 6 );
+	return B;
 }

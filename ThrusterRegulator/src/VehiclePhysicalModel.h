@@ -11,7 +11,14 @@
 
 using namespace Eigen;
 
+class VehiclePhysicalModel;
+
 Matrix3d Smtrx( const Eigen::Vector3d& r );
+MatrixXd calculateNbar( const Matrix< double, 12, 12 >& A,
+                        const Matrix< double, 12, 6 >& B,
+                        const Matrix< double, 6, 12 >& K );
+Matrix< double, 12, 12 > calculateAStateMatrix( const VectorXd& currentState, const VehiclePhysicalModel& model );
+Matrix< double, 12, 6 > calculateBStateMatrix( const VehiclePhysicalModel& model );
 
 class VehiclePhysicalModel final
 {
@@ -88,17 +95,12 @@ public:
 		initMatrices();
 	}
 
-	Matrix< double, 12, 12 > getAStateMatrix( const VectorXd& currentState ) const;
-	Matrix< double, 12, 6 > getBStateMatrix() const;
-
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
 	void adjustParametersForWorkingFrequency( float freq );
 
 	Matrix< double, 6, 6 > calculateCoriolisMatrix( const VectorXd& currentState ) const;
-	MatrixXd getNbar( const Matrix< double, 12, 12 >& A,
-	                  const Matrix< double, 12, 6 >& B,
-	                  const Matrix< double, 6, 12 >& K );
+
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 
 	void initMatrices();
@@ -112,12 +114,15 @@ private:
 
 	MatrixXd KAll = MatrixXd::Zero( 5, 5 );
 
-	// Rate of angular acceleration of thruster. Used in thrust allocation
-	double deltaU = 0.0;
+	friend MatrixXd calculateNbar( const Matrix< double, 12, 12 >& A,
+	                               const Matrix< double, 12, 6 >& B,
+	                               const Matrix< double, 6, 12 >& K );
+	friend Matrix< double, 12, 12 > calculateAStateMatrix( const VectorXd& currentState,
+	                                                       const VehiclePhysicalModel& model );
+	friend Matrix< double, 12, 6 > calculateBStateMatrix( const VehiclePhysicalModel& model );
 
 	// public:
 	// 	// VectorXd states = VectorXd::Zero(12);
-	// 	void thrust_allocation( VectorXd tau );
 	// 	VectorXd getThrustSignal() const;
 	// 	VectorXd getAzimuth() const;
 	// 	VectorXd getFutureState( VectorXd currentState, Matrix1212 A, Matrix126 B, double deltaT );
