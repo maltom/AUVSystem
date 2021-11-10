@@ -102,6 +102,7 @@ private:
 	Matrix< double, 6, 6 > calculateCoriolisMatrix( const VectorXd& currentState ) const;
 
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
+	void allocateThrust( const VectorXd& tau );
 
 	void initMatrices();
 
@@ -126,5 +127,4 @@ private:
 	// 	VectorXd getThrustSignal() const;
 	// 	VectorXd getAzimuth() const;
 	// 	VectorXd getFutureState( VectorXd currentState, Matrix1212 A, Matrix126 B, double deltaT );
-	// 	MatrixXd getNbar( Matrix1212 A, Matrix126 B, Matrix612 K );
 };
