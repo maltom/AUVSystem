@@ -88,9 +88,19 @@ public:
 		initMatrices();
 	}
 
+	Matrix< double, 12, 12 > getAStateMatrix( const VectorXd& currentState ) const;
+	Matrix< double, 12, 6 > getBStateMatrix() const;
+
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
-	void adjustParametersForWorkingFrequency(float freq);
+	void adjustParametersForWorkingFrequency( float freq );
+
+	Matrix< double, 6, 6 > calculateCoriolisMatrix( const VectorXd& currentState ) const;
+	MatrixXd getNbar( const Matrix< double, 12, 12 >& A,
+	                  const Matrix< double, 12, 6 >& B,
+	                  const Matrix< double, 6, 12 >& K );
+	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
+
 	void initMatrices();
 
 	Inertial inertialParams;
@@ -105,17 +115,8 @@ private:
 	// Rate of angular acceleration of thruster. Used in thrust allocation
 	double deltaU = 0.0;
 
-	// 	static Matrix3d Smtrx( Vector3d r ); // Function creating a special kind of matrix
-	// 	void init_geometry();                // Initializing mass, inertia moments, rg
-	// 	void init_drag();                    // initializing drag matrices
-	// 	void init_thrust();
-	// 	VectorXd getRestoringForces( VectorXd currentState ); // Getting restoring forces vector
-
 	// public:
 	// 	// VectorXd states = VectorXd::Zero(12);
-	// 	Matrix< double, 6, 6 > coriolis_matrix( VectorXd cur_state );
-	// 	Matrix< double, 12, 12 > A_state_matrix( VectorXd cur_state );
-	// 	Matrix< double, 12, 6 > B_state_matrix();
 	// 	void thrust_allocation( VectorXd tau );
 	// 	VectorXd getThrustSignal() const;
 	// 	VectorXd getAzimuth() const;
