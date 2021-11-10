@@ -1,3 +1,5 @@
+resize -s 40 172
+
 if [ -d "build" ]; then
     cd build
 fi
