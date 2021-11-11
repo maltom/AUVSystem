@@ -8,13 +8,10 @@
 #include "CommonEnums.h"
 
 using namespace Eigen;
+using namespace regulator;
 
 struct LQRRegulator
 {
-	// to wywalic
-	static constexpr auto stateDim   = 12u;
-	static constexpr auto controlDim = 6u;
-
 	Matrix< double, stateDim, stateDim > A   = Matrix< double, stateDim, stateDim >::Zero( stateDim, stateDim );
 	Matrix< double, stateDim, controlDim > B = Matrix< double, stateDim, controlDim >::Zero( stateDim, controlDim );
 

@@ -12,12 +12,15 @@
 #include "VehiclePhysicalModel.h"
 
 using namespace Eigen;
+using namespace regulator;
 
-MatrixXd calculateNbar( const Matrix< double, 12, 12 >& A,
-                        const Matrix< double, 12, 6 >& B,
-                        const Matrix< double, 6, 12 >& K );
-Matrix< double, 12, 12 > calculateAStateMatrix( const VectorXd& currentState, const VehiclePhysicalModel& model );
-Matrix< double, 12, 6 > calculateBStateMatrix( const VehiclePhysicalModel& model );
+void allocateThrust( const VectorXd& desiredForces_tau );
+MatrixXd calculateNbar( const Matrix< double, stateDim, stateDim >& A,
+                        const Matrix< double, stateDim, controlDim >& B,
+                        const Matrix< double, controlDim, stateDim >& K );
+Matrix< double, stateDim, stateDim > calculateAStateMatrix( const VectorXd& currentState,
+                                                            const VehiclePhysicalModel& model );
+Matrix< double, stateDim, controlDim > calculateBStateMatrix( const VehiclePhysicalModel& model );
 
 class ThrusterRegulator final : public NodeBase
 {
@@ -37,7 +40,7 @@ private:
 	VehiclePhysicalModel model;
 	LQRRegulator lqrRegulator;
 
-	ct::optcon::LQR< 6, 6 > lqrSolver;
+	ct::optcon::LQR< controlDim, controlDim > lqrSolver;
 
 	float regulatorWorkingFrequency{ 10.0f };
 

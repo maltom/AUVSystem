@@ -29,7 +29,7 @@ public:
 		double buoyancy{ 0.0 };
 
 		// inertial coefficients matrix
-		Matrix< double, 6, 6 > Mrb = Matrix< double, 6, 6 >::Zero( 6, 6 );
+		Matrix< double, sixDim, sixDim > Mrb = Matrix< double, sixDim, sixDim >::Zero();
 
 		Vector3d centerOfGravity  = Vector3d::Zero();
 		Vector3d centerOfBuoyancy = Vector3d::Zero();
@@ -49,20 +49,20 @@ public:
 		struct AddedMass
 		{
 			double Xua{ 0.0 }, Yva{ 0.0 }, Zwa{ 0.0 }, Kpa{ 0.0 }, Mqa{ 0.0 }, Nra{ 0.0 };
-			Matrix< double, 6, 6 > Ma = Matrix< double, 6, 6 >::Zero( 6, 6 );
+			Matrix< double, sixDim, sixDim > Ma = Matrix< double, sixDim, sixDim >::Zero();
 		};
 		AddedMass addedMass;
 		Linear linear;
 		Quadratic quadratic;
 
-		Matrix< double, 6, 6 > Dl  = Matrix< double, 6, 6 >::Zero();
-		Matrix< double, 6, 6 > Dnl = Matrix< double, 6, 6 >::Zero();
+		Matrix< double, sixDim, sixDim > Dl  = Matrix< double, sixDim, sixDim >::Zero();
+		Matrix< double, sixDim, sixDim > Dnl = Matrix< double, sixDim, sixDim >::Zero();
 	};
 
 	struct Thrusters
 	{
 		// configuration - the  , {x, y, z, p, q, r}
-		MatrixXd AllThrustersConfigurationsMatrix = MatrixXd::Zero( 6, 5 );
+		MatrixXd AllThrustersConfigurationsMatrix = MatrixXd::Zero( sixDim, 5 );
 
 		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
 		std::vector< VectorXd > thrusterConfigurations;
@@ -90,7 +90,7 @@ public:
 		initMatrices();
 	}
 
-	Matrix< double, 6, 6 > calculateCoriolisMatrix( const VectorXd& currentState ) const;
+	Matrix< double, sixDim, sixDim > calculateCoriolisMatrix( const VectorXd& currentState ) const;
 
 	const Drag& getModelDrag() const
 	{
@@ -116,7 +116,6 @@ private:
 	void loadPhysicalParameters( configFiles::fileID configID );
 	void adjustParametersForWorkingFrequency( float freq );
 
-
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 	void allocateThrust( const VectorXd& tau );
 
@@ -132,7 +131,6 @@ private:
 	MatrixXd KAll = MatrixXd::Zero( 5, 5 );
 
 	// public:
-	// 	// VectorXd states = VectorXd::Zero(12);
 	// 	VectorXd getThrustSignal() const;
 	// 	VectorXd getAzimuth() const;
 	// 	VectorXd getFutureState( VectorXd currentState, Matrix1212 A, Matrix126 B, double deltaT );

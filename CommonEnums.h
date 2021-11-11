@@ -10,7 +10,7 @@ enum fileID
 {
 	main_file = 0
 };
-constexpr int configFilesCount = 1;
+constexpr int configFilesCount                = 1;
 static std::array< std::string, 1 > filePaths = { MAIN_CONFIG_FILE_PATH };
 } // namespace configFiles
 
@@ -39,3 +39,12 @@ enum Device
 };
 
 } // namespace network
+
+namespace regulator
+{
+constexpr auto stateDim   = 12u;
+constexpr auto controlDim = 6u;
+// As we have 3 axes and 3 rotations - we have 6 space variables and sixDim is to reference 6 in places were it is tied
+// i.e. matrices dimensions
+constexpr auto sixDim = 6u;
+} // namespace regulator
