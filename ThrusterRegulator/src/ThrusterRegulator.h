@@ -13,6 +13,12 @@
 
 using namespace Eigen;
 
+MatrixXd calculateNbar( const Matrix< double, 12, 12 >& A,
+                        const Matrix< double, 12, 6 >& B,
+                        const Matrix< double, 6, 12 >& K );
+Matrix< double, 12, 12 > calculateAStateMatrix( const VectorXd& currentState, const VehiclePhysicalModel& model );
+Matrix< double, 12, 6 > calculateBStateMatrix( const VehiclePhysicalModel& model );
+
 class ThrusterRegulator final : public NodeBase
 {
 public:

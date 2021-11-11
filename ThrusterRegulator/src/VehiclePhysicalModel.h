@@ -14,11 +14,6 @@ using namespace Eigen;
 class VehiclePhysicalModel;
 
 Matrix3d Smtrx( const Eigen::Vector3d& r );
-MatrixXd calculateNbar( const Matrix< double, 12, 12 >& A,
-                        const Matrix< double, 12, 6 >& B,
-                        const Matrix< double, 6, 12 >& K );
-Matrix< double, 12, 12 > calculateAStateMatrix( const VectorXd& currentState, const VehiclePhysicalModel& model );
-Matrix< double, 12, 6 > calculateBStateMatrix( const VehiclePhysicalModel& model );
 
 class VehiclePhysicalModel final
 {
@@ -95,11 +90,32 @@ public:
 		initMatrices();
 	}
 
+	Matrix< double, 6, 6 > calculateCoriolisMatrix( const VectorXd& currentState ) const;
+
+	const Drag& getModelDrag() const
+	{
+		return this->dragParams;
+	}
+
+	const Inertial& getModelInertial() const
+	{
+		return this->inertialParams;
+	}
+
+	const Thrusters& getModelThrusters() const
+	{
+		return this->thrusterParams;
+	}
+
+	const Servos& getModelServos() const
+	{
+		return this->servos;
+	}
+
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
 	void adjustParametersForWorkingFrequency( float freq );
 
-	Matrix< double, 6, 6 > calculateCoriolisMatrix( const VectorXd& currentState ) const;
 
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 	void allocateThrust( const VectorXd& tau );
@@ -114,13 +130,6 @@ private:
 	// Thrust configuration matrix;
 
 	MatrixXd KAll = MatrixXd::Zero( 5, 5 );
-
-	friend MatrixXd calculateNbar( const Matrix< double, 12, 12 >& A,
-	                               const Matrix< double, 12, 6 >& B,
-	                               const Matrix< double, 6, 12 >& K );
-	friend Matrix< double, 12, 12 > calculateAStateMatrix( const VectorXd& currentState,
-	                                                       const VehiclePhysicalModel& model );
-	friend Matrix< double, 12, 6 > calculateBStateMatrix( const VehiclePhysicalModel& model );
 
 	// public:
 	// 	// VectorXd states = VectorXd::Zero(12);
