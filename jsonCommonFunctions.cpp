@@ -283,6 +283,42 @@ VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID )
 
 namespace regulator
 {
+AllocationPenalizers readPenalizerData( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	AllocationPenalizers data;
+
+	auto penData
+	    = desiredConfigFile->parsedFile.get< jsonxx::Object >( "regulator" ).get< jsonxx::Object >( "penalizers" );
+
+	auto Omega = penData.get< jsonxx::Array >( "Omega" );
+	auto Q     = penData.get< jsonxx::Array >( "Q" );
+	auto W     = penData.get< jsonxx::Array >( "W" );
+
+	data.Omega = VectorXd::Zero( Omega.size() );
+	data.Q     = VectorXd::Zero( Q.size() );
+	data.W     = VectorXd::Zero( W.size() );
+
+	for( auto i = 0u; i < Omega.size(); ++i )
+	{
+		data.Omega( i ) = static_cast< double >( Omega.get< jsonxx::Number >( i ) );
+	}
+	for( auto i = 0u; i < Q.size(); ++i )
+	{
+		data.Q( i ) = static_cast< double >( Q.get< jsonxx::Number >( i ) );
+	}
+	for( auto i = 0u; i < W.size(); ++i )
+	{
+		data.W( i ) = static_cast< double >( W.get< jsonxx::Number >( i ) );
+	}
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return data;
+}
+
 LQRRegulator readLQRData( configFiles::fileID configID )
 {
 	busy.lock();
@@ -295,24 +331,24 @@ LQRRegulator readLQRData( configFiles::fileID configID )
 	auto QVectorData = regulatorData.get< jsonxx::Array >( "QMatrix" );
 	auto RVectorData = regulatorData.get< jsonxx::Array >( "RMatrix" );
 
-	if( QVectorData.size() != LQRRegulator::stateDim )
+	if( QVectorData.size() != ::regulator::stateDim )
 	{
 		throw "Wrong number of parameters in QMatrix!";
 	}
-	if( RVectorData.size() != LQRRegulator::controlDim )
+	if( RVectorData.size() != ::regulator::controlDim )
 	{
 		throw "Wrong number of parameters in RMatrix!";
 	}
 
-	VectorXd Qvec = VectorXd::Zero( LQRRegulator::stateDim );
-	VectorXd Rvec = VectorXd::Zero( LQRRegulator::controlDim );
+	VectorXd Qvec = VectorXd::Zero( ::regulator::stateDim );
+	VectorXd Rvec = VectorXd::Zero( ::regulator::controlDim );
 
-	for( auto i = 0u; i < LQRRegulator::stateDim; ++i )
+	for( auto i = 0u; i < ::regulator::stateDim; ++i )
 	{
 		Qvec( i ) = static_cast< double >( QVectorData.get< jsonxx::Number >( i ) );
 	}
 
-	for( auto i = 0u; i < LQRRegulator::controlDim; ++i )
+	for( auto i = 0u; i < ::regulator::controlDim; ++i )
 	{
 		Rvec( i ) = static_cast< double >( RVectorData.get< jsonxx::Number >( i ) );
 	}

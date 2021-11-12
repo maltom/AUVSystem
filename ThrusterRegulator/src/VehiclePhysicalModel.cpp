@@ -1,7 +1,5 @@
 #include "VehiclePhysicalModel.h"
 
-#include <iostream>
-
 #include "jsonCommonFunctions.h"
 
 void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID )
@@ -51,7 +49,13 @@ void VehiclePhysicalModel::initMatrices()
 	this->dragParams.Dl  = ( -vl ).asDiagonal();
 	this->dragParams.Dnl = ( -vnl ).asDiagonal();
 
-	// Thrust Matrix
+	// Thrust matrix
+
+	for( auto i = 0u; i < this->thrusterParams.thrustersAmount; ++i )
+	{
+		this->thrusterParams.AllThrustersConfigurationsMatrix.block< 6, 1 >( 0, i )
+		    = this->thrusterParams.thrusterConfigurations.at( i );
+	}
 }
 
 VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState ) const

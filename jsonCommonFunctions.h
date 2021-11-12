@@ -46,6 +46,7 @@ extern VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID );
 
 namespace regulator
 {
+extern AllocationPenalizers readPenalizerData( configFiles::fileID configID );
 extern LQRRegulator readLQRData( configFiles::fileID configID );
 extern double readWorkingFrequency( configFiles::fileID configID );
 } // namespace regulator

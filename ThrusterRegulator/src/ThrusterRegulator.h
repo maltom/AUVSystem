@@ -14,7 +14,9 @@
 using namespace Eigen;
 using namespace regulator;
 
-void allocateThrust( const VectorXd& desiredForces_tau );
+void allocateThrust( const VectorXd& desiredForces_tau,
+                     const VehiclePhysicalModel& model,
+                     const AllocationPenalizers& penalizers );
 MatrixXd calculateNbar( const Matrix< double, stateDim, stateDim >& A,
                         const Matrix< double, stateDim, controlDim >& B,
                         const Matrix< double, controlDim, stateDim >& K );
@@ -29,7 +31,6 @@ public:
 	    : NodeBase( node, configID, nID ), model( configID )
 	{
 		loadRegulatorParameters( this->configFileID );
-
 		subscribeTopics();
 		advertiseTopics();
 	}
@@ -39,6 +40,7 @@ protected:
 private:
 	VehiclePhysicalModel model;
 	LQRRegulator lqrRegulator;
+	AllocationPenalizers penalizers;
 
 	ct::optcon::LQR< controlDim, controlDim > lqrSolver;
 

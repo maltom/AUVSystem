@@ -18,3 +18,11 @@ struct LQRRegulator
 	DiagonalMatrix< double, stateDim > Q;
 	DiagonalMatrix< double, controlDim > R;
 };
+
+struct AllocationPenalizers
+{
+	VectorXd Q     = VectorXd::Zero( 3 ); // Penalizing the difference between desired tau and generated one
+	VectorXd Omega = VectorXd::Zero( 2 ); // Penalizing too fast turn rate - not really important
+	VectorXd W     = VectorXd::Zero(
+        2 ); // Penalizing the power consumption of motors. Not really important as it's taken care of in LQR
+};

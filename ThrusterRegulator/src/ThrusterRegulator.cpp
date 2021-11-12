@@ -28,6 +28,7 @@ void ThrusterRegulator::connectServices() {}
 void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 {
 	this->lqrRegulator              = jsonFunctions::regulator::readLQRData( config );
+	this->penalizers                = jsonFunctions::regulator::readPenalizerData( config );
 	this->regulatorWorkingFrequency = jsonFunctions::regulator::readWorkingFrequency( config );
 }
 
@@ -77,10 +78,12 @@ Matrix< double, stateDim, controlDim > calculateBStateMatrix( const VehiclePhysi
 	return B;
 }
 
-void allocateThrust( const VectorXd& desiredForces_tau )
+void allocateThrust( const VectorXd& desiredForces_tau,
+                     const VehiclePhysicalModel& model,
+                     const AllocationPenalizers& penalizers )
 {
 	// Initializing thrust conf. matrix for azimuthal thrusters
-	
+
 	MatrixXd T1 = MatrixXd::Zero( 3, 1 );
 	MatrixXd T2 = MatrixXd::Zero( 3, 1 );
 	MatrixXd T_azimuth
@@ -104,18 +107,9 @@ void allocateThrust( const VectorXd& desiredForces_tau )
 	double u_min = -0.4; // delta u which means how fast the force can grow in 1 timestep
 	double u_max = 0.4;
 
-	// Cost matrices for quad prog
-	VectorXd Q  = VectorXd::Zero( 3 ); // Penalizing the difference between desired tau and generated one
-	VectorXd Om = VectorXd::Zero( 2 ); // Penalizing too fast turn rate - not really important
-	VectorXd W  = VectorXd::Zero(
-        2 ); // Penalizing the power consumption of motors. Not really important as it's taken care of in LQR
-	Q << 1000.0, 1000.0, 1000.0;
-	Om << 1.0, 1.0;
-	W << 300.0, 300.0;
-
 	// Diagonal matrix H which is main matrix in quadprog problem. x^T * H * X + f*X
 	VectorXd diag_H = VectorXd::Zero( 7 );
-	diag_H << 2.0 * W, 2.0 * Q, 2.0 * Om;
+	diag_H << 2.0 * penalizers.W, 2.0 * penalizers.Q, 2.0 * penalizers.Omega;
 	MatrixXd H = MatrixXd::Zero( 7, 7 );
 	H          = diag_H.asDiagonal();
 

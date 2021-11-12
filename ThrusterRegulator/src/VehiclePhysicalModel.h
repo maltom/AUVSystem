@@ -10,6 +10,7 @@
 #include "CommonEnums.h"
 
 using namespace Eigen;
+using namespace regulator;
 
 class VehiclePhysicalModel;
 
