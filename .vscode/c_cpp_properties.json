@@ -10,7 +10,8 @@
                 "/opt/ros/noetic/include/",
                 "/usr/include/boost/asio/",
                 "/usr/include/eigen3/Eigen",
-                "/usr/local/include/"
+                "/usr/local/include/",
+                "/usr/include/opencv4/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

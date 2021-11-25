@@ -30,6 +30,8 @@ void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 	this->lqrRegulator              = jsonFunctions::regulator::readLQRData( config );
 	this->penalizers                = jsonFunctions::regulator::readPenalizerData( config );
 	this->regulatorWorkingFrequency = jsonFunctions::regulator::readWorkingFrequency( config );
+
+	this->thrustValues_u = VectorXd::Zero( model.getModelThrusters().thrustersAmount, 1 );
 }
 
 MatrixXd calculateNbar( const Matrix< double, stateDim, stateDim >& A,
@@ -78,12 +80,12 @@ Matrix< double, stateDim, controlDim > calculateBStateMatrix( const VehiclePhysi
 	return B;
 }
 
-void allocateThrust( const VectorXd& desiredForces_tau,
+void allocateThrust( VectorXd& thrustSignal_u,
+                     const VectorXd& desiredForces_tau,
                      const VehiclePhysicalModel& model,
                      const AllocationPenalizers& penalizers )
 {
 	// Initializing thrust conf. matrix for azimuthal thrusters
-
 	MatrixXd T1 = MatrixXd::Zero( 3, 1 );
 	MatrixXd T2 = MatrixXd::Zero( 3, 1 );
 	MatrixXd T_azimuth
@@ -94,11 +96,11 @@ void allocateThrust( const VectorXd& desiredForces_tau,
 	T_azimuth << T1, T2;
 
 	VectorXd uPrev;
-	uPrev  = u;
-	u( 0 ) = u( 0 ) * 40.0;
-	u( 1 ) = u( 1 ) * 40.0;
+	uPrev  = thrustSignal_u;
+	u( 0 ) = u( 0 ) * model.getModelThrusters().maxThrust;
+	u( 1 ) = u( 1 ) * model.getModelThrusters().maxThrust;
 
-	tau_desired << tau( 0 ), tau( 1 ), tau( 5 );
+	tau_desired << desiredForces_tau( 0 ), desiredForces_tau( 1 ), desiredForces_tau( 5 );
 
 	// Constraints
 	double delta_a = 0.03; // Speed of servo - the angle which it turns by in 1 timestep 0.015 for 0.005deltaT
@@ -200,7 +202,7 @@ void allocateThrust( const VectorXd& desiredForces_tau,
 
 	// Desired tau for this thrust allocation
 	VectorXd tau_c = VectorXd::Zero( sixDim );
-	tau_c << 0.0, 0.0, tau( 2 ), tau( 3 ), tau( 4 ), 0.0;
+	tau_c << 0.0, 0.0, desiredForces_tau( 2 ), desiredForces_tau( 3 ), desiredForces_tau( 4 ), 0.0;
 
 	// Final calculated vector of control signal
 	Vector3d u2 = Vector3d::Zero( 3 );

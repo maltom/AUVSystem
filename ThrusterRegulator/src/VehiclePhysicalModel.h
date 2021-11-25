@@ -68,9 +68,6 @@ public:
 		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
 		std::vector< VectorXd > thrusterConfigurations;
 
-		// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
-		VectorXd u;
-
 		// inertia of thruster - how fast can thrusters change their generated thrust per deltaT
 		double deltaU{ 0.0 };
 

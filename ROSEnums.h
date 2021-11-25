@@ -88,6 +88,7 @@ enum NodeIDs
 	Debug,
 	ThrusterRegulator,
 	TrajectoryPlanner,
+	AdditionalCameraProcessor,
 	PositioningSLAM,
 
 	Last = PositioningSLAM,
@@ -95,8 +96,9 @@ enum NodeIDs
 };
 
 static const std::array< std::string, NodeIDs::Count > NodeNames{
-	"MainLogic", "HealthCheck",       "UDPNode",           "TCPNode",
-	"Debug",     "ThrusterRegulator", "TrajectoryPlanner", "PositioningSLAM"
+	"MainLogic",       "HealthCheck",       "UDPNode",           "TCPNode",
+	"Debug",           "ThrusterRegulator", "TrajectoryPlanner", "AdditionalCameraProcessor",
+	"PositioningSLAM",
 };
 
 } // namespace AUVROS

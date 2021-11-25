@@ -24,6 +24,7 @@ set(HEADERS
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
+add_subdirectory(AdditionalCameraProcessor)
 add_subdirectory(Debug)
 add_subdirectory(EmergencyRestartProtocol)
 add_subdirectory(HealthCheck)
