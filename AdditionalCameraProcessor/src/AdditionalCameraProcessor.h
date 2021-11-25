@@ -23,6 +23,7 @@ public:
 	{
 		subscribeTopics();
 		advertiseTopics();
+		receiver->showImage();
 	}
 	~AdditionalCameraProcessor() = default;
 
@@ -32,4 +33,6 @@ private:
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;
+
+	CameraReceiver* receiver;
 };
