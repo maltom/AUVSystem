@@ -14,7 +14,8 @@
 using namespace Eigen;
 using namespace regulator;
 
-void allocateThrust( VectorXd& thrustSignal_u,
+void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
+                     VectorXd& servoAngle_alpha,
                      const VectorXd& desiredForces_tau,
                      const VehiclePhysicalModel& model,
                      const AllocationPenalizers& penalizers );
@@ -42,10 +43,10 @@ private:
 	VehiclePhysicalModel model;
 	LQRRegulator lqrRegulator;
 	AllocationPenalizers penalizers;
-	
 
 	// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
 	VectorXd thrustValues_u;
+	VectorXd servoAngles_alpha;
 
 	ct::optcon::LQR< controlDim, controlDim > lqrSolver;
 

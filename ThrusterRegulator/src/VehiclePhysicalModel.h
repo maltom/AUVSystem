@@ -72,13 +72,12 @@ public:
 		double deltaU{ 0.0 };
 
 		double maxThrust;
-		int thrustersAmount;
+		unsigned numberOfAzimuthalThrusters{ 0u };
+		unsigned thrustersAmount{ 0u };
 	};
 
 	struct Servos
 	{
-		// int - thruster number that is attached to servo, double servo Angle
-		std::vector< std::pair< int, double > > servoNumberAngle;
 		std::vector< std::pair< int, std::vector< dimensionsIndex > > > azimuthalThrusterDimensionsOfInfluence;
 		double servoSpeed{ 0.0 };
 	};

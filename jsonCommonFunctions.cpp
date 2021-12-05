@@ -218,28 +218,30 @@ VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID )
 	auto thrustersData
 	    = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "thrusters" );
 
-	auto azimuthalThrusters = thrustersData.get< jsonxx::Array >( "azimuthal" );
+	auto isAzimuthalThrusters = thrustersData.get< jsonxx::Array >( "azimuthal" );
 
-	for( auto i = 0u; i < azimuthalThrusters.size(); ++i )
+	unsigned azimuthalThrustersCount{ 0u };
+
+	for( auto i = 0u; i < isAzimuthalThrusters.size(); ++i )
 	{
-		if( azimuthalThrusters.get< jsonxx::Boolean >( i ) )
+		if( isAzimuthalThrusters.get< jsonxx::Boolean >( i ) )
 		{
-			data.servoNumberAngle.emplace_back( i, 0.0 );
+			++azimuthalThrustersCount;
 		}
 	}
 
 	auto dimensionsOfInfluence = thrustersData.get< jsonxx::Array >( "azimuthalThrustersDimensionsInfluence" );
 
-	if( dimensionsOfInfluence.size() > azimuthalThrusters.size() )
+	if( dimensionsOfInfluence.size() > azimuthalThrustersCount )
 	{
 		throw "Too much data describing dimensions of influence.";
 	}
-	else if( dimensionsOfInfluence.size() < azimuthalThrusters.size() )
+	else if( dimensionsOfInfluence.size() < azimuthalThrustersCount )
 	{
 		throw "Not all azimuthal thrusters are described!";
 	}
 
-	for( auto i = 0u; i < data.servoNumberAngle.size(); ++i )
+	for( auto i = 0u; i < azimuthalThrustersCount; ++i )
 	{
 		auto dimensionsOfOne = dimensionsOfInfluence.get< jsonxx::Array >( i );
 		std::vector< dimensionsIndex > dimensionsVec;
@@ -272,7 +274,7 @@ VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID )
 				dimensionsVec.push_back( dimensionsIndex::yaw );
 			}
 		}
-		data.azimuthalThrusterDimensionsOfInfluence.emplace_back( data.servoNumberAngle.at( i ).first, dimensionsVec );
+		data.azimuthalThrusterDimensionsOfInfluence.emplace_back( i, dimensionsVec );
 	}
 
 	auto servoData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "servos" );

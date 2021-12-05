@@ -4,11 +4,12 @@
 
 void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID )
 {
-	this->inertialParams = jsonFunctions::vehicle::readInertialData( configID );
-	this->thrusterParams = jsonFunctions::vehicle::readThrustersData( configID );
-	this->dragParams     = jsonFunctions::vehicle::readDragData( configID );
-	this->servos         = jsonFunctions::vehicle::readServosData( configID );
+	this->inertialParams                                = jsonFunctions::vehicle::readInertialData( configID );
+	this->thrusterParams                                = jsonFunctions::vehicle::readThrustersData( configID );
+	this->dragParams                                    = jsonFunctions::vehicle::readDragData( configID );
+	this->servos                                        = jsonFunctions::vehicle::readServosData( configID );
 	this->thrusterParams.azimuthalThrustersConfigMatrix = this->getAzimuthalThrustersConfig();
+	this->thrusterParams.numberOfAzimuthalThrusters     = servos.azimuthalThrusterDimensionsOfInfluence.size();
 }
 
 void VehiclePhysicalModel::adjustParametersForWorkingFrequency( float freq ) {}
