@@ -1,12 +1,12 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include <geometry_msgs/Twist.h>
 #include <ros/master.h>
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
+#include <vector>
 
 #include "CameraReceiver.h"
 #include "CommonEnums.h"
@@ -23,7 +23,8 @@ public:
 	{
 		subscribeTopics();
 		advertiseTopics();
-		receiver->showImage();
+		auto camerasCount = jsonFunctions::cameras::countAdditionalCameras( configFileID );
+		this->receivers.resize( camerasCount );
 	}
 	~AdditionalCameraProcessor() = default;
 
@@ -34,5 +35,5 @@ private:
 	void advertiseTopics() override;
 	void connectServices() override;
 
-	CameraReceiver* receiver;
+	std::vector< CameraReceiver > receivers;
 };

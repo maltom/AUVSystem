@@ -8,6 +8,7 @@ void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID 
 	this->thrusterParams = jsonFunctions::vehicle::readThrustersData( configID );
 	this->dragParams     = jsonFunctions::vehicle::readDragData( configID );
 	this->servos         = jsonFunctions::vehicle::readServosData( configID );
+	this->thrusterParams.azimuthalThrustersConfigMatrix = this->getAzimuthalThrustersConfig();
 }
 
 void VehiclePhysicalModel::adjustParametersForWorkingFrequency( float freq ) {}
@@ -71,6 +72,50 @@ VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState 
 	    this->inertialParams.centerOfGravity( 2 ) * this->inertialParams.weight * cos( th ) * sin( ph ),
 	    this->inertialParams.centerOfGravity( 2 ) * this->inertialParams.weight * sin( th ), 0.0;
 	return restoringForces;
+}
+
+MatrixXd VehiclePhysicalModel::getAzimuthalThrustersConfig()
+{
+	MatrixXd configMatrix;
+
+	for( auto i = 0u; i < this->servos.azimuthalThrusterDimensionsOfInfluence.size(); ++i )
+	{
+		auto thrusterNumber = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).first;
+		auto influences     = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).second;
+		auto thrusterConfig = this->thrusterParams.thrusterConfigurations.at( thrusterNumber );
+		auto variant        = influences.size();
+
+		switch( variant )
+		{
+		case 1u:
+			configMatrix << thrusterConfig( influences.at( 0 ) );
+			break;
+		case 2u:
+			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) );
+			break;
+		case 3u:
+			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
+			    thrusterConfig( influences.at( 2 ) );
+			break;
+		case 4u:
+			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
+			    thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) );
+			break;
+		case 5u:
+			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
+			    thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) ),
+			    thrusterConfig( influences.at( 4 ) );
+			break;
+		case 6u:
+			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
+			    thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) ),
+			    thrusterConfig( influences.at( 4 ) ), thrusterConfig( influences.at( 5 ) );
+			break;
+		default:
+			break;
+		}
+	}
+	return configMatrix;
 }
 
 Matrix< double, sixDim, sixDim > VehiclePhysicalModel::calculateCoriolisMatrix( const VectorXd& currentState ) const

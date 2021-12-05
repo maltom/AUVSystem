@@ -2,6 +2,7 @@
 
 #include <ext/stdio_filebuf.h>
 #include <chrono>
+#include <cstdint>
 #include <fstream>
 #include <mutex>
 #include <thread>
@@ -9,6 +10,7 @@ extern "C"
 {
 #include <sys/file.h> //flock()
 }
+#include <vector>
 
 #include "external/jsonxx/jsonxx.h"
 
@@ -50,6 +52,14 @@ extern AllocationPenalizers readPenalizerData( configFiles::fileID configID );
 extern LQRRegulator readLQRData( configFiles::fileID configID );
 extern double readWorkingFrequency( configFiles::fileID configID );
 } // namespace regulator
+
+namespace cameras
+{
+extern bool checkForStereoscopicCameraPresent( configFiles::fileID configID );
+extern uint8_t countAdditionalCameras( configFiles::fileID configID );
+// extern std::vector< float > getFOV( configFiles::fileID configID );
+} // namespace camera
+
 } // namespace jsonFunctions
 
 class ConfigFile

@@ -1,4 +1,8 @@
 #include "ThrusterRegulator.h"
+
+#include <vector>
+
+#include "external/EigenQP/EigenQP.h"
 #include "ROSEnums.h"
 
 void ThrusterRegulator::processInMainLoop() {}
@@ -80,25 +84,16 @@ Matrix< double, stateDim, controlDim > calculateBStateMatrix( const VehiclePhysi
 	return B;
 }
 
+
+
 void allocateThrust( VectorXd& thrustSignal_u,
                      const VectorXd& desiredForces_tau,
                      const VehiclePhysicalModel& model,
                      const AllocationPenalizers& penalizers )
 {
-	// Initializing thrust conf. matrix for azimuthal thrusters
-	MatrixXd T1 = MatrixXd::Zero( 3, 1 );
-	MatrixXd T2 = MatrixXd::Zero( 3, 1 );
-	MatrixXd T_azimuth
-	    = MatrixXd::Zero( 3, 2 ); // Thrust conf. matrix for 2 azimuthal thrusters, including only x,y,yaw forces
-	VectorXd tau_desired = VectorXd::Zero( 3, 1 ); // Vector of desired forces  and moments: x,y,yaw
-	T1 << t1( 0 ), t1( 1 ), t1( 5 );               // t1 and t2 are global thrust conf. matrices including sin and cos
-	T2 << t2( 0 ), t2( 1 ), t2( 5 );
-	T_azimuth << T1, T2;
-
-	VectorXd uPrev;
-	uPrev  = thrustSignal_u;
-	u( 0 ) = u( 0 ) * model.getModelThrusters().maxThrust;
-	u( 1 ) = u( 1 ) * model.getModelThrusters().maxThrust;
+	VectorXd uPrev = thrustSignal_u;
+	u( 0 )         = u( 0 ) * model.getModelThrusters().maxThrust;
+	u( 1 )         = u( 1 ) * model.getModelThrusters().maxThrust;
 
 	tau_desired << desiredForces_tau( 0 ), desiredForces_tau( 1 ), desiredForces_tau( 5 );
 

@@ -67,7 +67,7 @@ public:
 
 		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
 		std::vector< VectorXd > thrusterConfigurations;
-
+		MatrixXd azimuthalThrustersConfigMatrix;
 		// inertia of thruster - how fast can thrusters change their generated thrust per deltaT
 		double deltaU{ 0.0 };
 
@@ -79,6 +79,7 @@ public:
 	{
 		// int - thruster number that is attached to servo, double servo Angle
 		std::vector< std::pair< int, double > > servoNumberAngle;
+		std::vector< std::pair< int, std::vector< dimensionsIndex > > > azimuthalThrusterDimensionsOfInfluence;
 		double servoSpeed{ 0.0 };
 	};
 
@@ -114,6 +115,7 @@ private:
 	void loadPhysicalParameters( configFiles::fileID configID );
 	void adjustParametersForWorkingFrequency( float freq );
 
+	MatrixXd getAzimuthalThrustersConfig();
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 	void allocateThrust( const VectorXd& tau );
 

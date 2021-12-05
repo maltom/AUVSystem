@@ -1,6 +1,6 @@
 #include "jsonCommonFunctions.h"
 
-#include <iostream>
+#include <cstdint>
 #include <exception>
 #include <mutex>
 
@@ -215,9 +215,10 @@ VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID )
 
 	VehiclePhysicalModel::Servos data;
 
-	auto azimuthalThrusters = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" )
-	                              .get< jsonxx::Object >( "thrusters" )
-	                              .get< jsonxx::Array >( "azimuthal" );
+	auto thrustersData
+	    = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "thrusters" );
+
+	auto azimuthalThrusters = thrustersData.get< jsonxx::Array >( "azimuthal" );
 
 	for( auto i = 0u; i < azimuthalThrusters.size(); ++i )
 	{
@@ -225,6 +226,53 @@ VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID )
 		{
 			data.servoNumberAngle.emplace_back( i, 0.0 );
 		}
+	}
+
+	auto dimensionsOfInfluence = thrustersData.get< jsonxx::Array >( "azimuthalThrustersDimensionsInfluence" );
+
+	if( dimensionsOfInfluence.size() > azimuthalThrusters.size() )
+	{
+		throw "Too much data describing dimensions of influence.";
+	}
+	else if( dimensionsOfInfluence.size() < azimuthalThrusters.size() )
+	{
+		throw "Not all azimuthal thrusters are described!";
+	}
+
+	for( auto i = 0u; i < data.servoNumberAngle.size(); ++i )
+	{
+		auto dimensionsOfOne = dimensionsOfInfluence.get< jsonxx::Array >( i );
+		std::vector< dimensionsIndex > dimensionsVec;
+
+		for( auto i = 0u; i < dimensionsOfOne.size(); ++i )
+		{
+			auto dimension = dimensionsOfOne.get< std::string >( i );
+			if( dimension == "x" )
+			{
+				dimensionsVec.push_back( dimensionsIndex::x );
+			}
+			else if( dimension == "y" )
+			{
+				dimensionsVec.push_back( dimensionsIndex::y );
+			}
+			else if( dimension == "z" )
+			{
+				dimensionsVec.push_back( dimensionsIndex::z );
+			}
+			else if( dimension == "roll" )
+			{
+				dimensionsVec.push_back( dimensionsIndex::roll );
+			}
+			else if( dimension == "pitch" )
+			{
+				dimensionsVec.push_back( dimensionsIndex::pitch );
+			}
+			else if( dimension == "yaw" )
+			{
+				dimensionsVec.push_back( dimensionsIndex::yaw );
+			}
+		}
+		data.azimuthalThrusterDimensionsOfInfluence.emplace_back( data.servoNumberAngle.at( i ).first, dimensionsVec );
 	}
 
 	auto servoData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "servos" );
@@ -365,7 +413,7 @@ double readWorkingFrequency( configFiles::fileID configID )
 	busy.lock();
 	ConfigFile* desiredConfigFile = new ConfigFile( configID );
 
-	double data;
+	double data{ 0.0 };
 
 	auto regulatorData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "regulator" );
 
@@ -377,4 +425,84 @@ double readWorkingFrequency( configFiles::fileID configID )
 }
 
 } // namespace regulator
+
+namespace cameras
+{
+bool checkForStereoscopicCameraPresent( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	auto cameraData
+	    = desiredConfigFile->parsedFile.get< jsonxx::Object >( "cameras" ).get< jsonxx::Array >( "stereoscopic" );
+
+	auto countStereo = 0u;
+	for( const auto& in : cameraData.values() )
+	{
+		countStereo += static_cast< unsigned >( in->get< jsonxx::Boolean >() );
+	}
+
+	delete desiredConfigFile;
+	busy.unlock();
+
+	auto result = false;
+	switch( countStereo )
+	{
+	case 0u:
+		result = false;
+		break;
+	case 1u:
+		result = true;
+		break;
+	default:
+		throw "More than one stereoscopic camera found in config!";
+		break;
+	}
+	return result;
+}
+
+uint8_t countAdditionalCameras( configFiles::fileID configID )
+{
+	busy.lock();
+	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+	auto cameraData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "cameras" );
+
+	auto stereoscopic = cameraData.get< jsonxx::Array >( "stereoscopic" );
+	if( stereoscopic.size() != cameraData.get< jsonxx::Array >( "positionsAndRotations" ).size() )
+	{
+		throw "Data describing camera is corrupted.";
+	}
+	uint8_t data{ 0u };
+
+	for( auto i = 0u; i < stereoscopic.size(); ++i )
+	{
+		if( !stereoscopic.get< jsonxx::Boolean >( i ) )
+		{
+			++data;
+		}
+	}
+
+	delete desiredConfigFile;
+	busy.unlock();
+	return data;
+}
+
+// std::vector< float > getFOV( configFiles::fileID configID )
+// {
+// 	busy.lock();
+// 	ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+// 	double data;
+
+// 	auto regulatorData = desiredConfigFile->parsedFile.get< jsonxx::Object >( "regulator" );
+
+// 	data = static_cast< double >( regulatorData.get< jsonxx::Number >( "regulatorWorkingFrequency" ) );
+
+// 	delete desiredConfigFile;
+// 	busy.unlock();
+// 	return data;
+// }
+} // namespace cameras
+
 } // namespace jsonFunctions

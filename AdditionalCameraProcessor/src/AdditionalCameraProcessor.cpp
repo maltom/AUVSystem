@@ -8,9 +8,9 @@
 
 void AdditionalCameraProcessor::processInMainLoop()
 {
-	receiver = new CameraReceiver();
+
 	std::cout << "petla\n";
-	receiver->showImage();
+	receivers.at( 0 ).showImage();
 }
 
 void AdditionalCameraProcessor::subscribeTopics() {}

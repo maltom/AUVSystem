@@ -14,16 +14,6 @@
 using namespace Eigen;
 using namespace regulator;
 
-enum dimensionsIndex
-{
-	x = 0,
-	y,
-	z,
-	roll,
-	pitch,
-	yaw
-};
-
 void allocateThrust( VectorXd& thrustSignal_u,
                      const VectorXd& desiredForces_tau,
                      const VehiclePhysicalModel& model,
@@ -52,6 +42,7 @@ private:
 	VehiclePhysicalModel model;
 	LQRRegulator lqrRegulator;
 	AllocationPenalizers penalizers;
+	
 
 	// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
 	VectorXd thrustValues_u;

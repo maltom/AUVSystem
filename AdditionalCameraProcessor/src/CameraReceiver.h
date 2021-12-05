@@ -10,7 +10,8 @@ class CameraReceiver final
 {
 public:
 	CameraReceiver();
-cv::Mat image;
+	cv::Mat image;
 	void showImage();
+
 private:
 };

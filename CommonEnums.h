@@ -48,3 +48,13 @@ constexpr auto controlDim = 6u;
 // i.e. matrices dimensions
 constexpr auto sixDim = 6u;
 } // namespace regulator
+
+enum dimensionsIndex
+{
+	x = 0,
+	y,
+	z,
+	roll,
+	pitch,
+	yaw
+};

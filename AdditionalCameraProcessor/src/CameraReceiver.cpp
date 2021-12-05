@@ -8,17 +8,18 @@ CameraReceiver::CameraReceiver()
 {
 
 	image = cv::imread( "../../ziomki.JPG" );
-	cv::namedWindow( "Display Image", cv::WINDOW_AUTOSIZE );
+	cv::namedWindow( "Display", cv::WindowFlags::WINDOW_FULLSCREEN );
 }
 
 void CameraReceiver::showImage()
 {
-	
+
 	if( !image.data )
 	{
 		printf( "No image data \n" );
 	}
 	else
 		printf( "udao sie" );
-	cv::imshow( "Display Image", image );
+	cv::imshow( "Display", image );
+	cv::waitKey( 0 );
 }
