@@ -1,5 +1,10 @@
 resize -s 40 172
 
+if [ "node.dump" ]; then
+    rm -f node.dump
+    touch node.dump
+fi
+
 if [ -d "build" ]; then
     cd build
 fi
