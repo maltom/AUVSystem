@@ -10,11 +10,14 @@ void NodeBase::startMainLoop()
 	while( ros::ok() )
 	{
 		ros::spinOnce();
+		if( ticks % healthReportTickSpan == 0 )
+		{
+			this->reportHealth();
+		}
 		++ticks;
+
 		this->processInMainLoop();
 
-		if( ticks % healthReportTickSpan == 0 )
-			this->reportHealth();
 		this->rosLoopRate->sleep();
 	}
 }

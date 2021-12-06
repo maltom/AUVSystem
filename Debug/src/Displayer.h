@@ -21,7 +21,8 @@ constexpr unsigned columnSeparatorWidth            = 1u;
 constexpr unsigned newLineSignWidth                = 1u;
 constexpr unsigned headerDisplayWidth              = labelDisplayWidth + columnSeparatorWidth + dataDisplayWidth;
 constexpr unsigned totalDisplayWidth               = columnSeparatorWidth
-    + ( labelDisplayWidth + columnSeparatorWidth + dataDisplayWidth + columnSeparatorWidth ) * totalNumberOfMajorColumnsPerRow
+    + ( labelDisplayWidth + columnSeparatorWidth + dataDisplayWidth + columnSeparatorWidth )
+        * totalNumberOfMajorColumnsPerRow
     + newLineSignWidth;
 constexpr unsigned rowSeparatorWidth            = totalDisplayWidth - 2 * columnSeparatorWidth;
 constexpr std::string_view sideBorderSeparator  = "┃";
@@ -72,7 +73,7 @@ public:
 		setupDisplayLabels();
 	}
 
-	void addInfoToDisplay( const std::string& header, const std::vector< std::string >& labels, DataType init );
+	void addInfoToDisplay( const std::string& header, const std::vector< std::string >& labels, const DataType& init );
 	void setMajorColumnValues( unsigned dataColumnIndex, const std::vector< DataType >& dataForDisplayer );
 
 	void fillMajorDataRow( std::string& display );

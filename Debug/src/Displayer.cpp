@@ -4,8 +4,15 @@
 #include <iostream>
 #include <exception>
 
-void Displayer::addInfoToDisplay( const std::string& header, const std::vector< std::string >& labels, DataType init )
+void Displayer::addInfoToDisplay( const std::string& header,
+                                  const std::vector< std::string >& labels,
+                                  const DataType& init )
 {
+	if( header.size() > display::headerDisplayWidth )
+	{
+		throw "Header name is too long.";
+	}
+
 	this->dataColumns.emplace_back( header, labels, init );
 }
 
@@ -109,7 +116,7 @@ std::string Displayer::createMajorRow( unsigned dataRowNumber ) const
 	size_t maxColumnHeight{ 0 };
 
 	for( auto i = dataRowNumber * display::totalNumberOfMajorColumnsPerRow;
-	     ( i < dataColumns.size() && i < ( dataRowNumber * display::totalNumberOfMajorColumnsPerRow + 1 ) );
+	     ( i < dataColumns.size() && i < ( dataRowNumber + 1 ) * display::totalNumberOfMajorColumnsPerRow );
 	     ++i )
 	{
 		maxColumnHeight = std::max( maxColumnHeight, dataColumns.at( i ).dataLabelsFields.size() );
@@ -132,6 +139,7 @@ std::string Displayer::createMajorRow( unsigned dataRowNumber ) const
 					// label
 					dataSubRow += " ";
 					auto labelToAdd = dataColumns.at( i ).dataLabelsFields.at( subRowIndex ).first;
+					labelToAdd.resize( display::labelDisplayWidth - 2u, ' ' );
 					dataSubRow += labelToAdd;
 
 					for( auto j = 0u; j < display::labelDisplayWidth - labelToAdd.size() - 1; ++j )
@@ -144,6 +152,7 @@ std::string Displayer::createMajorRow( unsigned dataRowNumber ) const
 					// value
 					dataSubRow += " ";
 					auto valueToAdd = dataColumns.at( i ).dataLabelsFields.at( subRowIndex ).second;
+					valueToAdd.resize( display::dataDisplayWidth - 2u, ' ' );
 					dataSubRow += valueToAdd;
 
 					for( auto j = 0u; j < display::dataDisplayWidth - valueToAdd.size() - 1; ++j )
@@ -195,11 +204,11 @@ void Displayer::displayDebugInfo( bool isNumberOfSubscribedTopicsGood ) const
 	finalDisplay.append( createUtilityRow( display::rowType::topBorder ) );
 
 	// add some stuff
-	finalDisplay.append( createMajorRow() );
+	finalDisplay.append( createMajorRow( 0u ) );
 
 	// bottom
 	finalDisplay.append( createUtilityRow( display::rowType::bottomBorder ) );
-	system( "clear" );
+	int r = system( "clear" );
 	finalDisplay.shrink_to_fit();
 	std::cout << finalDisplay;
 }

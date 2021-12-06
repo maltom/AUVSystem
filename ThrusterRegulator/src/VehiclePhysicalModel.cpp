@@ -1,5 +1,7 @@
 #include "VehiclePhysicalModel.h"
 
+#include <algorithm>
+
 #include "jsonCommonFunctions.h"
 
 void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID )
@@ -78,42 +80,53 @@ VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState 
 MatrixXd VehiclePhysicalModel::getAzimuthalThrustersConfig()
 {
 	MatrixXd configMatrix;
-
+	std::vector< MatrixXd > configVectors;
 	for( auto i = 0u; i < this->servos.azimuthalThrusterDimensionsOfInfluence.size(); ++i )
 	{
 		auto thrusterNumber = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).first;
 		auto influences     = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).second;
 		auto thrusterConfig = this->thrusterParams.thrusterConfigurations.at( thrusterNumber );
 		auto variant        = influences.size();
-
+		configVectors.emplace_back( MatrixXd::Zero( variant, 1 ) );
 		switch( variant )
 		{
 		case 1u:
-			configMatrix << thrusterConfig( influences.at( 0 ) );
+			*configVectors.rbegin() << thrusterConfig( influences.at( 0 ) );
 			break;
 		case 2u:
-			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) );
+			*configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) );
 			break;
 		case 3u:
-			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
+			*configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
 			    thrusterConfig( influences.at( 2 ) );
 			break;
 		case 4u:
-			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
+			*configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
 			    thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) );
 			break;
 		case 5u:
-			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
+			*configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
 			    thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) ),
 			    thrusterConfig( influences.at( 4 ) );
 			break;
 		case 6u:
-			configMatrix << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
+			*configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
 			    thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) ),
 			    thrusterConfig( influences.at( 4 ) ), thrusterConfig( influences.at( 5 ) );
 			break;
 		default:
 			break;
+		}
+		auto maxVectorLength = 0u;
+		for( const auto& in : configVectors )
+		{
+			maxVectorLength = std::max( maxVectorLength, static_cast< unsigned >( in.rows() ) );
+		}
+		configMatrix = MatrixXd::Zero( maxVectorLength, configVectors.size() );
+
+		for( auto i = 0u; i < configMatrix.cols(); ++i )
+		{
+			configMatrix.block( 0, i, maxVectorLength, 1 ) = configVectors.at( i );
 		}
 	}
 	return configMatrix;
