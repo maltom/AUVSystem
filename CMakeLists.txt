@@ -26,7 +26,7 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_subdirectory(AdditionalCameraProcessor)
 add_subdirectory(Debug)
-#add_subdirectory(EmergencyRestartProtocol)
+add_subdirectory(EmergencyRestartProtocol)
 add_subdirectory(HealthCheck)
 add_subdirectory(MainLogic)
 add_subdirectory(PositioningSLAM)

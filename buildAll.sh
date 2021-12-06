@@ -5,7 +5,8 @@ if [ ! -d "build" ]; then
 fi
 cd build
 
-cmake -DCMAKE_BUILD_TYPE=Debug ..
+#cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j12
 unset GLOBIGNORE
 
