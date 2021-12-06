@@ -83,10 +83,10 @@ MatrixXd VehiclePhysicalModel::getAzimuthalThrustersConfig()
 	std::vector< MatrixXd > configVectors;
 	for( auto i = 0u; i < this->servos.azimuthalThrusterDimensionsOfInfluence.size(); ++i )
 	{
-		auto thrusterNumber = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).first;
-		auto influences     = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).second;
-		auto thrusterConfig = this->thrusterParams.thrusterConfigurations.at( thrusterNumber );
-		auto variant        = influences.size();
+		const auto& thrusterNumber = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).first;
+		const auto& influences     = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).second;
+		const auto& thrusterConfig = this->thrusterParams.thrusterConfigurations.at( thrusterNumber );
+		auto variant               = influences.size();
 		configVectors.emplace_back( MatrixXd::Zero( variant, 1 ) );
 		switch( variant )
 		{
@@ -117,17 +117,17 @@ MatrixXd VehiclePhysicalModel::getAzimuthalThrustersConfig()
 		default:
 			break;
 		}
-		auto maxVectorLength = 0u;
-		for( const auto& in : configVectors )
-		{
-			maxVectorLength = std::max( maxVectorLength, static_cast< unsigned >( in.rows() ) );
-		}
-		configMatrix = MatrixXd::Zero( maxVectorLength, configVectors.size() );
+	}
+	auto maxVectorLength = 0u;
+	for( const auto& in : configVectors )
+	{
+		maxVectorLength = std::max( maxVectorLength, static_cast< unsigned >( in.rows() ) );
+	}
+	configMatrix = MatrixXd::Zero( maxVectorLength, configVectors.size() );
 
-		for( auto i = 0u; i < configMatrix.cols(); ++i )
-		{
-			configMatrix.block( 0, i, maxVectorLength, 1 ) = configVectors.at( i );
-		}
+	for( auto i = 0u; i < configMatrix.cols(); ++i )
+	{
+		configMatrix.block( 0, i, maxVectorLength, 1 ) = configVectors.at( i );
 	}
 	return configMatrix;
 }
