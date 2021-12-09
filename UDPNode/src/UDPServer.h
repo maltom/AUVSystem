@@ -11,6 +11,7 @@
 
 #include "CommonEnums.h"
 
+using boost::asio::ip::address;
 using boost::asio::ip::udp;
 
 class UDPServer final
@@ -31,10 +32,13 @@ private:
 
 protected:
 public:
-	UDPServer( const uint16_t serverPort, const uint16_t clientPort );
+	UDPServer( const uint16_t serverPort,
+	           const uint16_t clientPort,
+	           const std::string& serverIpAdress,
+	           const std::string& clientIpAdress );
 
 	~UDPServer();
-    void startServer();
+	void startServer();
 	bool sendOutgoingMessages( std::queue< network::UDPoutgoingMessage >& msgsToSend );
 	void getIncomingMessages( std::queue< network::UDPincomingMessage >& targerContainer );
 };

@@ -18,6 +18,7 @@ void ThrusterRegulator::subscribeTopics()
 	                                                             &ThrusterRegulator::sendArbitrarlySetServos,
 	                                                             this ) );
 }
+
 void ThrusterRegulator::advertiseTopics()
 {
 	this->rosPublishers.emplace_back(

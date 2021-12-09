@@ -9,11 +9,13 @@ set(MODULES
 
 set(SOURCES
     src/main.cpp
+    src/MessageProcessing.cpp
     src/UDPNode.cpp
     src/UDPServer.cpp
 )
 
 set(HEADERS
+    src/MessageProcessing.h
     src/UDPNode.h
     src/UDPServer.h
 )
