@@ -23,8 +23,14 @@ void Debug::subscribeTopics()
 	                                                             AUVROS::QueueSize::GlobalHealthQueueSize,
 	                                                             &Debug::displayNodeHealthStatus,
 	                                                             this ) );
-	displayer.addInfoToDisplay(
-	    "Health Info", std::vector< std::string >( AUVROS::NodeNames.begin(), AUVROS::NodeNames.end() - 5 ), "init" );
+
+	displayer.addInfoToDisplay( "Thrusters arbitrarly",
+	                            std::vector< std::string >( labels::thrusters.begin(), labels::thrusters.end() ),
+	                            "init" );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrusters,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &Debug::displayArbitrarlySetThrustersStatus,
+	                                                             this ) );
 }
 
 void Debug::displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report )
@@ -45,6 +51,17 @@ void Debug::displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& r
 		}
 	}
 	displayer.setMajorColumnValues( DisplayerDataPositions::Health, values );
+}
+
+void Debug::displayArbitrarlySetThrustersStatus( const AUVROS::MessageTypes::ThrustersSignal& message )
+{
+	std::vector< DataType > values;
+
+	for( auto i = 0u; i < 5u; ++i )
+	{
+		values.emplace_back( std::to_string( message.data.at( i ) ) );
+	}
+	displayer.setMajorColumnValues( DisplayerDataPositions::ThrustersArbitrarly, values );
 }
 
 void Debug::advertiseTopics() {}

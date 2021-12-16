@@ -14,7 +14,7 @@ void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID 
 	this->thrusterParams.numberOfAzimuthalThrusters     = servos.azimuthalThrusterDimensionsOfInfluence.size();
 }
 
-void VehiclePhysicalModel::adjustParametersForWorkingFrequency( float freq ) {}
+void VehiclePhysicalModel::adjustParametersForWorkingFrequency( const float freq ) {}
 
 void VehiclePhysicalModel::initMatrices()
 {
@@ -52,7 +52,9 @@ void VehiclePhysicalModel::initMatrices()
 	this->dragParams.Dnl = ( -vnl ).asDiagonal();
 
 	// Thrust matrix
-
+	// TODO: to musi byc odswiezane - trzeba dopisac funkcje osobna, ktora liczy i updateuje nie tylko macierz, ale tez
+	// TODO: wektory w oparciu o funkcje, ktore musza byc zdefiniowane w pliku. dorob nowy atrybut klasy, ktory bedzie
+	// TODO: przechowywal funkcje do przeliczenia wartosci (sin, cos, zero) jak i pochodne
 	for( auto i = 0u; i < this->thrusterParams.thrustersAmount; ++i )
 	{
 		this->thrusterParams.AllThrustersConfigurationsMatrix.block< 6, 1 >( 0, i )
@@ -62,18 +64,26 @@ void VehiclePhysicalModel::initMatrices()
 
 VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState ) const
 {
-	double th = currentState( 4 );
-	double ph = currentState( 3 );
+	const auto& theta = currentState( 4 ); // pitch
+	const auto& phi   = currentState( 3 ); // roll
+
+	const auto& W = this->inertialParams.weight;
+	const auto& B = this->inertialParams.buoyancy;
+
+	const auto& xg = this->inertialParams.centerOfGravity( 0 );
+	const auto& yg = this->inertialParams.centerOfGravity( 1 );
+	const auto& zg = this->inertialParams.centerOfGravity( 2 );
+
+	const auto& xb = this->inertialParams.centerOfBuoyancy( 0 );
+	const auto& yb = this->inertialParams.centerOfBuoyancy( 1 );
+	const auto& zb = this->inertialParams.centerOfBuoyancy( 2 );
 
 	VectorXd restoringForces = VectorXd::Zero( sixDim );
-	// tutaj jest mnozenie przez this->inertialParams.centerOfGravity( 2 ) - kiedys to bylo rg(2) - czy nie powinnismy
-	// tez gdzies mnozyc tez przez wektor centerOfBuoyancy?
-	// z reszta chyba za malo tych mnozen jest
-	restoringForces << ( this->inertialParams.weight - this->inertialParams.buoyancy ) * sin( th ),
-	    -( this->inertialParams.weight - this->inertialParams.buoyancy ) * cos( th ) * sin( ph ),
-	    -( this->inertialParams.weight - this->inertialParams.buoyancy ) * cos( th ) * cos( ph ),
-	    this->inertialParams.centerOfGravity( 2 ) * this->inertialParams.weight * cos( th ) * sin( ph ),
-	    this->inertialParams.centerOfGravity( 2 ) * this->inertialParams.weight * sin( th ), 0.0;
+	restoringForces << ( W - B ) * sin( theta ), -( W - B ) * cos( theta ) * sin( phi ),
+	    -( W - B ) * cos( theta ) * cos( phi ),
+	    -( yg * W - yb * B ) * cos( theta ) * cos( phi ) + ( zg * W - zb * B ) * cos( theta ) * sin( phi ),
+	    ( zg * W - zb * B ) * sin( theta ) + ( xg * W - xb * B ) * cos( theta ) * cos( phi ),
+	    -( xg * W - xb * B ) * cos( theta ) * sin( phi ) - ( yg * W - yb * B ) * sin( theta );
 	return restoringForces;
 }
 
