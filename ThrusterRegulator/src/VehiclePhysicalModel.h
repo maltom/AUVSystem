@@ -116,7 +116,6 @@ private:
 
 	MatrixXd getAzimuthalThrustersConfig();
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
-	void allocateThrust( const VectorXd& tau );
 
 	void initMatrices();
 

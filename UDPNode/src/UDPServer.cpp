@@ -1,13 +1,19 @@
 #include "UDPServer.h"
 
 #include <algorithm>
-
 #include <boost/bind.hpp>
 
-UDPServer::UDPServer( const uint16_t serverPort, const uint16_t clientPort )
+#include "jsonCommonFunctions.h"
+
+UDPServer::UDPServer( const uint16_t serverPort,
+                      const uint16_t clientPort,
+                      const std::string& serverIpAdress,
+                      const std::string& clientIpAdress )
 {
+	// socket         = std::make_unique< udp::socket >( ioContext,
+	//   udp::endpoint( address::from_string( serverIpAdress ), serverPort ) );
 	socket         = std::make_unique< udp::socket >( ioContext, udp::endpoint( udp::v4(), serverPort ) );
-	clientEndpoint = udp::endpoint( udp::v4(), clientPort );
+	clientEndpoint = udp::endpoint( address::from_string( clientIpAdress ), clientPort );
 }
 
 void UDPServer::startServer()

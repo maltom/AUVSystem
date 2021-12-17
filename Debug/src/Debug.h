@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <memory>
 #include <string>
 
@@ -12,6 +13,13 @@
 #include "Displayer.h"
 #include "jsonCommonFunctions.h"
 #include "NodeBase.h"
+
+namespace labels
+{
+	const std::array< std::string, 5 > thrusters{
+		"Thruster #1", "Thruster #2", "Thruster #3", "Thruster #4", "Thruster #5"
+	};
+}
 
 class Debug final : public NodeBase
 {
@@ -31,7 +39,8 @@ protected:
 private:
 	enum DisplayerDataPositions
 	{
-		Health
+		Health,
+		ThrustersArbitrarly
 	};
 
 	void processInMainLoop() override;
@@ -42,6 +51,7 @@ private:
 	bool countAndCompareNumberOfTopics() const;
 
 	void displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report );
+	void displayArbitrarlySetThrustersStatus( const AUVROS::MessageTypes::ThrustersSignal& message );
 
 	Displayer displayer;
 

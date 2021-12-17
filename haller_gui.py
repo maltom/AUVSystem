@@ -81,7 +81,7 @@ class ControlsFrame:
         self.sliders = {}
         self.sliders_frame = tk.Frame(temp)
         self.sliders_frame.pack(side=tk.LEFT)
-        self.slider_controls(self.sliders_frame, "Thruster #", NUM_OF_THRUSTERS, -100, 100)
+        self.slider_controls(self.sliders_frame, "Thruster #", NUM_OF_THRUSTERS, -1.0, 1.0)
         self.slider_controls(self.sliders_frame, "Servo #", NUM_OF_SERVOS, -90, 90)
         self.send_thruster_btn = tk.Button(self.sliders_frame, text="Send Thrusters")
         self.send_thruster_btn.pack(side=tk.LEFT)
@@ -165,12 +165,12 @@ class AuvConfigSettings:
         
 
     def update(config):
-        path = '/'.join([*__file__.split('/')[0:-2], 'config', 'auvConfig', 'auvConfig.json'])
+        path = '/'.join([*__file__.split('/')[0:-2], 'AUVSystem', 'auvConfig', 'auvConfig.json'])
         with open(path, 'w') as file:
             json.dump(config, file, indent=4)
     
     def load_config():
-        path = '/'.join([*__file__.split('/')[0:-2], 'config', 'auvConfig', 'auvConfig.json'])
+        path = '/'.join([*__file__.split('/')[0:-2], 'AUVSystem', 'auvConfig', 'auvConfig.json'])
         with open(path, 'r') as file:
             return json.load(file)
 
@@ -180,7 +180,7 @@ class RosHandler:
         self.camera_frame: CameraFrame = camera_frame
         self.controls_frame: ControlsFrame = controls_frame
 
-        rospy.init_node('heller_gui', anonymous=True)
+        rospy.init_node('haller_gui', anonymous=True)
         rospy.Subscriber('image_msg', ImageMsg, self.camera_frame.update_img_msg)
 
         self.thruster_Sender = rospy.Publisher(THRUSTER_TOPIC, Float32MultiArray, queue_size=10)

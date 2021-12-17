@@ -78,7 +78,7 @@ KeepEmptyLinesAtTheStartOfBlocks: true
 MacroBlockBegin: '^[A-Z_]+_(BEGIN|CONTINUE)[A-Z_]*$|^[A-Z_]*(BEGIN|CONTINUE)_[A-Z_]+$|^CPP_INTERFACE(_[1-9]+)?$|^glBegin'
 MacroBlockEnd:   '^[A-Z_]+_END[A-Z_]*$|^[A-Z_]*END_[A-Z_]+$|^CPP_INTERFACE_END$|^glEnd'
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: None
+NamespaceIndentation: Inner
 ObjCBlockIndentWidth: 4
 ObjCSpaceAfterProperty: true
 ObjCSpaceBeforeProtocolList: true

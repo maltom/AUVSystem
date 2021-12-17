@@ -7,6 +7,7 @@
 
 #include "CommonEnums.h"
 #include "jsonCommonFunctions.h"
+#include "MessageProcessing.h"
 #include "ROSEnums.h"
 
 void UDPNode::processInMainLoop()
@@ -23,6 +24,14 @@ void UDPNode::subscribeTopics()
 	                                                             &UDPNode::sendThrustersSignalToMicroController,
 	                                                             this ) );
 	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::HardwareSignals::signalToServos,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &UDPNode::sendServosSignalToMicroController,
+	                                                             this ) );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrusters,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &UDPNode::sendThrustersSignalToMicroController,
+	                                                             this ) );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetServos,
 	                                                             AUVROS::QueueSize::StandardQueueSize,
 	                                                             &UDPNode::sendServosSignalToMicroController,
 	                                                             this ) );
@@ -54,6 +63,9 @@ void UDPNode::loadNetworkConfig()
 		this->serverPort = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::jetson );
 		this->clientPort
 		    = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::microcontroller );
+			this->serverAdress = jsonFunctions::network::readDeviceIPNumber( configFileID, network::Device::jetson );
+		this->clientAdress
+		    = jsonFunctions::network::readDeviceIPNumber( configFileID, network::Device::microcontroller );
 	}
 	catch( const std::exception& e )
 	{
@@ -123,8 +135,8 @@ void UDPNode::processOutgoingMessages( const Frame& frame )
 			byteArray.at( j ) = *bytePointer;
 			++bytePointer;
 		}
-		// going from end to beginning because of little endian
-		for( auto it = byteArray.rbegin(); it != byteArray.rend(); ++it )
+
+		for( auto it = byteArray.begin(); it != byteArray.end(); ++it )
 		{
 			message.push_back( *it );
 		}
@@ -140,7 +152,7 @@ void UDPNode::sendThrustersSignalToMicroController( const AUVROS::MessageTypes::
 	frame.payloadSize = length;
 	for( auto i = 0u; i < length; ++i )
 	{
-		frame.payload[ i ] = message.data[ i ];
+		frame.payload[ i ] = adjustThrusterValues( message.data[ i ] );
 	}
 
 	this->processOutgoingMessages( frame );

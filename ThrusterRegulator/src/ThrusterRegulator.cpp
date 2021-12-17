@@ -6,7 +6,24 @@
 #include "external/EigenQP/EigenQP.h"
 #include "ROSEnums.h"
 
-void ThrusterRegulator::processInMainLoop() {}
+void ThrusterRegulator::processInMainLoop()
+{
+
+	if( ticks % regulatorTickSpan == 0 )
+	{
+		ramp += deltaRamp;
+		if( ramp >= 1.0f )
+		{
+			ramp = 0.0f;
+		}
+		AUVROS::MessageTypes::ThrustersSignal dummy;
+		dummy.layout.dim.emplace_back( std_msgs::MultiArrayDimension() );
+
+		dummy.data                     = { ramp, ramp, ramp, ramp, ramp };
+		dummy.layout.dim.begin()->size = 5;
+		rosPublishers.at( advertisers::thrustersArbitrarly )->publish( dummy );
+	}
+}
 void ThrusterRegulator::subscribeTopics()
 {
 	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrusters,
@@ -18,6 +35,7 @@ void ThrusterRegulator::subscribeTopics()
 	                                                             &ThrusterRegulator::sendArbitrarlySetServos,
 	                                                             this ) );
 }
+
 void ThrusterRegulator::advertiseTopics()
 {
 	this->rosPublishers.emplace_back(
@@ -27,6 +45,14 @@ void ThrusterRegulator::advertiseTopics()
 	this->rosPublishers.emplace_back(
 	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
 	        AUVROS::Topics::HardwareSignals::signalToServos, AUVROS::QueueSize::StandardQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ThrustersSignal >(
+	        AUVROS::Topics::DevPC::arbitrarlySetThrusters, AUVROS::QueueSize::StandardQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
+	        AUVROS::Topics::DevPC::arbitrarlySetServos, AUVROS::QueueSize::StandardQueueSize ) ) );
 }
 void ThrusterRegulator::connectServices() {}
 
@@ -35,6 +61,7 @@ void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 	this->lqrRegulator              = jsonFunctions::regulator::readLQRData( config );
 	this->penalizers                = jsonFunctions::regulator::readPenalizerData( config );
 	this->regulatorWorkingFrequency = jsonFunctions::regulator::readWorkingFrequency( config );
+	this->regulatorTickSpan         = static_cast< unsigned >( this->rosRate / this->regulatorWorkingFrequency );
 
 	this->thrustValues_u    = VectorXd::Zero( model.getModelThrusters().thrustersAmount, 1 );
 	this->servoAngles_alpha = VectorXd::Zero( model.getModelThrusters().numberOfAzimuthalThrusters, 1 );
@@ -153,6 +180,18 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	MatrixXd diff_T = MatrixXd::Zero( azimuthalDesiredForces_tau.size(), 2 );
 
 	// First and second azimuthal thruster. Below are calculated derivatives of thrust. conf. matrices
+
+	// Jka masz wektor sygnalow pednikow (u) to musisz go rozdzielic na 2 podwektory - taki co idzie do QP i taki co nie
+	// idzie. tutaj brane bylo X,Y YAW z pednikow 1 i 2 do osobnych wektorow jako pochodne, dlatego przemnozone
+	// jest przez te sinusy da1 << -sin( servoAngle_alpha( 0 ) ) * thrustSignal_u( 0 ), cos( servoAngle_alpha( 0 ) ) *
+	// thrustSignal_u( 0 ),
+	//     ( ( -0.165 * sin( servoAngle_alpha( 0 ) ) ) + ( 0.038 * cos( servoAngle_alpha( 0 ) ) ) ) * thrustSignal_u( 0
+	//     );
+	// da2 << -sin( servoAngle_alpha( 1 ) ) * thrustSignal_u( 1 ), cos( servoAngle_alpha( 1 ) ) * thrustSignal_u( 1 ),
+	//     ( ( 0.165 * sin( servoAngle_alpha( 1 ) ) ) + ( 0.038 * cos( servoAngle_alpha( 1 ) ) ) ) * thrustSignal_u( 1
+	//     );
+
+	// TODO: zmien nazwe  da1 i da2, daj sprytne mnozenie przez pochodne funkcji kata
 	da1 << -sin( servoAngle_alpha( 0 ) ) * thrustSignal_u( 0 ), cos( servoAngle_alpha( 0 ) ) * thrustSignal_u( 0 ),
 	    ( ( -0.165 * sin( servoAngle_alpha( 0 ) ) ) + ( 0.038 * cos( servoAngle_alpha( 0 ) ) ) ) * thrustSignal_u( 0 );
 	da2 << -sin( servoAngle_alpha( 1 ) ) * thrustSignal_u( 1 ), cos( servoAngle_alpha( 1 ) ) * thrustSignal_u( 1 ),
@@ -206,10 +245,6 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 
 	QP::solve_quadprog( H, f, Aeq, Beq, Ci, ci0, x );
 
-	// Solving and printing quadprog
-	//    std::cout << "Solve quadprog:" << QP::solve_quadprog(H,f,Aeq,Beq,Ci,ci0,x) << std::endl;
-	//    std::cout << "x= " << std::endl << x << std::endl;
-
 	thrustSignal_u( 0 ) += x( 0 ); // Adding values of calculated change in force
 	thrustSignal_u( 1 ) += x( 1 );
 
@@ -229,7 +264,8 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	Thrust_conf_inv = Thrust_conf.completeOrthogonalDecomposition().pseudoInverse();
 
 	// Matrix of maximum values of thrust force
-	Vector3d diag_K( 40.0, 40.0, 40.0 );
+	Vector3d diag_K(
+	    model.getModelThrusters().maxThrust, model.getModelThrusters().maxThrust, model.getModelThrusters().maxThrust );
 	Matrix3d K;
 	K = diag_K.asDiagonal();
 
@@ -247,7 +283,7 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	thrustSignal_u( 4 ) = u2( 2 );
 
 	// Adding some inertia to the thrusters
-	for( int i = 0; i <= 4; i++ )
+	for( int i = 0; i < model.getModelThrusters().thrustersAmount; i++ )
 	{
 		if( ( thrustSignal_u( i ) - uPrev( i ) ) > deltaU_max )
 		{
@@ -260,7 +296,7 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	}
 
 	// Making sure that we cannot demand 110% of power
-	for( int i = 0; i <= 4; i++ )
+	for( int i = 0; i < model.getModelThrusters().thrustersAmount; i++ )
 	{
 		if( thrustSignal_u( i ) > 1.0 )
 		{

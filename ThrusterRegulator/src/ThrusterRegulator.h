@@ -15,10 +15,10 @@ using namespace Eigen;
 using namespace regulator;
 
 void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
-                     VectorXd& servoAngle_alpha,
-                     const VectorXd& desiredForces_tau,
-                     const VehiclePhysicalModel& model,
-                     const AllocationPenalizers& penalizers );
+                               VectorXd& servoAngle_alpha,
+                               const VectorXd& desiredForces_tau,
+                               const VehiclePhysicalModel& model,
+                               const AllocationPenalizers& penalizers );
 MatrixXd calculateNbar( const Matrix< double, stateDim, stateDim >& A,
                         const Matrix< double, stateDim, controlDim >& B,
                         const Matrix< double, controlDim, stateDim >& K );
@@ -40,6 +40,14 @@ public:
 
 protected:
 private:
+	enum advertisers
+	{
+		signalToThrusters,
+		signalToServos,
+		thrustersArbitrarly,
+		servosArbitrarly
+	};
+
 	VehiclePhysicalModel model;
 	LQRRegulator lqrRegulator;
 	AllocationPenalizers penalizers;
@@ -51,7 +59,9 @@ private:
 	ct::optcon::LQR< controlDim, controlDim > lqrSolver;
 
 	float regulatorWorkingFrequency{ 10.0f };
-
+	unsigned regulatorTickSpan;
+	float ramp{ 0.0f };
+	float deltaRamp{ 0.02f };
 	void processInMainLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;

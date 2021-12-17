@@ -20,9 +20,9 @@ class UDPNode final : public NodeBase
 {
 	struct Frame
 	{
-		Command commandCode;
+		uint8_t commandCode;
 		uint8_t payloadSize;
-		std::array< float, network::UDPpayloadMaxSize > payload;
+		std::array< network::payloadWordType, network::UDPpayloadMaxSize > payload;
 	};
 
 public:
@@ -30,7 +30,7 @@ public:
 	    : NodeBase( node, configID, nID )
 	{
 		loadNetworkConfig();
-		this->udpServer = std::make_unique< UDPServer >( this->serverPort, 53060 );
+		this->udpServer = std::make_unique< UDPServer >( serverPort, clientPort, serverAdress, clientAdress );
 
 		subscribeTopics();
 		advertiseTopics();
@@ -43,11 +43,11 @@ private:
 
 	std::unique_ptr< UDPServer > udpServer;
 
-	ros::Publisher arbitrarlySetThrusters;
-
 	// jetson is the udp server
 	uint16_t serverPort;
 	uint16_t clientPort;
+	std::string serverAdress;
+	std::string clientAdress;
 
 	void processInMainLoop() override;
 	void subscribeTopics() override;
