@@ -60,8 +60,6 @@ private:
 
 	float regulatorWorkingFrequency{ 10.0f };
 	unsigned regulatorTickSpan;
-	float ramp{ 0.0f };
-	float deltaRamp{ 0.02f };
 	void processInMainLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;

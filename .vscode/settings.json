@@ -71,5 +71,6 @@
         "csignal": "cpp",
         "codecvt": "cpp",
         "shared_mutex": "cpp"
-    }
+    },
+    "ros.distro": "noetic"
 }

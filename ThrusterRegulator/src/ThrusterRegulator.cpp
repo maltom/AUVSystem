@@ -11,17 +11,7 @@ void ThrusterRegulator::processInMainLoop()
 
 	if( ticks % regulatorTickSpan == 0 )
 	{
-		ramp += deltaRamp;
-		if( ramp >= 1.0f )
-		{
-			ramp = 0.0f;
-		}
-		AUVROS::MessageTypes::ThrustersSignal dummy;
-		dummy.layout.dim.emplace_back( std_msgs::MultiArrayDimension() );
-
-		dummy.data                     = { ramp, ramp, ramp, ramp, ramp };
-		dummy.layout.dim.begin()->size = 5;
-		rosPublishers.at( advertisers::thrustersArbitrarly )->publish( dummy );
+		
 	}
 }
 void ThrusterRegulator::subscribeTopics()
