@@ -1,7 +1,10 @@
 #pragma once
 
+#include <array>
 #include <fstream>
+#include <functional>
 #include <memory>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -12,7 +15,8 @@
 using namespace Eigen;
 using namespace regulator;
 
-class VehiclePhysicalModel;
+using TorquesFunctions
+    = std::vector< std::tuple< std::function< double() >, std::function< double( double ) >, double > >;
 
 Matrix3d Smtrx( const Eigen::Vector3d& r );
 
@@ -62,15 +66,37 @@ public:
 
 	struct Thrusters
 	{
+		struct LinearForcesFunction
+		{
+			double minusFactor{ 1.0 };
+			std::function< double( double ) > trigonometricFunction;
+		};
+
+		struct TorqueFunction
+		{
+			double minusFactor{ 1.0 };
+			std::function< double( double ) > trigonometricFunction;
+			dimensionsIndex dimensionToMultiply{ dimensionsIndex::x };
+		};
+
+		struct AzimuthalThrusterFunctions
+		{
+			std::array< LinearForcesFunction, 3 > linearForces;
+			std::array< std::pair< TorqueFunction, TorqueFunction >, 3 > torques;
+		};
+
 		// configuration - the  , {x, y, z, p, q, r}
 		MatrixXd AllThrustersConfigurationsMatrix = MatrixXd::Zero( sixDim, 5 );
 
 		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
 		std::vector< VectorXd > thrusterConfigurations;
 		MatrixXd azimuthalThrustersConfigMatrix;
+
+		std::vector< AzimuthalThrusterFunctions > azimuthalBaseFunctions;
+		std::vector< AzimuthalThrusterFunctions > azimuthalDerivativeFunctions;
+
 		// inertia of thruster - how fast can thrusters change their generated thrust per deltaT
 		double deltaU{ 0.0 };
-
 		double maxThrust;
 		unsigned numberOfAzimuthalThrusters{ 0u };
 		unsigned thrustersAmount{ 0u };

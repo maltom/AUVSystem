@@ -25,42 +25,42 @@ class configFile;
 
 namespace jsonFunctions
 {
-	extern std::mutex busy;
+extern std::mutex busy;
 
-	namespace ROS
-	{
-		extern double readDebugRate( configFiles::fileID configID );
-		extern double readRosRate( configFiles::fileID configID );
-		extern double readHealthCheckRate( configFiles::fileID configID );
-		extern double readHealthReportRate( configFiles::fileID configID );
-	} // namespace ROS
-	namespace network
-	{
-		extern uint16_t readDevicePortNumber( configFiles::fileID configID, Device device );
-		extern std::string readDeviceIPNumber( configFiles::fileID configID, Device device );
-	} // namespace network
+namespace ROS
+{
+	extern double readDebugRate( configFiles::fileID configID );
+	extern double readRosRate( configFiles::fileID configID );
+	extern double readHealthCheckRate( configFiles::fileID configID );
+	extern double readHealthReportRate( configFiles::fileID configID );
+} // namespace ROS
+namespace network
+{
+	extern uint16_t readDevicePortNumber( configFiles::fileID configID, Device device );
+	extern std::string readDeviceIPNumber( configFiles::fileID configID, Device device );
+} // namespace network
 
-	namespace vehicle
-	{
-		extern VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID );
-		extern VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID );
-		extern VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID );
-		extern VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID );
-	} // namespace vehicle
+namespace vehicle
+{
+	extern VehiclePhysicalModel::Inertial readInertialData( configFiles::fileID configID );
+	extern VehiclePhysicalModel::Thrusters readThrustersData( configFiles::fileID configID );
+	extern VehiclePhysicalModel::Servos readServosData( configFiles::fileID configID );
+	extern VehiclePhysicalModel::Drag readDragData( configFiles::fileID configID );
+} // namespace vehicle
 
-	namespace regulator
-	{
-		extern AllocationPenalizers readPenalizerData( configFiles::fileID configID );
-		extern LQRRegulator readLQRData( configFiles::fileID configID );
-		extern double readWorkingFrequency( configFiles::fileID configID );
-	} // namespace regulator
+namespace regulator
+{
+	extern AllocationPenalizers readPenalizerData( configFiles::fileID configID );
+	extern LQRRegulator readLQRData( configFiles::fileID configID );
+	extern double readWorkingFrequency( configFiles::fileID configID );
+} // namespace regulator
 
-	namespace cameras
-	{
-		extern bool checkForStereoscopicCameraPresent( configFiles::fileID configID );
-		extern uint8_t countAdditionalCameras( configFiles::fileID configID );
-		// extern std::vector< float > getFOV( configFiles::fileID configID );
-	} // namespace cameras
+namespace cameras
+{
+	extern bool checkForStereoscopicCameraPresent( configFiles::fileID configID );
+	extern uint8_t countAdditionalCameras( configFiles::fileID configID );
+	// extern std::vector< float > getFOV( configFiles::fileID configID );
+} // namespace cameras
 
 } // namespace jsonFunctions
 
