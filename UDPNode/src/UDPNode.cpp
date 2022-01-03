@@ -102,13 +102,6 @@ UDPNode::Frame UDPNode::decomposeFrame( const network::UDPincomingMessage& incMs
 
 void UDPNode::processCommand( const Frame& frame )
 {
-	// std::cout << "KOMENDA NR: " << frame.commandCode << "\n";
-	// std::cout << "ROZMIAR: " << frame.payloadSize << "\n";
-	// for( int i = 0; i < frame.payloadSize; ++i )
-	// {
-	// 	std::cout << "|" << frame.payload[ i ];
-	// }
-	// std::cout << "\n";
 	switch( frame.commandCode )
 	{
 	case Command::HEARTBEAT:

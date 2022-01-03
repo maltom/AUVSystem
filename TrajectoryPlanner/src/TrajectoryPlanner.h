@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <queue>
 #include <vector>
 
 #include <geometry_msgs/Twist.h>
@@ -9,11 +10,22 @@
 
 #include "CommonEnums.h"
 #include "NodeBase.h"
+#include "ROSEnums.h"
 
-using wayPoint = geometry_msgs::Twist;
+// Dummy declarations for unknown types - these will be declared in ROSEnums, not here
+using OccupancyGrid  = int; // OccupancyGrid is to become a custom message type
+using GenerationMode = int; // three variants - 1. long straights (pinger, "banana" marker), 2. path between
+                            // obstacles, 3. precise steering to reach the object of interest
 
 class TrajectoryPlanner final : public NodeBase
 {
+	enum class WaypointType
+	{
+		first,
+		intermediate,
+		target
+	};
+
 public:
 	TrajectoryPlanner( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID, AUVROS::NodeIDs nID )
 	    : NodeBase( node, configID, nID )
@@ -30,6 +42,18 @@ private:
 	void advertiseTopics() override;
 	void connectServices() override;
 
-	std::vector< wayPoint > plannedPath;
-	wayPoint currentPosition;
+	void receiveOccupancyGrid( const OccupancyGrid& grid ); // receive occupancy grid and create a local copy here
+	void generatePath();                                    // use local copy of OccupancyGrid inside
+
+	void checkCurrentPathForCollisions();
+	void switchPublisherToNextWaypoint(
+	    bool shouldSwitch ); // method to call when thruster sends "signal" on topic to change -
+	                         // with argument because you can't send an empty message
+
+	void notifyTargetWaypointReached();   // signalizing to other nodes
+	void publishCurrentWaypointToReach(); // publishing Waypoint in meters
+
+	OccupancyGrid occupancyGrid;
+	std::queue< AUVROS::MessageTypes::Waypoint > plannedPath;
+	AUVROS::MessageTypes::Position currentPosition;
 };

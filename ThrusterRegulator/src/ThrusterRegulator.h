@@ -65,8 +65,4 @@ private:
 	void advertiseTopics() override;
 	void connectServices() override;
 	void loadRegulatorParameters( configFiles::fileID configID );
-
-	void sendArbitrarlySetThrusters( const AUVROS::MessageTypes::ThrustersSignal& signal );
-	void sendArbitrarlySetServos( const AUVROS::MessageTypes::ServosSignal& signal );
-	// void allocateThrust();
 };

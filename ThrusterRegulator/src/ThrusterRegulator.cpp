@@ -16,14 +16,7 @@ void ThrusterRegulator::processInMainLoop()
 }
 void ThrusterRegulator::subscribeTopics()
 {
-	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrusters,
-	                                                             AUVROS::QueueSize::StandardQueueSize,
-	                                                             &ThrusterRegulator::sendArbitrarlySetThrusters,
-	                                                             this ) );
-	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetServos,
-	                                                             AUVROS::QueueSize::StandardQueueSize,
-	                                                             &ThrusterRegulator::sendArbitrarlySetServos,
-	                                                             this ) );
+
 }
 
 void ThrusterRegulator::advertiseTopics()
@@ -35,14 +28,6 @@ void ThrusterRegulator::advertiseTopics()
 	this->rosPublishers.emplace_back(
 	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
 	        AUVROS::Topics::HardwareSignals::signalToServos, AUVROS::QueueSize::StandardQueueSize ) ) );
-
-	this->rosPublishers.emplace_back(
-	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ThrustersSignal >(
-	        AUVROS::Topics::DevPC::arbitrarlySetThrusters, AUVROS::QueueSize::StandardQueueSize ) ) );
-
-	this->rosPublishers.emplace_back(
-	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
-	        AUVROS::Topics::DevPC::arbitrarlySetServos, AUVROS::QueueSize::StandardQueueSize ) ) );
 }
 void ThrusterRegulator::connectServices() {}
 
@@ -301,6 +286,3 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	// std::cout << "Alpha 01: " << alpha01 << " alpha 02: " << alpha02 << std::endl;
 	// std::cout << "u = " << u << std::endl;
 }
-
-void ThrusterRegulator::sendArbitrarlySetThrusters( const AUVROS::MessageTypes::ThrustersSignal& signal ) {}
-void ThrusterRegulator::sendArbitrarlySetServos( const AUVROS::MessageTypes::ServosSignal& signal ) {}
