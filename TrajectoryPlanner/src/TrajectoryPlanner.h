@@ -42,8 +42,11 @@ private:
 	void advertiseTopics() override;
 	void connectServices() override;
 
-	void receiveOccupancyGrid( const OccupancyGrid& grid ); // receive occupancy grid and create a local copy here
-	void generatePath();                                    // use local copy of OccupancyGrid inside
+	void generateObstacleModeTrajectory( const OccupancyGrid& grid ); // for ros, receive argument from caller
+	void generatePreciseTrajectory( const AUVROS::MessageTypes::Position& target ); // same
+	void generateStraightTrajectory( const double azimuth );                        // same
+
+	void generatePath( const GenerationMode mode );
 
 	void checkCurrentPathForCollisions();
 	void switchPublisherToNextWaypoint(
