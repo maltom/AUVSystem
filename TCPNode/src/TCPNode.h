@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fstream>
 #include <memory>
 #include <queue>
 #include <string>
@@ -11,48 +10,51 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
 
-#include "CommonEnums.h"
 #include "auvConfig/CommunicationCodes.h"
+#include "external/jsonxx/jsonxx.h"
+#include "CommonEnums.h"
 #include "NodeBase.h"
+#include "ROSEnums.h"
+#include "TCPClient.h"
 
 class TCPNode final : public NodeBase
 {
 	struct Frame
 	{
-		Command commandCode;
-		uint8_t payloadSize;
-		std::array< float, network::UDPpayloadMaxSize > payload;
+		
 	};
 
 public:
 	TCPNode( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID, AUVROS::NodeIDs nID )
 	    : NodeBase( node, configID, nID )
 	{
-		// loadNetworkConfig();
+		loadNetworkConfig();
+		this->tcpClient = std::make_unique< TCPClient >( serverPort, clientPort, serverAdress, clientAdress );
+
 		subscribeTopics();
 		advertiseTopics();
 	}
-	~TCPNode() = default;
 
-	// protected:
-	// private:
-	// 	std::queue< network::UDPincomingMessage > incomingMessages;
-	// 	std::queue< network::UDPoutgoingMessage > outgoingMessages;
+private:
+	std::queue< network::UDPincomingMessage > incomingMessages;
+	std::queue< network::UDPoutgoingMessage > outgoingMessages;
 
-	// 	std::unique_ptr< TCPServer > udpServer;
+	std::unique_ptr< TCPClient > tcpClient;
 
-	// 	// jetson is the udp server
-	// 	uint16_t serverPort;
-	// 	uint16_t clientPort;
+	// system is the tcp client
+	uint16_t serverPort;
+	uint16_t clientPort;
+	std::string serverAdress;
+	std::string clientAdress;
 
 	void processInMainLoop() override;
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;
 
-	// 	void loadNetworkConfig();
-	// 	void processIncomingMessages();
-	// 	void processOutgoingMessages( const Frame& frameToSend );
-	// 	Frame decomposeFrame( const network::UDPincomingMessage& incMsg );
-	// 	void processCommand( const Frame& frame );
+	void loadNetworkConfig();
+	void processIncomingMessages();
+	void processOutgoingMessages( const Frame& frameToSend );
+	Frame decomposeFrame( const network::UDPincomingMessage& incMsg );
+	void processCommand( const Frame& frame );
 };

@@ -67,7 +67,7 @@ namespace cameras
 class ConfigFile
 {
 public:
-	ConfigFile( configFiles::fileID configID )
+	explicit ConfigFile( configFiles::fileID configID )
 	{
 		configFileFstream.open( configFiles::filePaths.at( configID ), std::ios::in );
 

@@ -35,7 +35,7 @@ void Debug::subscribeTopics()
 
 void Debug::displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report )
 {
-	std::vector< DataType > values;
+	std::vector< DataType > values{};
 
 	std::bitset< AUVROS::NodeIDs::Count > nodesHealthSet( report.data );
 
@@ -57,7 +57,7 @@ void Debug::displayArbitrarlySetThrustersStatus( const AUVROS::MessageTypes::Thr
 {
 	std::vector< DataType > values;
 
-	for( auto i = 0u; i < 5u; ++i )
+		for( auto i = 0u; i < message.data.size(); ++i )
 	{
 		values.emplace_back( std::to_string( message.data.at( i ) ) );
 	}
@@ -69,7 +69,7 @@ void Debug::connectServices() {}
 
 bool Debug::countAndCompareNumberOfTopics() const
 {
-	unsigned countActive;
+	unsigned countActive{ 0u };
 	for( auto& in : listOfTopics )
 	{
 		if( in.name.find( AUVROS::Folders::MainFolderShort ) != std::string::npos )

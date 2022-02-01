@@ -9,11 +9,15 @@ set(MODULES
 
 set(SOURCES
     src/main.cpp
+    src/MessageProcessing.cpp
     src/TCPNode.cpp
+    src/TCPClient.cpp
 )
 
 set(HEADERS
+    src/MessageProcessing.h
     src/TCPNode.h
+    src/TCPClient.h
 )
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 

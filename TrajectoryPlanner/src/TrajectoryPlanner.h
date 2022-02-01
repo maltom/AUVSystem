@@ -56,7 +56,7 @@ private:
 	void notifyTargetWaypointReached();   // signalizing to other nodes
 	void publishCurrentWaypointToReach(); // publishing Waypoint in meters
 
-	OccupancyGrid occupancyGrid;
+	OccupancyGrid occupancyGrid;	// local occupancy grid is needed to mark waypoints inside
 	std::queue< AUVROS::MessageTypes::Waypoint > plannedPath;
 	AUVROS::MessageTypes::Position currentPosition;
 };

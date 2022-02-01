@@ -14,5 +14,5 @@ int main( int argc, char** argv )
 	std::shared_ptr< ros::NodeHandle > tcpNodeNode = std::make_shared< ros::NodeHandle >();
 
 	TCPNode tcpNode( tcpNodeNode, configFiles::fileID::main_file, AUVROS::NodeIDs::TCPNode );
-    tcpNode.startMainLoop();
+	tcpNode.startMainLoop();
 }

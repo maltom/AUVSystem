@@ -18,7 +18,6 @@ class StateStack final
 {
 public:
 	StateStack();
-	~StateStack() {}
 
 	std::shared_ptr< T > getCurrentState() const;
 	void setStateInsteadOfCurrent( StateEnums stateEnum );
@@ -54,7 +53,7 @@ void StateStack< T >::setStateInsteadOfCurrent( StateEnums stateEnum )
 	}
 	else
 	{
-		throw "StateStack is empty!";
+		throw std::runtime_error( "StateStack is empty!" );
 	}
 }
 
@@ -67,7 +66,7 @@ void StateStack< T >::popState()
 	}
 	else
 	{
-		throw "StateStack can't be empty!";
+		throw std::runtime_error( "StateStack can't be empty!" );
 	}
 }
 
@@ -83,7 +82,7 @@ void StateStack< T >::popMultipleStates( unsigned number )
 	}
 	else
 	{
-		throw "Too few states on stack to pop!";
+		throw std::runtime_error( "Too few states on stack to pop!" );
 	}
 }
 

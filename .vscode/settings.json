@@ -72,5 +72,9 @@
         "codecvt": "cpp",
         "shared_mutex": "cpp"
     },
-    "ros.distro": "noetic"
+    "files.exclude": {
+        "**/external": true
+    },
+    "ros.distro": "noetic",
+    "C_Cpp.codeAnalysis.clangTidy.enabled": true
 }

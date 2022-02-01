@@ -1,0 +1,6 @@
+Checks: 'cppcoreguidelines-*,hicpp-*,clang-analyzer-,bugprone-,boost-,cppcoreguidelines-,google-,modernize-,-hicpp-uppercase-literal-suffix,-cppcoreguidelines-init-variables,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-non-private-member-variables-in-classes'
+CheckOptions:
+    - key: bugprone-argument-comment.StrictMode
+      value: 1
+    - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+      value: 1

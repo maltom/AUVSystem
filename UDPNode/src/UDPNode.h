@@ -43,7 +43,7 @@ private:
 
 	std::unique_ptr< UDPServer > udpServer;
 
-	// jetson is the udp server
+	// system is the udp server
 	uint16_t serverPort;
 	uint16_t clientPort;
 	std::string serverAdress;

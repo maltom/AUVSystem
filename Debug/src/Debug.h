@@ -16,9 +16,9 @@
 
 namespace labels
 {
-	const std::array< std::string, 5 > thrusters{
-		"Thruster #1", "Thruster #2", "Thruster #3", "Thruster #4", "Thruster #5"
-	};
+const std::array< std::string, 5 > thrusters{
+	"Thruster #1", "Thruster #2", "Thruster #3", "Thruster #4", "Thruster #5"
+};
 }
 
 class Debug final : public NodeBase
@@ -33,7 +33,6 @@ public:
 		subscribeTopics();
 		advertiseTopics();
 	}
-	~Debug() = default;
 
 protected:
 private:

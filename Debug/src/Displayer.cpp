@@ -10,7 +10,7 @@ void Displayer::addInfoToDisplay( const std::string& header,
 {
 	if( header.size() > display::headerDisplayWidth )
 	{
-		throw "Header name is too long.";
+		throw std::runtime_error( "Header name is too long." );
 	}
 
 	this->dataColumns.emplace_back( header, labels, init );
@@ -20,7 +20,7 @@ void Displayer::setMajorColumnValues( unsigned dataColumnIndex, const std::vecto
 {
 	if( this->dataColumns.at( dataColumnIndex ).dataLabelsFields.size() != dataForDisplayer.size() )
 	{
-		throw "Wrong data or data size for display.";
+		throw std::runtime_error( "Wrong data or data size for display." );
 	}
 
 	for( auto i = 0u; i < dataForDisplayer.size(); ++i )
@@ -208,7 +208,7 @@ void Displayer::displayDebugInfo( bool isNumberOfSubscribedTopicsGood ) const
 
 	// bottom
 	finalDisplay.append( createUtilityRow( display::rowType::bottomBorder ) );
-	int r = system( "clear" );
+	system( "clear" );
 	finalDisplay.shrink_to_fit();
 	std::cout << finalDisplay;
 }

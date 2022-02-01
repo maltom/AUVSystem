@@ -76,7 +76,7 @@ namespace network
 		}
 		else
 		{
-			throw "Config file doesn't have any network data!";
+			throw std::runtime_error( "Config file doesn't have any network data!" );
 		}
 		auto devicesConfig = networkConfig.get< jsonxx::Object >( "devices" );
 		jsonxx::Object deviceObj;
@@ -89,7 +89,7 @@ namespace network
 			}
 			else
 			{
-				throw "Config file doesn't have devPC network data!";
+				throw std::runtime_error( "Config file doesn't have devPC network data!" );
 			}
 			break;
 		case Device::DVL:
@@ -99,7 +99,7 @@ namespace network
 			}
 			else
 			{
-				throw "Config file doesn't have DVL network data!";
+				throw std::runtime_error( "Config file doesn't have DVL network data!" );
 			}
 			break;
 		case Device::jetson:
@@ -109,7 +109,7 @@ namespace network
 			}
 			else
 			{
-				throw "Config file doesn't have jetson network data!";
+				throw std::runtime_error( "Config file doesn't have jetson network data!" );
 			}
 			break;
 		case Device::microcontroller:
@@ -119,7 +119,7 @@ namespace network
 			}
 			else
 			{
-				throw "Config file doesn't have microcontroller network data!";
+				throw std::runtime_error( "Config file doesn't have microcontroller network data!" );
 			}
 			break;
 		default:
@@ -145,7 +145,7 @@ namespace network
 		}
 		else
 		{
-			throw "Config file doesn't have any network data!";
+			throw std::runtime_error( "Config file doesn't have any network data!" );
 		}
 		auto devicesConfig = networkConfig.get< jsonxx::Object >( "devices" );
 		jsonxx::Object deviceObj;
@@ -158,7 +158,7 @@ namespace network
 			}
 			else
 			{
-				throw "Config file doesn't have devPC network data!";
+				throw std::runtime_error( "Config file doesn't have devPC network data!" );
 			}
 			break;
 		case Device::DVL:
@@ -168,7 +168,7 @@ namespace network
 			}
 			else
 			{
-				throw "Config file doesn't have DVL network data!";
+				throw std::runtime_error( "Config file doesn't have DVL network data!" );
 			}
 			break;
 		case Device::jetson:
@@ -178,7 +178,7 @@ namespace network
 			}
 			else
 			{
-				throw "Config file doesn't have jetson network data!";
+				throw std::runtime_error( "Config file doesn't have jetson network data!" );
 			}
 			break;
 		case Device::microcontroller:
@@ -188,7 +188,7 @@ namespace network
 			}
 			else
 			{
-				throw "Config file doesn't have microcontroller network data!";
+				throw std::runtime_error( "Config file doesn't have microcontroller network data!" );
 			}
 			break;
 		default:
@@ -199,7 +199,7 @@ namespace network
 		std::string result;
 		if( ipArray.size() != 4 )
 		{
-			throw "IP is invalid.";
+			throw std::runtime_error( "IP is invalid." );
 		}
 		else
 		{
@@ -338,7 +338,7 @@ namespace vehicle
 			else if( str == "0" )
 				return static_cast< dimensionsIndex >( 0 );
 			else
-				throw "Wrong dimension index in Azimuthal Math";
+				throw std::runtime_error( "Wrong dimension index in Azimuthal Math" );
 		};
 
 		for( auto i = 0u; i < azimuthalThrustersCount; ++i )
@@ -431,11 +431,11 @@ namespace vehicle
 
 		if( dimensionsOfInfluence.size() > azimuthalThrustersCount )
 		{
-			throw "Too much data describing dimensions of influence.";
+			throw std::runtime_error( "Too much data describing dimensions of influence." );
 		}
 		else if( dimensionsOfInfluence.size() < azimuthalThrustersCount )
 		{
-			throw "Not all azimuthal thrusters are described!";
+			throw std::runtime_error( "Not all azimuthal thrusters are described!" );
 		}
 
 		for( auto i = 0u; i < azimuthalThrustersCount; ++i )
@@ -581,11 +581,11 @@ namespace regulator
 
 		if( QVectorData.size() != ::regulator::stateDim )
 		{
-			throw "Wrong number of parameters in QMatrix!";
+			throw std::runtime_error( "Wrong number of parameters in QMatrix!" );
 		}
 		if( RVectorData.size() != ::regulator::controlDim )
 		{
-			throw "Wrong number of parameters in RMatrix!";
+			throw std::runtime_error( "Wrong number of parameters in RMatrix!" );
 		}
 
 		VectorXd Qvec = VectorXd::Zero( ::regulator::stateDim );
@@ -655,7 +655,7 @@ namespace cameras
 			result = true;
 			break;
 		default:
-			throw "More than one stereoscopic camera found in config!";
+			throw std::runtime_error( "More than one stereoscopic camera found in config!" );
 			break;
 		}
 		return result;
@@ -671,7 +671,7 @@ namespace cameras
 		auto stereoscopic = cameraData.get< jsonxx::Array >( "stereoscopic" );
 		if( stereoscopic.size() != cameraData.get< jsonxx::Array >( "positionsAndRotations" ).size() )
 		{
-			throw "Data describing camera is corrupted.";
+			throw std::runtime_error( "Data describing camera is corrupted." );
 		}
 		uint8_t data{ 0u };
 

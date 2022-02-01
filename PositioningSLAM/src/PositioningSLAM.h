@@ -10,8 +10,6 @@
 #include "CommonEnums.h"
 #include "NodeBase.h"
 
-using position = geometry_msgs::Twist;
-
 class PositioningSLAM final : public NodeBase
 {
 public:
@@ -29,4 +27,7 @@ private:
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;
+
+
+	void update
 };
