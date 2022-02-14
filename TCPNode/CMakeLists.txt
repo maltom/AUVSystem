@@ -10,8 +10,9 @@ set(MODULES
 set(SOURCES
     src/main.cpp
     src/MessageProcessing.cpp
-    src/TCPNode.cpp
     src/TCPClient.cpp
+    src/jsonTCPFunctions.cpp
+    src/TCPNode.cpp
 )
 
 set(HEADERS

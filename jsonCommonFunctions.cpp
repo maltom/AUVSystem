@@ -63,6 +63,8 @@ namespace ROS
 } // namespace ROS
 namespace network
 {
+	using namespace ::network;
+
 	uint16_t readDevicePortNumber( configFiles::fileID configID, Device device )
 	{
 
