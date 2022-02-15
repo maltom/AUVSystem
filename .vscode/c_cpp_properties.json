@@ -4,14 +4,12 @@
             "name": "Linux",
             "includePath": [
                 "/usr/include/c++/9/**",
-                "${workspaceFolder}/",
                 "${workspaceFolder}/**",
-                "/usr/include/libevdev-1.0/",
                 "/opt/ros/noetic/include/",
                 "/usr/include/boost/asio/",
-                "/usr/include/eigen3/Eigen",
+                "/usr/include/eigen3/Eigen/",
                 "/usr/local/include/",
-                "/usr/include/opencv4/"
+                "/usr/include/opencv4/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

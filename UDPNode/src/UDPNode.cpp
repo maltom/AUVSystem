@@ -105,10 +105,8 @@ void UDPNode::processCommand( const Frame& frame )
 	switch( frame.commandCode )
 	{
 	case Command::HEARTBEAT:
-		std::cout << "HARTBIT";
 		break;
 	default:
-		std::cout << "DIFOLT";
 		break;
 	}
 }
