@@ -120,6 +120,7 @@ public:
 
 	Matrix< double, sixDim, sixDim > calculateCoriolisMatrix( const VectorXd& currentState ) const;
 
+	MatrixXd getAzimuthalThrustersConfig() const;
 	void calculateAllThrusterConfigutationMatrix();
 	void updateAzimuthalThrusterConfig( std::vector< double > newServosAngles );
 
@@ -147,7 +148,6 @@ private:
 	void loadPhysicalParameters( configFiles::fileID configID );
 	void adjustParametersForWorkingFrequency( const float freq );
 
-	MatrixXd getAzimuthalThrustersConfig() const;
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 
 	void initMatrices();
