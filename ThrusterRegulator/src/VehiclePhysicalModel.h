@@ -109,7 +109,7 @@ public:
 	{
 		std::vector< std::pair< int, std::vector< dimensionsIndex > > > azimuthalThrusterDimensionsOfInfluence;
 		double servoSpeed{ 0.0 };
-		std::vector< double > servosAngles;
+		std::vector< std::pair< double, dimensionsIndex > > servosAngles;
 	};
 
 	VehiclePhysicalModel( configFiles::fileID configID )
@@ -121,7 +121,7 @@ public:
 	Matrix< double, sixDim, sixDim > calculateCoriolisMatrix( const VectorXd& currentState ) const;
 
 	void calculateAllThrusterConfigutationMatrix();
-	void updateAzimuthalThrusterConfig(std::vector<double> newServosAngles);
+	void updateAzimuthalThrusterConfig( std::vector< double > newServosAngles );
 
 	const Drag& getModelDrag() const
 	{
@@ -147,7 +147,7 @@ private:
 	void loadPhysicalParameters( configFiles::fileID configID );
 	void adjustParametersForWorkingFrequency( const float freq );
 
-	MatrixXd getAzimuthalThrustersConfig();
+	MatrixXd getAzimuthalThrustersConfig() const;
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 
 	void initMatrices();

@@ -481,6 +481,12 @@ namespace vehicle
 
 		data.servoSpeed = servoData.get< jsonxx::Number >( "angleSpeedPerSecond" );
 
+		// awfully bad practice - but very specific to project's hardware
+		for( auto i = 0u; i < azimuthalThrustersCount; ++i )
+		{
+			data.servosAngles.emplace_back( std::make_pair( 0.0, dimensionsIndex::pitch ) );
+		}
+
 		delete desiredConfigFile;
 		busy.unlock();
 		return data;
