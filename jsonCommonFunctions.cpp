@@ -285,7 +285,7 @@ namespace vehicle
 			    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 3 ) ),
 			    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 4 ) ),
 			    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 5 ) );
-			data.thrusterConfigurations.push_back( thrusterVec );
+			data.positionsAndRotations.push_back( thrusterVec );
 		}
 
 		auto isAzimuthalThrusters = thrustersData.get< jsonxx::Array >( "azimuthal" );

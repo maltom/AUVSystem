@@ -10,7 +10,7 @@ TCPClient::TCPClient( const uint16_t serverPort,
                       const std::string& serverIpAdress,
                       const std::string& clientIpAdress )
 {
-	// socket         = std::make_unique< udp::socket >( ioContext,
+	// socket         = std::make_unique< tcp::socket >( ioContext,
 	//   udp::endpoint( address::from_string( serverIpAdress ), serverPort ) );
 	socket         = std::make_unique< tcp::socket >( ioContext, tcp::endpoint( tcp::v4(), serverPort ) );
 	clientEndpoint = tcp::endpoint( address::from_string( clientIpAdress ), clientPort );
@@ -24,7 +24,7 @@ void TCPClient::startServer()
 
 void TCPClient::startReceiving()
 {
-	socket->( boost::asio::buffer( receivedMessage ),
+	socket->as( boost::asio::buffer( receivedMessage ),
 	                            clientEndpoint,
 	                            boost::bind( &TCPClient::handleReceive,
 	                                         this,

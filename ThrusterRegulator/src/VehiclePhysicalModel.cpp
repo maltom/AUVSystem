@@ -1,6 +1,7 @@
 #include "VehiclePhysicalModel.h"
 
 #include <algorithm>
+#include <exception>
 
 #include "jsonCommonFunctions.h"
 
@@ -54,11 +55,7 @@ void VehiclePhysicalModel::initMatrices()
 	// TODO: to musi byc odswiezane - trzeba dopisac funkcje osobna, ktora liczy i updateuje nie tylko macierz, ale tez
 	// TODO: wektory w oparciu o funkcje, ktore musza byc zdefiniowane w pliku. dorob nowy atrybut klasy, ktory bedzie
 	// TODO: przechowywal funkcje do przeliczenia wartosci (sin, cos, zero) jak i pochodne
-	for( auto i = 0u; i < this->thrusterParams.thrustersAmount; ++i )
-	{
-		this->thrusterParams.AllThrustersConfigurationsMatrix.block< 6, 1 >( 0, i )
-		    = this->thrusterParams.thrusterConfigurations.at( i );
-	}
+	calculateAllThrusterConfigutationMatrix();
 }
 
 VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState ) const
@@ -94,8 +91,9 @@ MatrixXd VehiclePhysicalModel::getAzimuthalThrustersConfig()
 	{
 		const auto& thrusterNumber = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).first;
 		const auto& influences     = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).second;
-		const auto& thrusterConfig = this->thrusterParams.thrusterConfigurations.at( thrusterNumber );
+		const auto& thrusterConfig = this->thrusterParams.AllThrustersConfigurationsMatrix.block< 6, 1 >( 0, i );
 		auto variant               = influences.size();
+
 		configVectors.emplace_back( MatrixXd::Zero( variant, 1 ) );
 		switch( variant )
 		{
@@ -127,7 +125,7 @@ MatrixXd VehiclePhysicalModel::getAzimuthalThrustersConfig()
 			break;
 		}
 	}
-	auto maxVectorLength = 0u;
+	auto maxVectorLength{ 0u };
 	for( const auto& in : configVectors )
 	{
 		maxVectorLength = std::max( maxVectorLength, static_cast< unsigned >( in.rows() ) );
@@ -139,6 +137,50 @@ MatrixXd VehiclePhysicalModel::getAzimuthalThrustersConfig()
 		configMatrix.block( 0, i, maxVectorLength, 1 ) = configVectors.at( i );
 	}
 	return configMatrix;
+}
+
+void VehiclePhysicalModel::calculateAllThrusterConfigutationMatrix()
+{
+
+	for( auto i = 0u; i < this->thrusterParams.thrustersAmount; ++i )
+	{
+		const auto& oneThrusterPositionAndRotation = this->thrusterParams.positionsAndRotations.at( i );
+
+		MatrixXd oneThrusterConfig = MatrixXd::Zero( 6, 1 );
+		// x, y, z in the robots frame of reference, roll, pitch, yaw calculated from neutral position
+		// neutral position is assumed to be in the case of thruster forward thrust vector pointing in x axis
+		oneThrusterConfig( dimensionsIndex::x ) = std::cos( oneThrusterPositionAndRotation( dimensionsIndex::pitch ) )
+		    * std::cos( oneThrusterPositionAndRotation( dimensionsIndex::yaw ) );
+		oneThrusterConfig( dimensionsIndex::y ) = std::sin( oneThrusterPositionAndRotation( dimensionsIndex::yaw ) )
+		    * std::cos( oneThrusterPositionAndRotation( dimensionsIndex::roll ) );
+		oneThrusterConfig( dimensionsIndex::z ) = -std::sin( oneThrusterPositionAndRotation( dimensionsIndex::pitch ) )
+		    * std::cos( oneThrusterPositionAndRotation( dimensionsIndex::roll ) );
+
+		// moments
+		oneThrusterConfig( dimensionsIndex::roll )
+		    = oneThrusterConfig( dimensionsIndex::z ) * oneThrusterPositionAndRotation( dimensionsIndex::y )
+		    - oneThrusterConfig( dimensionsIndex::y ) * oneThrusterPositionAndRotation( dimensionsIndex::z );
+		oneThrusterConfig( dimensionsIndex::pitch )
+		    = oneThrusterConfig( dimensionsIndex::x ) * oneThrusterPositionAndRotation( dimensionsIndex::z )
+		    - oneThrusterConfig( dimensionsIndex::z ) * oneThrusterPositionAndRotation( dimensionsIndex::x );
+		oneThrusterConfig( dimensionsIndex::yaw )
+		    = oneThrusterConfig( dimensionsIndex::y ) * oneThrusterPositionAndRotation( dimensionsIndex::x )
+		    - oneThrusterConfig( dimensionsIndex::x ) * oneThrusterPositionAndRotation( dimensionsIndex::y );
+
+		this->thrusterParams.AllThrustersConfigurationsMatrix.block< 6, 1 >( 0, i ) = oneThrusterConfig;
+	}
+}
+
+void VehiclePhysicalModel::updateAzimuthalThrusterConfig( std::vector< double > newServosAngles )
+{
+	if( newServosAngles.size() != this->thrusterParams.numberOfAzimuthalThrusters )
+	{
+		throw std::runtime_error( "Wrong number of azimuthal thrusters to update!" );
+	}
+	this->servos.servosAngles = newServosAngles;
+
+	
+
 }
 
 Matrix< double, sixDim, sixDim > VehiclePhysicalModel::calculateCoriolisMatrix( const VectorXd& currentState ) const

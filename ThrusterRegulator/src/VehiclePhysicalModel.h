@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <fstream>
 #include <functional>
 #include <memory>
@@ -89,15 +90,17 @@ public:
 		MatrixXd AllThrustersConfigurationsMatrix = MatrixXd::Zero( sixDim, 5 );
 
 		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
-		std::vector< VectorXd > thrusterConfigurations;
-		MatrixXd azimuthalThrustersConfigMatrix;
+		std::vector< VectorXd > positionsAndRotations;
+		// Influence is calculated from position and rotations
+
+		// MatrixXd azimuthalThrustersConfigMatrix;
 
 		std::vector< AzimuthalThrusterFunctions > azimuthalBaseFunctions;
 		std::vector< AzimuthalThrusterFunctions > azimuthalDerivativeFunctions;
 
 		// inertia of thruster - how fast can thrusters change their generated thrust per deltaT
 		double deltaU{ 0.0 };
-		double maxThrust;
+		double maxThrust{ 0.0 };
 		unsigned numberOfAzimuthalThrusters{ 0u };
 		unsigned thrustersAmount{ 0u };
 	};
@@ -106,6 +109,7 @@ public:
 	{
 		std::vector< std::pair< int, std::vector< dimensionsIndex > > > azimuthalThrusterDimensionsOfInfluence;
 		double servoSpeed{ 0.0 };
+		std::vector< double > servosAngles;
 	};
 
 	VehiclePhysicalModel( configFiles::fileID configID )
@@ -115,6 +119,9 @@ public:
 	}
 
 	Matrix< double, sixDim, sixDim > calculateCoriolisMatrix( const VectorXd& currentState ) const;
+
+	void calculateAllThrusterConfigutationMatrix();
+	void updateAzimuthalThrusterConfig(std::vector<double> newServosAngles);
 
 	const Drag& getModelDrag() const
 	{
@@ -138,7 +145,7 @@ public:
 
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
-	void adjustParametersForWorkingFrequency( float freq );
+	void adjustParametersForWorkingFrequency( const float freq );
 
 	MatrixXd getAzimuthalThrustersConfig();
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector

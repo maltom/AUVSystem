@@ -95,6 +95,8 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
                                const AllocationPenalizers& penalizers )
 {
 	VectorXd uPrev = thrustSignal_u;
+
+	
 	for( auto i = 0u; i < model.getModelThrusters().numberOfAzimuthalThrusters; ++i )
 	{
 		thrustSignal_u( model.getModelServos().azimuthalThrusterDimensionsOfInfluence.at( i ).first )
@@ -107,6 +109,8 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	// Vector of desired forces and moments only in azimuthal dimensions
 	VectorXd azimuthalDesiredForces_tau = VectorXd::Zero( numberOfDims, 1 );
 	const auto& influences              = model.getModelServos().azimuthalThrusterDimensionsOfInfluence.at( 0 ).second;
+
+
 	switch( influences.size() )
 	{
 	case 1u:
