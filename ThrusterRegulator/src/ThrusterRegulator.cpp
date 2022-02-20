@@ -11,13 +11,9 @@ void ThrusterRegulator::processInMainLoop()
 
 	if( ticks % regulatorTickSpan == 0 )
 	{
-		
 	}
 }
-void ThrusterRegulator::subscribeTopics()
-{
-
-}
+void ThrusterRegulator::subscribeTopics() {}
 
 void ThrusterRegulator::advertiseTopics()
 {
@@ -89,14 +85,19 @@ Matrix< double, stateDim, controlDim > calculateBStateMatrix( const VehiclePhysi
 }
 
 void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
-                               VectorXd& servoAngle_alpha,
                                const VectorXd& desiredForces_tau,
                                const VehiclePhysicalModel& model,
                                const AllocationPenalizers& penalizers )
 {
-	VectorXd uPrev = thrustSignal_u;
+	VectorXd uPrev                         = thrustSignal_u;
+	const auto& deltaA                     = model.getModelServos().servoSpeed;
+	const auto& numberOfAzimuthalThrusters = model.getModelThrusters().numberOfAzimuthalThrusters;
+	const auto& maxThrust                  = model.getModelThrusters().maxThrust;
+	// delta u which means how fast the force can grow in 1 timestep
+	const auto& deltaU = model.getModelThrusters().deltaU;
+	// normalized - [0:1]
+	auto deltaUNormalized = deltaU / model.getModelThrusters().maxThrust;
 
-	
 	for( auto i = 0u; i < model.getModelThrusters().numberOfAzimuthalThrusters; ++i )
 	{
 		thrustSignal_u( model.getModelServos().azimuthalThrusterDimensionsOfInfluence.at( i ).first )
@@ -110,48 +111,14 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	VectorXd azimuthalDesiredForces_tau = VectorXd::Zero( numberOfDims, 1 );
 	const auto& influences              = model.getModelServos().azimuthalThrusterDimensionsOfInfluence.at( 0 ).second;
 
-
-	switch( influences.size() )
-	{
-	case 1u:
-		azimuthalDesiredForces_tau << desiredForces_tau( influences.at( 0 ) );
-		break;
-	case 2u:
-		azimuthalDesiredForces_tau << desiredForces_tau( influences.at( 0 ) ), desiredForces_tau( influences.at( 1 ) );
-		break;
-	case 3u:
-		azimuthalDesiredForces_tau << desiredForces_tau( influences.at( 0 ) ), desiredForces_tau( influences.at( 1 ) ),
-		    desiredForces_tau( influences.at( 2 ) );
-		break;
-	case 4u:
-		azimuthalDesiredForces_tau << desiredForces_tau( influences.at( 0 ) ), desiredForces_tau( influences.at( 1 ) ),
-		    desiredForces_tau( influences.at( 2 ) ), desiredForces_tau( influences.at( 3 ) );
-		break;
-	case 5u:
-		azimuthalDesiredForces_tau << desiredForces_tau( influences.at( 0 ) ), desiredForces_tau( influences.at( 1 ) ),
-		    desiredForces_tau( influences.at( 2 ) ), desiredForces_tau( influences.at( 3 ) ),
-		    desiredForces_tau( influences.at( 4 ) );
-		break;
-	case 6u:
-		azimuthalDesiredForces_tau << desiredForces_tau( influences.at( 0 ) ), desiredForces_tau( influences.at( 1 ) ),
-		    desiredForces_tau( influences.at( 2 ) ), desiredForces_tau( influences.at( 3 ) ),
-		    desiredForces_tau( influences.at( 4 ) ), desiredForces_tau( influences.at( 5 ) );
-		break;
-	default:
-		break;
-	}
-
-	// delta u which means how fast the force can grow in 1 timestep
-	double deltaU_max = model.getModelThrusters().deltaU / model.getModelThrusters().maxThrust;
-
 	// Diagonal matrix H which is main matrix in quadprog problem. x^T * H * X + f*X
-	VectorXd diag_H = VectorXd::Zero( 7 );
+	VectorXd diag_H = VectorXd::Zero( 13 );
 	diag_H << 2.0 * penalizers.W, 2.0 * penalizers.Q, 2.0 * penalizers.Omega;
-	MatrixXd H = MatrixXd::Zero( 7, 7 );
+	MatrixXd H = MatrixXd::Zero( 13, 13 );
 	H          = diag_H.asDiagonal();
 
 	// Vector of linearity in quadprog as seen before
-	VectorXd f = VectorXd::Zero( 7 );
+	VectorXd f = VectorXd::Zero( 13 );
 
 	// Calculating derivatives for linearization
 	MatrixXd da1    = MatrixXd::Zero( azimuthalDesiredForces_tau.size(), 1 );
@@ -183,7 +150,7 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	MatrixXd Aeq      = MatrixXd::Zero( 7, 3 );
 	MatrixXd temp_Aeq = MatrixXd::Zero( 3, 7 ); // Matrix which looks identical to that one from Matlab
 
-	temp_Aeq.block( 0, 0, 3, 2 ) = model.getModelThrusters().azimuthalThrustersConfigMatrix;
+	temp_Aeq.block( 0, 0, 3, 2 ) = model.getAzimuthalThrustersConfig();
 	Vector3d v_diag( 1, 1, 1 );
 	temp_Aeq.block( 0, 2, 3, 3 ) = v_diag.asDiagonal();
 	temp_Aeq.block( 0, 5, 3, 2 ) = diff_T;
@@ -216,9 +183,9 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	temp_Ci << Lb, Ub;
 	Ci = temp_Ci.transpose();
 
-	ci0 << -deltaU_max, -deltaU_max, 0.0, 0.0, 0.0, model.getModelServos().servoSpeed,
-	    model.getModelServos().servoSpeed, deltaU_max, deltaU_max, 0.0, 0.0, 0.0, model.getModelServos().servoSpeed,
-	    model.getModelServos().servoSpeed; // Vector of bound valuses
+	ci0 << -deltaUNormalized, -deltaUNormalized, 0.0, 0.0, 0.0, deltaA, deltaA, deltaUNormalized, deltaUNormalized, 0.0,
+	    0.0, 0.0, deltaA,
+	    deltaA; // Vector of bound valuses
 
 	VectorXd x = VectorXd::Zero( 7 ); // Initializing solution vector
 
@@ -227,8 +194,8 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	thrustSignal_u( 0 ) += x( 0 ); // Adding values of calculated change in force
 	thrustSignal_u( 1 ) += x( 1 );
 
-	thrustSignal_u( 0 ) /= model.getModelThrusters().maxThrust;
-	thrustSignal_u( 1 ) /= model.getModelThrusters().maxThrust;
+	thrustSignal_u( 0 ) /= maxThrust;
+	thrustSignal_u( 1 ) /= maxThrust;
 
 	servoAngle_alpha( 0 ) += x( 5 ); // And calculated change in servo angle
 	servoAngle_alpha( 1 ) += x( 6 );
@@ -243,8 +210,7 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	Thrust_conf_inv = Thrust_conf.completeOrthogonalDecomposition().pseudoInverse();
 
 	// Matrix of maximum values of thrust force
-	Vector3d diag_K(
-	    model.getModelThrusters().maxThrust, model.getModelThrusters().maxThrust, model.getModelThrusters().maxThrust );
+	Vector3d diag_K( maxThrust, maxThrust, maxThrust );
 	Matrix3d K;
 	K = diag_K.asDiagonal();
 
