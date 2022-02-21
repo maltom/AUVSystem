@@ -93,16 +93,16 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	const auto& deltaA                     = model.getModelServos().servoSpeed;
 	const auto& numberOfAzimuthalThrusters = model.getModelThrusters().numberOfAzimuthalThrusters;
 	const auto& maxThrust                  = model.getModelThrusters().maxThrust;
+	const auto& allThrustersConfig_T       = model.getModelThrusters().AllThrustersConfigurationsMatrix;
+	const auto& azimuthalThrustersDifferentialConfig_Tdiff
+	    = model.getModelThrusters().AzimuthalThrustersDifferentialConfig;
 	// delta u which means how fast the force can grow in 1 timestep
 	const auto& deltaU = model.getModelThrusters().deltaU;
 	// normalized - [0:1]
 	auto deltaUNormalized = deltaU / model.getModelThrusters().maxThrust;
 
-	for( auto i = 0u; i < model.getModelThrusters().numberOfAzimuthalThrusters; ++i )
-	{
-		thrustSignal_u( model.getModelServos().azimuthalThrusterDimensionsOfInfluence.at( i ).first )
-		    *= model.getModelThrusters().maxThrust;
-	}
+	// change from [-1:1] to newtons
+	uPrev *= maxThrust;
 
 	// for now - only one pair of azimuthal thrusters is considered here working in the same plane and axis
 	auto numberOfDims = model.getModelServos().azimuthalThrusterDimensionsOfInfluence.at( 0 ).second.size();
@@ -120,47 +120,19 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	// Vector of linearity in quadprog as seen before
 	VectorXd f = VectorXd::Zero( 13 );
 
-	// Calculating derivatives for linearization
-	MatrixXd da1    = MatrixXd::Zero( azimuthalDesiredForces_tau.size(), 1 );
-	MatrixXd da2    = MatrixXd::Zero( azimuthalDesiredForces_tau.size(), 1 );
-	MatrixXd diff_T = MatrixXd::Zero( azimuthalDesiredForces_tau.size(), 2 );
-
-	// First and second azimuthal thruster. Below are calculated derivatives of thrust. conf. matrices
-
-	// Jka masz wektor sygnalow pednikow (u) to musisz go rozdzielic na 2 podwektory - taki co idzie do QP i taki co nie
-	// idzie. tutaj brane bylo X,Y YAW z pednikow 1 i 2 do osobnych wektorow jako pochodne, dlatego przemnozone
-	// jest przez te sinusy da1 << -sin( servoAngle_alpha( 0 ) ) * thrustSignal_u( 0 ), cos( servoAngle_alpha( 0 ) ) *
-	// thrustSignal_u( 0 ),
-	//     ( ( -0.165 * sin( servoAngle_alpha( 0 ) ) ) + ( 0.038 * cos( servoAngle_alpha( 0 ) ) ) ) * thrustSignal_u( 0
-	//     );
-	// da2 << -sin( servoAngle_alpha( 1 ) ) * thrustSignal_u( 1 ), cos( servoAngle_alpha( 1 ) ) * thrustSignal_u( 1 ),
-	//     ( ( 0.165 * sin( servoAngle_alpha( 1 ) ) ) + ( 0.038 * cos( servoAngle_alpha( 1 ) ) ) ) * thrustSignal_u( 1
-	//     );
-
-	// TODO: zmien nazwe  da1 i da2, daj sprytne mnozenie przez pochodne funkcji kata
-	da1 << -sin( servoAngle_alpha( 0 ) ) * thrustSignal_u( 0 ), cos( servoAngle_alpha( 0 ) ) * thrustSignal_u( 0 ),
-	    ( ( -0.165 * sin( servoAngle_alpha( 0 ) ) ) + ( 0.038 * cos( servoAngle_alpha( 0 ) ) ) ) * thrustSignal_u( 0 );
-	da2 << -sin( servoAngle_alpha( 1 ) ) * thrustSignal_u( 1 ), cos( servoAngle_alpha( 1 ) ) * thrustSignal_u( 1 ),
-	    ( ( 0.165 * sin( servoAngle_alpha( 1 ) ) ) + ( 0.038 * cos( servoAngle_alpha( 1 ) ) ) ) * thrustSignal_u( 1 );
-
-	diff_T << da1, da2;
-
 	// Equality constraints for QP
-	// In Matlab there is only Aeq and beq. Here I need to pass Aeq^T to the function so I calculate it's transpose
-	MatrixXd Aeq      = MatrixXd::Zero( 7, 3 );
-	MatrixXd temp_Aeq = MatrixXd::Zero( 3, 7 ); // Matrix which looks identical to that one from Matlab
+	MatrixXd Aeq         = MatrixXd::Zero( 6, 13 );
+	VectorXd tempOnesVec = VectorXd::Ones( sixDim );
+	MatrixXd tempOnesMat = tempOnesVec.asDiagonal();
 
-	temp_Aeq.block( 0, 0, 3, 2 ) = model.getAzimuthalThrustersConfig();
-	Vector3d v_diag( 1, 1, 1 );
-	temp_Aeq.block( 0, 2, 3, 3 ) = v_diag.asDiagonal();
-	temp_Aeq.block( 0, 5, 3, 2 ) = diff_T;
+	Aeq.block< sixDim, 5 >( 0, 0 )      = allThrustersConfig_T;
+	Aeq.block< sixDim, sixDim >( 0, 5 ) = tempOnesMat;
+	Aeq.block< sixDim, 2 >( 0, 11 )     = azimuthalThrustersDifferentialConfig_Tdiff;
 
-	Aeq = temp_Aeq.transpose();
+	VectorXd Beq = VectorXd::Zero( sixDim );
 
-	// Also the same as Matlab
-	MatrixXd Beq;
-	Beq = -( azimuthalDesiredForces_tau
-	         - ( model.getModelThrusters().azimuthalThrustersConfigMatrix * thrustSignal_u.block( 0, 0, 2, 1 ) ) );
+	// TODO: ustalić czy spada z rowerka. jak spada, to znaczy, że trzeba transponować u
+	Beq = -( desiredForces_tau - allThrustersConfig_T * thrustSignal_u );
 
 	// Inequality constraints
 	// I need to specify lower and upper bounds for the variables
@@ -170,9 +142,9 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	// Ci^T * X + ci0 >= 0
 	// So I needed to create a matrix Ci which gives vector of both +-u, +-s, +-alpha
 	// And ci0 vector which corresponds to proper values of bounds
-	MatrixXd Lb       = MatrixXd::Zero( 7, 7 );
-	MatrixXd Ub       = MatrixXd::Zero( 7, 7 );
-	VectorXd vec_ones = VectorXd::Zero( 7 );
+	VectorXd lowerBoundary = MatrixXd::Zero( 13, 1 );
+	MatrixXd upperBoundary = MatrixXd::Zero( 13, 1 );
+	VectorXd vec_ones      = VectorXd::Zero( 13 );
 	// The same as in Aeq - I pass tranposed version of matrix so I need to create temp_Ci matrix
 	MatrixXd Ci      = MatrixXd::Zero( 7, 14 );
 	MatrixXd temp_Ci = MatrixXd::Zero( 14, 7 );

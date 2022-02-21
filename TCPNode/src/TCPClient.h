@@ -28,6 +28,8 @@ private:
 	void handleReceive( const boost::system::error_code& error, std::size_t bytes_transferred );
 	void handleSend( const boost::system::error_code&, std::size_t );
 
+	static constexpr char bufferEmptySign{ '~' };
+
 protected:
 public:
 	TCPClient( const uint16_t serverPort,

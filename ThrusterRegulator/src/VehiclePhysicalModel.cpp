@@ -188,7 +188,7 @@ void VehiclePhysicalModel::calculateAllThrusterConfigutationMatrix()
 	}
 }
 
-void VehiclePhysicalModel::updateAzimuthalThrusterConfig( std::vector< double > newServosAngles )
+void VehiclePhysicalModel::updateAzimuthalThrusterConfig( const std::vector< double >& newServosAngles )
 {
 	if( newServosAngles.size() != this->thrusterParams.numberOfAzimuthalThrusters )
 	{
@@ -199,7 +199,7 @@ void VehiclePhysicalModel::updateAzimuthalThrusterConfig( std::vector< double > 
 	{
 		this->servos.servosAngles.at( i ).first = newServosAngles.at( i );
 	}
-	
+
 	calculateAllThrusterConfigutationMatrix();
 }
 

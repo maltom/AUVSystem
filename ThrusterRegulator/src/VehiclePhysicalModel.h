@@ -122,7 +122,7 @@ public:
 
 	MatrixXd getAzimuthalThrustersConfig() const;
 	void calculateAllThrusterConfigutationMatrix();
-	void updateAzimuthalThrusterConfig( std::vector< double > newServosAngles );
+	void updateAzimuthalThrusterConfig( const std::vector< double >& newServosAngles );
 
 	const Drag& getModelDrag() const
 	{
