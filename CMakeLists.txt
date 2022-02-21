@@ -32,7 +32,7 @@ add_subdirectory(MainLogic)
 # add_subdirectory(PositioningSLAM)
 add_subdirectory(TCPNode)
 # add_subdirectory(TrajectoryPlanner)
-add_subdirectory(ThrusterRegulator)
+# add_subdirectory(ThrusterRegulator)
 add_subdirectory(UDPNode)
 add_subdirectory(external)
 

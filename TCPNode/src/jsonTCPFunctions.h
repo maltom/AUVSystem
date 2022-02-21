@@ -5,7 +5,10 @@
 
 #include "external/jsonxx/jsonxx.h"
 
-using UnprocessedFrame = std::string;
+#include "CommonEnums.h"
+
+using UnprocessedFrame = network::TCPincomingMessage;
+using PreprocessedFrame = std::string;
 
 namespace dvlKeys
 {
@@ -115,15 +118,24 @@ struct Frame
 {
 	enum class Type
 	{
-        none,
+		none,
 		unprocessed,
+		preprocessed,
 		deadReckoning,
 		velocity
 	};
+	explicit Frame( UnprocessedFrame incomingFrame )
+	{
+		this->content = std::move( incomingFrame );
+		this->currentType = Type::unprocessed;
+	}
 
-	std::variant< UnprocessedFrame, ProcessedVelocityFrame, ProcessedDeadReckoningFrame > content;
+	std::variant< UnprocessedFrame, PreprocessedFrame, ProcessedVelocityFrame, ProcessedDeadReckoningFrame > content;
 
 	Type currentType{ Type::none };
 
 	bool processMe();
+
+private:
+	void preprocess();
 };

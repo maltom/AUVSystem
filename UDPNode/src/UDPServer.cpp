@@ -80,6 +80,7 @@ void UDPServer::getIncomingMessages( std::queue< network::UDPincomingMessage >& 
 
 UDPServer::~UDPServer()
 {
+	socket->close();
 	this->ioContext.stop();
 	UDPrunningThread.join();
 }

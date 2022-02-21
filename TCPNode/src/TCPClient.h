@@ -17,16 +17,16 @@ using boost::asio::ip::tcp;
 class TCPClient final
 {
 private:
-	std::queue< network::TCPincomingMessage > incomingMessages; 
+	std::queue< network::TCPincomingMessage > incomingMessages;
+	network::TCPincomingMessage receivedMessage;
 	boost::asio::io_context ioContext;
 	std::unique_ptr< tcp::socket > socket;
-	tcp::endpoint clientEndpoint;
+	tcp::endpoint serverEndpoint;
 	std::thread TCPrunningThread;
 	std::mutex incomingMessageBlock;
 	void startReceiving();
-	void handleReceive( const boost::system::error_code& error,
-	                    std::size_t bytes_transferred,
-	                    network::UDPincomingMessage receivedMessage );
+	void handleReceive( const boost::system::error_code& error, std::size_t bytes_transferred );
+	void handleSend( const boost::system::error_code&, std::size_t );
 
 protected:
 public:
@@ -36,7 +36,7 @@ public:
 	           const std::string& clientIpAdress );
 
 	~TCPClient();
-	void startServer();
-	bool sendOutgoingMessages( std::queue< network::UDPoutgoingMessage >& msgsToSend );
-	void getIncomingMessages( std::queue< network::UDPincomingMessage >& targerContainer );
+	void startClient();
+	bool sendOutgoingMessages( std::queue< network::TCPoutgoingMessage >& msgsToSend );
+	void getIncomingMessages( std::queue< network::TCPincomingMessage >& targetContainer );
 };
