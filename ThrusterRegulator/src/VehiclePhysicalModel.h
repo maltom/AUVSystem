@@ -88,6 +88,9 @@ public:
 
 		// configuration - the  , {x, y, z, p, q, r}
 		MatrixXd AllThrustersConfigurationsMatrix = MatrixXd::Zero( sixDim, 5 );
+		// Tdiff
+		// TODO: metoda do odświeżania tej macierzy
+		MatrixXd AzimuthalThrustersDifferentialConfig = MatrixXd::Zero( sixDim, 2 );
 
 		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
 		std::vector< VectorXd > positionsAndRotations;

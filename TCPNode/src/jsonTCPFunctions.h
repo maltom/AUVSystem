@@ -130,7 +130,7 @@ struct Frame
 		this->currentType = Type::unprocessed;
 	}
 
-	std::variant< UnprocessedFrame, PreprocessedFrame, ProcessedVelocityFrame, ProcessedDeadReckoningFrame > content;
+	std::variant< UnprocessedFrame, ProcessedVelocityFrame, ProcessedDeadReckoningFrame > content;
 
 	Type currentType{ Type::none };
 

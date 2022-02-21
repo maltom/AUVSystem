@@ -11,7 +11,6 @@ void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID 
 	this->thrusterParams = jsonFunctions::vehicle::readThrustersData( configID );
 	this->dragParams     = jsonFunctions::vehicle::readDragData( configID );
 	this->servos         = jsonFunctions::vehicle::readServosData( configID );
-	// this->thrusterParams.azimuthalThrustersConfigMatrix = this->getAzimuthalThrustersConfig();
 }
 
 void VehiclePhysicalModel::adjustParametersForWorkingFrequency( const float freq ) {}
