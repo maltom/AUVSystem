@@ -35,8 +35,8 @@ public:
 		subscribeTopics();
 		advertiseTopics();
 
-		dummyForces << 20.0, 0.0, 20.0, 0.0, 0.0, 0.0;
-		dummyThrustSignal << 0.0, 0.0, 0.0, 0.0, 0.0;
+		// dummyForces << 20.0, 0.0, 20.0, 0.0, 0.0, 0.0;
+		// dummyThrustSignal << 0.0, 0.0, 0.0, 0.0, 0.0;
 	}
 	~ThrusterRegulator() {}
 
