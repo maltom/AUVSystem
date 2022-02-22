@@ -16,6 +16,8 @@
 using namespace Eigen;
 using namespace regulator;
 
+constexpr double piNumber{ 3.141592 };
+
 using TorquesFunctions
     = std::vector< std::tuple< std::function< double() >, std::function< double( double ) >, double > >;
 
@@ -113,6 +115,8 @@ public:
 		std::vector< std::pair< int, std::vector< dimensionsIndex > > > azimuthalThrusterDimensionsOfInfluence;
 		double servoSpeed{ 0.0 };
 		std::vector< std::pair< double, dimensionsIndex > > servosAngles;
+
+		std::pair< double, double > servoAngleLimits{ 0.0, ::piNumber };
 	};
 
 	VehiclePhysicalModel( configFiles::fileID configID )

@@ -15,9 +15,8 @@ using namespace Eigen;
 using namespace regulator;
 
 void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
-                               VectorXd& servoAngle_alpha,
                                const VectorXd& desiredForces_tau,
-                               const VehiclePhysicalModel& model,
+                               VehiclePhysicalModel& model,
                                const AllocationPenalizers& penalizers );
 MatrixXd calculateNbar( const Matrix< double, stateDim, stateDim >& A,
                         const Matrix< double, stateDim, controlDim >& B,
@@ -35,6 +34,9 @@ public:
 		loadRegulatorParameters( this->configFileID );
 		subscribeTopics();
 		advertiseTopics();
+
+		dummyForces << 20.0, 0.0, 20.0, 0.0, 0.0, 0.0;
+		dummyThrustSignal << 0.0, 0.0, 0.0, 0.0, 0.0;
 	}
 	~ThrusterRegulator() {}
 
@@ -54,7 +56,9 @@ private:
 
 	// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
 	VectorXd thrustValues_u;
-	VectorXd servoAngles_alpha;
+
+	// VectorXd dummyForces       = VectorXd::Zero( 6 );
+	// VectorXd dummyThrustSignal = VectorXd::Zero( 5 );
 
 	ct::optcon::LQR< controlDim, controlDim > lqrSolver;
 

@@ -91,58 +91,6 @@ MatrixXd VehiclePhysicalModel::getAzimuthalThrustersConfig() const
 	    = this->thrusterParams.AllThrustersConfigurationsMatrix.block( 0, startColumn, sixDim, columnsNumber );
 
 	return azimuthalConfigMatrix;
-	/*MatrixXd configMatrix;
-	std::vector< MatrixXd > configVectors;
-	for( auto i = 0u; i < this->servos.azimuthalThrusterDimensionsOfInfluence.size(); ++i )
-	{
-	    const auto& thrusterNumber = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).first;
-	    const auto& influences     = this->servos.azimuthalThrusterDimensionsOfInfluence.at( i ).second;
-	    const auto& thrusterConfig = this->thrusterParams.AllThrustersConfigurationsMatrix.block< 6, 1 >( 0, i );
-	    auto variant               = influences.size();
-
-	    configVectors.emplace_back( MatrixXd::Zero( variant, 1 ) );
-	    switch( variant )
-	    {
-	    case 1u:
-	        *configVectors.rbegin() << thrusterConfig( influences.at( 0 ) );
-	        break;
-	    case 2u:
-	        *configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) );
-	        break;
-	    case 3u:
-	        *configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
-	            thrusterConfig( influences.at( 2 ) );
-	        break;
-	    case 4u:
-	        *configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
-	            thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) );
-	        break;
-	    case 5u:
-	        *configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
-	            thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) ),
-	            thrusterConfig( influences.at( 4 ) );
-	        break;
-	    case 6u:
-	        *configVectors.rbegin() << thrusterConfig( influences.at( 0 ) ), thrusterConfig( influences.at( 1 ) ),
-	            thrusterConfig( influences.at( 2 ) ), thrusterConfig( influences.at( 3 ) ),
-	            thrusterConfig( influences.at( 4 ) ), thrusterConfig( influences.at( 5 ) );
-	        break;
-	    default:
-	        break;
-	    }
-	}
-	auto maxVectorLength{ 0u };
-	for( const auto& in : configVectors )
-	{
-	    maxVectorLength = std::max( maxVectorLength, static_cast< unsigned >( in.rows() ) );
-	}
-	configMatrix = MatrixXd::Zero( maxVectorLength, configVectors.size() );
-
-	for( auto i = 0u; i < configMatrix.cols(); ++i )
-	{
-	    configMatrix.block( 0, i, maxVectorLength, 1 ) = configVectors.at( i );
-	}
-	return configMatrix;*/
 }
 
 void VehiclePhysicalModel::calculateAllThrusterConfigutationMatrix()
