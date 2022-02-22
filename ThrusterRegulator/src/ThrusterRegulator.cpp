@@ -144,34 +144,31 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	// And ci0 vector which corresponds to proper values of bounds
 	VectorXd lowerBoundary = MatrixXd::Zero( 13, 1 );
 	MatrixXd upperBoundary = MatrixXd::Zero( 13, 1 );
-	VectorXd vec_ones      = VectorXd::Zero( 13 );
+	VectorXd vec_ones      = VectorXd::Ones( 13 );
 	// The same as in Aeq - I pass tranposed version of matrix so I need to create temp_Ci matrix
-	MatrixXd Ci      = MatrixXd::Zero( 7, 14 );
-	MatrixXd temp_Ci = MatrixXd::Zero( 14, 7 );
-	VectorXd ci0     = VectorXd::Zero( 14, 1 );
-	vec_ones << 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0; // u,u,s,s,s,a,a
-	Lb = vec_ones.asDiagonal();                    // Lower bound
-	Ub = -Lb;                                      // Upper bound
-	temp_Ci << Lb, Ub;
+	MatrixXd Ci      = MatrixXd::Zero( 13, 26 );
+	MatrixXd temp_Ci = MatrixXd::Zero( 26, 13 );
+	VectorXd ci0     = VectorXd::Zero( 26, 1 );
+	lowerBoundary = vec_ones.asDiagonal();                    // Lower bound
+	upperBoundary = -lowerBoundary;                                      // Upper bound
+	temp_Ci << lowerBoundary, upperBoundary;
 	Ci = temp_Ci.transpose();
+	// TE MAGIC NUMBERS 128 POWINNY BYĆ JAKIMIŚ W KURWE DUŻYMI LICZBAMI. W MATLABIE MAM +- INF A TU NIE WIEM CO DAĆ
+	ci0 << -deltaUNormalized, -deltaUNormalized,-deltaUNormalized, -deltaUNormalized, -deltaUNormalized, -128, -128, -128, -128, -128, -128, -deltaA, -deltaA,
+		deltaUNormalized, deltaUNormalized,deltaUNormalized, deltaUNormalized, deltaUNormalized, 128, 128, 128, 128, 128, 128, deltaA, deltaA; // Vector of bound valuses
 
-	ci0 << -deltaUNormalized, -deltaUNormalized, 0.0, 0.0, 0.0, deltaA, deltaA, deltaUNormalized, deltaUNormalized, 0.0,
-	    0.0, 0.0, deltaA,
-	    deltaA; // Vector of bound valuses
-
-	VectorXd x = VectorXd::Zero( 7 ); // Initializing solution vector
+	VectorXd x = VectorXd::Zero( 13 ); // Initializing solution vector
 
 	QP::solve_quadprog( H, f, Aeq, Beq, Ci, ci0, x );
 
-	thrustSignal_u( 0 ) += x( 0 ); // Adding values of calculated change in force
-	thrustSignal_u( 1 ) += x( 1 );
+	thrustSignal_u += x.head(5); // Adding values of calculated change in force. 5 is number of thrusters
 
-	thrustSignal_u( 0 ) /= maxThrust;
-	thrustSignal_u( 1 ) /= maxThrust;
+	thrustSignal_u /= maxThrust;
 
-	servoAngle_alpha( 0 ) += x( 5 ); // And calculated change in servo angle
-	servoAngle_alpha( 1 ) += x( 6 );
+	servoAngle_alpha( 0 ) += x( 11 ); // And calculated change in servo angle
+	servoAngle_alpha( 1 ) += x( 12 );
 
+	//DO WYPIERDOLENIA W SUMIE
 	// Classical THRUST ALLOCATION
 	// Here I solve thrust allocation problem in classical way for forces in z,roll,pitch, for other 3 thrusters
 	MatrixXd Thrust_conf = MatrixXd::Zero( 6, 3 ); // Matrix for only 3 thrusters
