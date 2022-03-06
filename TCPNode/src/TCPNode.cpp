@@ -65,7 +65,7 @@ void TCPNode::processIncomingMessages()
 	}
 }
 
-Frame TCPNode::decomposeFrame( const network::TCPincomingMessage& incMsg )
+Frame TCPNode::decomposeFrame( const network::TCPunstickedMessage& incMsg )
 {
 	Frame result( incMsg );
 	result.processMe();
@@ -74,6 +74,20 @@ Frame TCPNode::decomposeFrame( const network::TCPincomingMessage& incMsg )
 
 void TCPNode::processCommand( const Frame& frame )
 {
+	switch( frame.currentType )
+	{
+	case Frame::Type::velocity:
+		std::cout << "Pryndkosc: " << std::get< ProcessedVelocityFrame >( frame.content ).figureOfMerit << "\n\n"
+		          << std::endl;
+		break;
+	case Frame::Type::deadReckoning:
+		std::cout << "DeadReck: " << std::get< ProcessedDeadReckoningFrame >( frame.content ).pitch << "\n\n"
+		          << std::endl;
+		break;
+	default:
+		break;
+	}
 	if( frame.currentType == Frame::Type::velocity )
-		std::cout << "HAHAHA: " << std::get< ProcessedVelocityFrame >( frame.content ).figureOfMerit << std::endl<< std::endl<< std::endl;
+	{
+	}
 }

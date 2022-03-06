@@ -33,7 +33,7 @@ public:
 	}
 
 private:
-	std::queue< network::TCPincomingMessage > incomingMessages;
+	std::queue< network::TCPunstickedMessage > incomingMessages;
 	std::queue< network::TCPoutgoingMessage > outgoingMessages;
 
 	std::unique_ptr< TCPClient > tcpClient;
@@ -52,6 +52,6 @@ private:
 	void loadNetworkConfig();
 	void processIncomingMessages();
 	void processOutgoingMessages( const Frame& frameToSend );
-	Frame decomposeFrame( const network::TCPincomingMessage& incMsg );
+	Frame decomposeFrame( const network::TCPunstickedMessage& incMsg );
 	void processCommand( const Frame& frame );
 };

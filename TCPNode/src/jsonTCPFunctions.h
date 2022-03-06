@@ -7,8 +7,7 @@
 
 #include "CommonEnums.h"
 
-using UnprocessedFrame = network::TCPincomingMessage;
-using PreprocessedFrame = std::string;
+using UnprocessedFrame = network::TCPunstickedMessage;
 
 namespace dvlKeys
 {
@@ -124,6 +123,7 @@ struct Frame
 		deadReckoning,
 		velocity
 	};
+	
 	explicit Frame( UnprocessedFrame incomingFrame )
 	{
 		this->content = std::move( incomingFrame );
@@ -135,7 +135,4 @@ struct Frame
 	Type currentType{ Type::none };
 
 	bool processMe();
-
-private:
-	void preprocess();
 };

@@ -9,11 +9,10 @@ bool Frame::processMe()
 		return false;
 	}
 
-	preprocess();
 	this->currentType = Type::preprocessed;
 
 	jsonxx::Object message;
-	message.parse( std::get< PreprocessedFrame >( this->content ) );
+	message.parse( std::get< UnprocessedFrame >( this->content ) );
 
 	if( message.get< jsonxx::String >( dvlKeys::typeOfReport ) == dvlReportTypes::velocity )
 	{
@@ -55,34 +54,5 @@ bool Frame::processMe()
 		this->currentType = Type::deadReckoning;
 		return true;
 	}
-}
-
-void Frame::preprocess()
-{
-	this->content = PreprocessedFrame( std::get< UnprocessedFrame >( this->content ).begin(),
-	                                   std::get< UnprocessedFrame >( this->content ).end() );
-
-	auto braceCounter{ 0u };
-	auto sizeCounter{ 0u };
-	for( const auto& in : std::get< PreprocessedFrame >( this->content ) )
-	{
-		switch( in )
-		{
-		case '{':
-			++braceCounter;
-			break;
-		case '}':
-			--braceCounter;
-			break;
-		default:
-			break;
-		}
-		++sizeCounter;
-
-		if( braceCounter == 0u )
-		{
-			std::get< PreprocessedFrame >( this->content ).resize( sizeCounter );
-			return;
-		}
-	}
+	return false;
 }

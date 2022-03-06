@@ -39,8 +39,9 @@ using UDPoutgoingMessage = std::string;
 
 constexpr auto TCPincomingBufferMaxLength{ 2048u };
 
-using TCPincomingMessage = std::array< char, TCPincomingBufferMaxLength >;
-using TCPoutgoingMessage = std::string;
+using TCPincomingMessage  = std::array< char, TCPincomingBufferMaxLength >;
+using TCPoutgoingMessage  = std::string;
+using TCPunstickedMessage = std::string;
 
 enum Device
 {
