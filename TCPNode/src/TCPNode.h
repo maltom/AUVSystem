@@ -33,6 +33,12 @@ public:
 	}
 
 private:
+
+	enum PublishersCodes
+	{
+		DVLDeadReckoning = 0
+	};
+
 	std::queue< network::TCPunstickedMessage > incomingMessages;
 	std::queue< network::TCPoutgoingMessage > outgoingMessages;
 

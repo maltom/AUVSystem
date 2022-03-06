@@ -22,20 +22,8 @@ void TCPNode::subscribeTopics() {}
 void TCPNode::advertiseTopics()
 {
 	this->rosPublishers.emplace_back(
-	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ThrustersSignal >(
-	        AUVROS::Topics::DevPC::arbitrarlySetThrusters, AUVROS::QueueSize::StandardQueueSize ) ) );
-
-	this->rosPublishers.emplace_back(
-	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
-	        AUVROS::Topics::DevPC::arbitrarlySetServos, AUVROS::QueueSize::StandardQueueSize ) ) );
-
-	this->rosPublishers.emplace_back(
-	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::Position >(
-	        AUVROS::Topics::DevPC::arbitrarlySetGlobalPosition, AUVROS::QueueSize::StandardQueueSize ) ) );
-
-	this->rosPublishers.emplace_back(
-	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
-	        AUVROS::Topics::DevPC::arbitrarlySetRelativePosition, AUVROS::QueueSize::StandardQueueSize ) ) );
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::DVLDeadReckoning >(
+	        AUVROS::Topics::HardwareSignals::DVLDeadReckoningData, AUVROS::QueueSize::DVLQueueSize ) ) );
 }
 
 void TCPNode::connectServices() {}
@@ -77,17 +65,19 @@ void TCPNode::processCommand( const Frame& frame )
 	switch( frame.currentType )
 	{
 	case Frame::Type::velocity:
-		std::cout << "Pryndkosc: " << std::get< ProcessedVelocityFrame >( frame.content ).figureOfMerit << "\n\n"
-		          << std::endl;
 		break;
 	case Frame::Type::deadReckoning:
-		std::cout << "DeadReck: " << std::get< ProcessedDeadReckoningFrame >( frame.content ).pitch << "\n\n"
-		          << std::endl;
-		break;
+	{
+		AUVROS::MessageTypes::DVLDeadReckoning rosDeadReckMsg;
+		auto& data          = std::get< ProcessedDeadReckoningFrame >( frame.content );
+		rosDeadReckMsg.data = { static_cast< float >( data.timeStamp ), static_cast< float >( data.x ),
+			                    static_cast< float >( data.y ),         static_cast< float >( data.z ),
+			                    static_cast< float >( data.roll ),      static_cast< float >( data.pitch ),
+			                    static_cast< float >( data.yaw ) };
+		this->rosPublishers.at( PublishersCodes::DVLDeadReckoning )->publish( rosDeadReckMsg );
+	}
+	break;
 	default:
 		break;
-	}
-	if( frame.currentType == Frame::Type::velocity )
-	{
 	}
 }

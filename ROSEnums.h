@@ -65,6 +65,19 @@ namespace MessageTypes
 	using ServosSignal    = std_msgs::Float32MultiArray;
 	using Position        = geometry_msgs::Twist;
 	using Waypoint        = geometry_msgs::Twist;
+
+	enum DVLDeadReckoningIndex
+	{
+		ts = 0,
+		x,
+		y,
+		z,
+		roll,
+		pitch,
+		yaw
+	};
+
+	using DVLDeadReckoning = std_msgs::Float32MultiArray;
 	// using OccupancyGrid
 	// this type depends on number of nodes. max number of nodes for Int32 is 32, can be increased to Int64
 	using HealthReport = std_msgs::Int32;
@@ -74,6 +87,7 @@ namespace QueueSize
 {
 	static constexpr auto StandardQueueSize     = 1000;
 	static constexpr auto HealthQueueSize       = 10;
+	static constexpr auto DVLQueueSize          = 50;
 	static constexpr auto GlobalHealthQueueSize = 100;
 
 	namespace Images
@@ -91,7 +105,7 @@ enum NodeIDs
 	TCPNode,
 	Debug,
 	ThrusterRegulator,
-	TrajectoryPlanner,
+	// TrajectoryPlanner,
 	// AdditionalCameraProcessor,
 	PositioningSLAM,
 
@@ -100,8 +114,8 @@ enum NodeIDs
 };
 
 static const std::array< std::string, NodeIDs::Count > NodeNames{
-	"MainLogic",       "HealthCheck",       "UDPNode",           "TCPNode",
-	"Debug",           "ThrusterRegulator", "TrajectoryPlanner", //"AdditionalCameraProcessor",
+	"MainLogic",       "HealthCheck", "UDPNode",
+	"TCPNode",         "Debug",       "ThrusterRegulator", //"TrajectoryPlanner", //"AdditionalCameraProcessor",
 	"PositioningSLAM",
 };
 
