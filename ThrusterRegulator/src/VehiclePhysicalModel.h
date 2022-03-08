@@ -16,8 +16,6 @@
 using namespace Eigen;
 using namespace regulator;
 
-constexpr double piNumber{ 3.141592 };
-
 using TorquesFunctions
     = std::vector< std::tuple< std::function< double() >, std::function< double( double ) >, double > >;
 
@@ -91,7 +89,6 @@ public:
 		// configuration - the  , {x, y, z, p, q, r}
 		MatrixXd AllThrustersConfigurationsMatrix = MatrixXd::Zero( sixDim, 5 );
 		// Tdiff
-		// TODO: metoda do odświeżania tej macierzy
 		MatrixXd AzimuthalThrustersDifferentialConfig = MatrixXd::Zero( sixDim, 2 );
 
 		// VectorXd::Zero( 6, 1 ) x thrusterAmount;
@@ -116,7 +113,7 @@ public:
 		double servoSpeed{ 0.0 };
 		std::vector< std::pair< double, dimensionsIndex > > servosAngles;
 
-		std::pair< double, double > servoAngleLimits{ 0.0, ::piNumber };
+		std::pair< double, double > servoAngleLimits{ 0.0, math::piNumber };
 	};
 
 	VehiclePhysicalModel( configFiles::fileID configID )

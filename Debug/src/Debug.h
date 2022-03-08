@@ -19,7 +19,7 @@ namespace labels
 const std::array< std::string, 5 > thrusters{
 	"Thruster #1", "Thruster #2", "Thruster #3", "Thruster #4", "Thruster #5"
 };
-const std::array< std::string, 7 > DVLDeadReckoning{ "Time", "x", "y", "z", "roll", "pitch", "yaw" };
+const std::array< std::string, 6 > DVLDeadReckoning{ "x", "y", "z", "roll", "pitch", "yaw" };
 } // namespace labels
 
 class Debug final : public NodeBase

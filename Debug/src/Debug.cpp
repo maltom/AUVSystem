@@ -32,9 +32,10 @@ void Debug::subscribeTopics()
 	                                                             &Debug::displayArbitrarlySetThrustersStatus,
 	                                                             this ) );
 
-	displayer.addInfoToDisplay( "DVL Dead Reckoning",
-	                            std::vector< std::string >( labels::DVLDeadReckoning.begin(), labels::DVLDeadReckoning.end() ),
-	                            "init" );
+	displayer.addInfoToDisplay(
+	    "DVL Dead Reckoning",
+	    std::vector< std::string >( labels::DVLDeadReckoning.begin(), labels::DVLDeadReckoning.end() ),
+	    "init" );
 	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::HardwareSignals::DVLDeadReckoningData,
 	                                                             AUVROS::QueueSize::StandardQueueSize,
 	                                                             &Debug::displayDVLDeadReckoningStatus,
@@ -75,10 +76,14 @@ void Debug::displayArbitrarlySetThrustersStatus( const AUVROS::MessageTypes::Thr
 void Debug::displayDVLDeadReckoningStatus( const AUVROS::MessageTypes::DVLDeadReckoning& message )
 {
 	std::vector< DataType > values;
-	for( auto i = 0u; i < message.data.size(); ++i )
-	{
-		values.emplace_back( std::to_string( message.data.at( i ) ) );
-	}
+
+	values.emplace_back( std::to_string( message.data.at( 0 ) ) );
+	values.emplace_back( std::to_string( message.data.at( 1 ) ) );
+	values.emplace_back( std::to_string( message.data.at( 2 ) ) );
+	values.emplace_back( std::to_string( message.data.at( 3 ) ) );
+	values.emplace_back( std::to_string( message.data.at( 4 ) ) );
+	values.emplace_back( std::to_string( message.data.at( 5 ) ) );
+
 	displayer.setMajorColumnValues( DisplayerDataPositions::DVLDeadReckoning, values );
 }
 

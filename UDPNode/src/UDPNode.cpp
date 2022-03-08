@@ -154,12 +154,16 @@ void UDPNode::sendThrustersSignalToMicroController( const AUVROS::MessageTypes::
 void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::ServosSignal& message )
 {
 	auto length = message.layout.dim.begin()->size;
+	if( length != 2 )
+	{
+		throw std::runtime_error( "Too many servos." );
+	}
 	Frame frame;
 	frame.commandCode = NORESPREQ_SET_SERVOS;
 	frame.payloadSize = length;
 	for( auto i = 0u; i < length; ++i )
 	{
-		frame.payload[ i ] = message.data[ i ];
+		frame.payload[ i ] = adjustServoValues( message.data[ i ] );
 	}
 
 	this->processOutgoingMessages( frame );

@@ -36,7 +36,9 @@ private:
 
 	enum PublishersCodes
 	{
-		DVLDeadReckoning = 0
+		DVLDeadReckoning = 0,
+		DVLVelocity,
+		DVLDRTimeStamp
 	};
 
 	std::queue< network::TCPunstickedMessage > incomingMessages;

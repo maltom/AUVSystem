@@ -18,12 +18,6 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
                                const VectorXd& desiredForces_tau,
                                VehiclePhysicalModel& model,
                                const AllocationPenalizers& penalizers );
-MatrixXd calculateNbar( const Matrix< double, stateDim, stateDim >& A,
-                        const Matrix< double, stateDim, controlDim >& B,
-                        const Matrix< double, controlDim, stateDim >& K );
-Matrix< double, stateDim, stateDim > calculateAStateMatrix( const VectorXd& currentState,
-                                                            const VehiclePhysicalModel& model );
-Matrix< double, stateDim, controlDim > calculateBStateMatrix( const VehiclePhysicalModel& model );
 
 class ThrusterRegulator final : public NodeBase
 {
@@ -56,12 +50,15 @@ private:
 
 	// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
 	VectorXd thrustValues_u;
-
+	VectorXd currentState              = VectorXd::Zero( stateDim ); // state = position and speed
+	VectorXd currentPosition           = VectorXd::Zero( sixDim );
+	VectorXd currentSpeed              = VectorXd::Zero( sixDim );
+	VectorXd positionToReach           = VectorXd::Zero( sixDim );
+	VectorXd regulatorFeedbackPosition = VectorXd::Zero( sixDim );
+	
 	// VectorXd dummyForces       = VectorXd::Zero( 6 );
 	// VectorXd dummyThrustSignal = VectorXd::Zero( 5 );
-
-	ct::optcon::LQR< controlDim, controlDim > lqrSolver;
-
+	double timeStamp{ 0.0 };
 	float regulatorWorkingFrequency{ 10.0f };
 	unsigned regulatorTickSpan;
 	void processInMainLoop() override;
@@ -69,4 +66,8 @@ private:
 	void advertiseTopics() override;
 	void connectServices() override;
 	void loadRegulatorParameters( configFiles::fileID configID );
+
+	// TODO: change to SLAM
+	void updateCurrentPositionAndAngularSpeed( const AUVROS::MessageTypes::DVLDeadReckoning& newPosition );
+	void updateVelocity( const AUVROS::MessageTypes::DVLVelocity& newVelocity );
 };

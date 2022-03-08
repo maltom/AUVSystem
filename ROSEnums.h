@@ -5,6 +5,7 @@
 
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Float64.h>
 #include <std_msgs/Int32.h>
 
 namespace AUVROS
@@ -36,6 +37,7 @@ namespace Topics
 
 		static const std::string DVLVelocityData      = Folders::HardwareSignalsSubFolder + "/DVLVelocityData";
 		static const std::string DVLDeadReckoningData = Folders::HardwareSignalsSubFolder + "/DVLDeadReckoningData";
+		static const std::string DVLDRTimeStamp       = Folders::HardwareSignalsSubFolder + "/DVLDRTimeStamp";
 	} // namespace HardwareSignals
 
 	namespace DevPC
@@ -66,18 +68,9 @@ namespace MessageTypes
 	using Position        = geometry_msgs::Twist;
 	using Waypoint        = geometry_msgs::Twist;
 
-	enum DVLDeadReckoningIndex
-	{
-		ts = 0,
-		x,
-		y,
-		z,
-		roll,
-		pitch,
-		yaw
-	};
-
 	using DVLDeadReckoning = std_msgs::Float32MultiArray;
+	using DVLVelocity      = geometry_msgs::Twist;
+	using DVLDRTimeStamp   = std_msgs::Float64;
 	// using OccupancyGrid
 	// this type depends on number of nodes. max number of nodes for Int32 is 32, can be increased to Int64
 	using HealthReport = std_msgs::Int32;

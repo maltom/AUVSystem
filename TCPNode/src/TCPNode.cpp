@@ -24,6 +24,14 @@ void TCPNode::advertiseTopics()
 	this->rosPublishers.emplace_back(
 	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::DVLDeadReckoning >(
 	        AUVROS::Topics::HardwareSignals::DVLDeadReckoningData, AUVROS::QueueSize::DVLQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::DVLVelocity >(
+	        AUVROS::Topics::HardwareSignals::DVLVelocityData, AUVROS::QueueSize::DVLQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::DVLDRTimeStamp >(
+	        AUVROS::Topics::HardwareSignals::DVLDRTimeStamp, AUVROS::QueueSize::DVLQueueSize ) ) );
 }
 
 void TCPNode::connectServices() {}
@@ -65,16 +73,30 @@ void TCPNode::processCommand( const Frame& frame )
 	switch( frame.currentType )
 	{
 	case Frame::Type::velocity:
-		break;
+	{
+		AUVROS::MessageTypes::DVLVelocity rosVelocityMsg;
+		auto& data              = std::get< ProcessedVelocityFrame >( frame.content );
+		rosVelocityMsg.linear.x = static_cast< float >( data.vx );
+		rosVelocityMsg.linear.y = static_cast< float >( data.vy );
+		rosVelocityMsg.linear.z = static_cast< float >( data.vz );
+
+		this->rosPublishers.at( PublishersCodes::DVLVelocity )->publish( rosVelocityMsg );
+	}
+	break;
 	case Frame::Type::deadReckoning:
 	{
+		auto& data = std::get< ProcessedDeadReckoningFrame >( frame.content );
+
 		AUVROS::MessageTypes::DVLDeadReckoning rosDeadReckMsg;
-		auto& data          = std::get< ProcessedDeadReckoningFrame >( frame.content );
-		rosDeadReckMsg.data = { static_cast< float >( data.timeStamp ), static_cast< float >( data.x ),
-			                    static_cast< float >( data.y ),         static_cast< float >( data.z ),
-			                    static_cast< float >( data.roll ),      static_cast< float >( data.pitch ),
-			                    static_cast< float >( data.yaw ) };
+		rosDeadReckMsg.data = { static_cast< float >( data.x ),        static_cast< float >( data.y ),
+			                    static_cast< float >( data.z ),        static_cast< float >( data.roll ),
+			                    static_cast< float >( data.pitch ),    static_cast< float >( data.yaw ),
+			                    static_cast< float >( data.timeStamp ) };
+
+		std_msgs::Float64 timeStamp;
+		timeStamp.data = data.timeStamp;
 		this->rosPublishers.at( PublishersCodes::DVLDeadReckoning )->publish( rosDeadReckMsg );
+		this->rosPublishers.at( PublishersCodes::DVLDRTimeStamp )->publish( timeStamp );
 	}
 	break;
 	default:
