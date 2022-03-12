@@ -11,6 +11,7 @@ from geometry_msgs.msg import Twist, Vector3
 from sensor_msgs.msg import Image as ImageMsg
 from PIL import Image, ImageTk
 from typing import *
+import re
 
 
 NUM_OF_THRUSTERS = 5
@@ -18,7 +19,9 @@ NUM_OF_SERVOS = 2
 THRUSTER_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrusters'
 SERVOS_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetServos'
 GLOBAL_POSITION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetGlobalPosition'
-
+THRUST_ALLOCATION_TOPIC = '/AUVInternalSystem/DevPC/allocateGlobalThrust'         # TODO: set actual thruster allocation topic
+AUV_SYSTEM_DIR = re.search(".*AUVSystem", os.getcwd())[0]
+AUV_CONFIG_DIR = os.path.join(AUV_SYSTEM_DIR, 'auvConfig', 'auvConfig.json')
 
 
 class MainGuiTabs:
@@ -93,8 +96,14 @@ class ControlsFrame:
         self.entries_frame.pack(side=tk.LEFT)
         self.input_controls(self.entries_frame)
         self.slider_controls(self.entries_frame, ['Pitch', 'Yaw', 'Roll'], 3, 0, 360)
-        self.send_globa_pos_btn = tk.Button(self.entries_frame, text="Send Values")
+        self.send_globa_pos_btn = tk.Button(self.entries_frame, text="Send Global Twist")
         self.send_globa_pos_btn.pack(fill=tk.BOTH)
+
+        self.thrust_frame = tk.Frame(temp)
+        self.thrust_frame.pack(side=tk.LEFT)
+        self.slider_controls(self.thrust_frame, ['X Thrust', 'Y Thrust', 'Z Thrust', "X Torque", "Y Torque", "Z Torque"], 6, -100, 100)
+        self.send_thrust_alloc_btn = tk.Button(self.thrust_frame, text="Send Thrust Alloc")
+        self.send_thrust_alloc_btn.pack(fill=tk.BOTH)
 
 
     def slider_controls(self, root, names, amount, min_value, max_value):
@@ -165,13 +174,11 @@ class AuvConfigSettings:
         
 
     def update(config):
-        path = '/'.join([*__file__.split('/')[0:-2],'auvConfig', 'auvConfig.json'])
-        with open(path, 'w') as file:
+        with open(AUV_CONFIG_DIR, 'w') as file:
             json.dump(config, file, indent=4)
     
     def load_config():
-        path = '/'.join([*__file__.split('/')[0:-2], 'auvConfig', 'auvConfig.json'])
-        with open(path, 'r') as file:
+        with open(AUV_CONFIG_DIR, 'r') as file:
             return json.load(file)
 
 
@@ -189,11 +196,15 @@ class RosHandler:
         self.controls_frame.send_servos_btn.configure(command=self.send_to_servos)
         self.global_position_Sender = rospy.Publisher(GLOBAL_POSITION_TOPIC, Twist, queue_size=10)
         self.controls_frame.send_globa_pos_btn.configure(command=self.send_global_pos)
+        self.thrust_alloc_Sender = rospy.Publisher(THRUST_ALLOCATION_TOPIC, Float32MultiArray, queue_size=10)
+        self.controls_frame.send_thrust_alloc_btn.configure(command=self.send_thrust_alloc)
 
         self.thr_dim = MultiArrayDimension("dim", 5, 5)
         self.thr_lay = MultiArrayLayout([self.thr_dim], 0)
         self.srv_dim = MultiArrayDimension("dim", 2, 2)
         self.srv_lay = MultiArrayLayout([self.srv_dim], 0)
+        self.alloc_dim = MultiArrayDimension("dim", 6, 6)
+        self.alloc_lay = MultiArrayLayout([self.alloc_dim], 0)
 
     def send_to_thrusters(self):
         values = [float(thruster['variable'].get()) for name, thruster in self.controls_frame.sliders.items()
@@ -223,6 +234,13 @@ class RosHandler:
 
         self.global_position_Sender.publish(global_pos_msg)
 
+    def send_thrust_alloc(self):
+        values = [float(thruster['variable'].get()) for name, thruster in self.controls_frame.sliders.items()
+                                                    if name in ['X Thrust', 'Y Thrust', 'Z Thrust', "X Torque", "Y Torque", "Z Torque"]]
+        thrust_alloc_msg = Float32MultiArray()
+        thrust_alloc_msg.layout = self.alloc_lay
+        thrust_alloc_msg.data = values
+        self.thrust_alloc_Sender.publish(thrust_alloc_msg)
 
 class HallerGui:
     def __init__(self):
