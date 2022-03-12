@@ -25,9 +25,7 @@ private:
 	std::thread UDPrunningThread;
 	std::mutex incomingMessageBlock;
 	void startReceiving();
-	void handleReceive( const boost::system::error_code& error,
-	                    std::size_t bytes_transferred,
-	                    network::UDPincomingMessage receivedMessage );
+	void handleReceive( const boost::system::error_code& error, std::size_t bytes_transferred );
 	void handleSend( std::string, const boost::system::error_code&, std::size_t ) {}
 
 protected:
@@ -40,5 +38,5 @@ public:
 	~UDPServer();
 	void startServer();
 	bool sendOutgoingMessages( std::queue< network::UDPoutgoingMessage >& msgsToSend );
-	void getIncomingMessages( std::queue< network::UDPincomingMessage >& targerContainer );
+	void getIncomingMessages( std::queue< network::UDPincomingMessage >& targetContainer );
 };

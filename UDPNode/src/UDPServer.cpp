@@ -1,6 +1,8 @@
 #include "UDPServer.h"
 
 #include <algorithm>
+
+#include <iostream>
 #include <boost/bind.hpp>
 
 #include "jsonCommonFunctions.h"
@@ -13,7 +15,8 @@ UDPServer::UDPServer( const uint16_t serverPort,
 	// socket         = std::make_unique< udp::socket >( ioContext,
 	//   udp::endpoint( address::from_string( serverIpAdress ), serverPort ) );
 	socket         = std::make_unique< udp::socket >( ioContext, udp::endpoint( udp::v4(), serverPort ) );
-	clientEndpoint = udp::endpoint( address::from_string( clientIpAdress ), clientPort );
+	clientEndpoint = udp::endpoint( udp::v4(), 38459 );
+	// clientEndpoint = udp::endpoint(address::from_string( clientIpAdress ), clientPort );
 }
 
 void UDPServer::startServer()
@@ -29,20 +32,17 @@ void UDPServer::startReceiving()
 	                            boost::bind( &UDPServer::handleReceive,
 	                                         this,
 	                                         boost::asio::placeholders::error,
-	                                         boost::asio::placeholders::bytes_transferred,
-	                                         receivedMessage ) );
+	                                         boost::asio::placeholders::bytes_transferred ) );
 }
 
-void UDPServer::handleReceive( const boost::system::error_code& error,
-                               std::size_t bytes_transferred,
-                               network::UDPincomingMessage receivedMessage )
+void UDPServer::handleReceive( const boost::system::error_code& error, std::size_t bytes_transferred )
 {
 	std::thread receiveThread(
 	    [ & ]
 	    {
 		    incomingMessageBlock.lock();
 
-		    incomingMessages.push( receivedMessage );
+		    incomingMessages.push( this->receivedMessage );
 		    network::UDPincomingMessage empty;
 
 		    std::swap( this->receivedMessage, empty );
@@ -70,16 +70,17 @@ bool UDPServer::sendOutgoingMessages( std::queue< network::UDPoutgoingMessage >&
 	return true;
 }
 
-void UDPServer::getIncomingMessages( std::queue< network::UDPincomingMessage >& targerContainer )
+void UDPServer::getIncomingMessages( std::queue< network::UDPincomingMessage >& targetContainer )
 {
 	incomingMessageBlock.lock();
-	std::swap( targerContainer, this->incomingMessages );
+	std::swap( targetContainer, this->incomingMessages );
 
 	incomingMessageBlock.unlock();
 }
 
 UDPServer::~UDPServer()
 {
+	socket->close();
 	this->ioContext.stop();
 	UDPrunningThread.join();
 }

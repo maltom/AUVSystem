@@ -1,5 +1,5 @@
 #include "UDPNode.h"
-
+#include <iostream>
 #include <array>
 #include <cstdlib>
 #include <exception>
@@ -63,7 +63,7 @@ void UDPNode::loadNetworkConfig()
 		this->serverPort = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::jetson );
 		this->clientPort
 		    = jsonFunctions::network::readDevicePortNumber( configFileID, network::Device::microcontroller );
-			this->serverAdress = jsonFunctions::network::readDeviceIPNumber( configFileID, network::Device::jetson );
+		this->serverAdress = jsonFunctions::network::readDeviceIPNumber( configFileID, network::Device::jetson );
 		this->clientAdress
 		    = jsonFunctions::network::readDeviceIPNumber( configFileID, network::Device::microcontroller );
 	}

@@ -22,23 +22,26 @@ namespace network
 {
 using payloadWordType = uint16_t;
 
-constexpr int UDPbytesForCommand{ 1 };
-constexpr int UDPcommandPositionFrame{ 0 };
+constexpr auto UDPbytesForCommand{ 1u };
+constexpr auto UDPcommandPositionFrame{ 0u };
 
-constexpr int UDPbytesForPayloadSize{ 1 };
-constexpr int UDPpayloadSizePositionFrame{ UDPcommandPositionFrame + UDPbytesForCommand };
+constexpr auto UDPbytesForPayloadSize{ 1u };
+constexpr auto UDPpayloadSizePositionFrame{ UDPcommandPositionFrame + UDPbytesForCommand };
 
-constexpr int UDPpayloadStartPositionFrame{ UDPpayloadSizePositionFrame + UDPbytesForPayloadSize };
-constexpr int UDPonePayloadWordByteSize{ sizeof( payloadWordType ) };
+constexpr auto UDPpayloadStartPositionFrame{ UDPpayloadSizePositionFrame + UDPbytesForPayloadSize };
+constexpr auto UDPonePayloadWordByteSize{ sizeof( payloadWordType ) };
 
-constexpr int UDPincomingBufferMaxLength{ 256 };
-constexpr int UDPpayloadMaxSize{ ( UDPincomingBufferMaxLength - UDPbytesForPayloadSize - UDPbytesForCommand )
-	                             / UDPonePayloadWordByteSize };
+constexpr auto UDPincomingBufferMaxLength{ 256u };
+constexpr auto UDPpayloadMaxSize{ ( UDPincomingBufferMaxLength - UDPbytesForPayloadSize - UDPbytesForCommand )
+	                              / UDPonePayloadWordByteSize };
 using UDPincomingMessage = std::array< unsigned char, UDPincomingBufferMaxLength >;
 using UDPoutgoingMessage = std::string;
 
-using TCPincomingMessage = std::string;
-using TCPoutgoingMessage = std::string;
+constexpr auto TCPincomingBufferMaxLength{ 2048u };
+
+using TCPincomingMessage  = std::array< char, TCPincomingBufferMaxLength >;
+using TCPoutgoingMessage  = std::string;
+using TCPunstickedMessage = std::string;
 
 enum Device
 {

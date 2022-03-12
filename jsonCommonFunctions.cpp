@@ -63,6 +63,8 @@ namespace ROS
 } // namespace ROS
 namespace network
 {
+	using namespace ::network;
+
 	uint16_t readDevicePortNumber( configFiles::fileID configID, Device device )
 	{
 
@@ -283,7 +285,7 @@ namespace vehicle
 			    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 3 ) ),
 			    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 4 ) ),
 			    static_cast< double >( oneThrusterPosRot.get< jsonxx::Number >( 5 ) );
-			data.thrusterConfigurations.push_back( thrusterVec );
+			data.positionsAndRotations.push_back( thrusterVec );
 		}
 
 		auto isAzimuthalThrusters = thrustersData.get< jsonxx::Array >( "azimuthal" );
@@ -478,6 +480,12 @@ namespace vehicle
 		    = desiredConfigFile->parsedFile.get< jsonxx::Object >( "vehicle" ).get< jsonxx::Object >( "servos" );
 
 		data.servoSpeed = servoData.get< jsonxx::Number >( "angleSpeedPerSecond" );
+
+		// awfully bad practice - but very specific to project's hardware
+		for( auto i = 0u; i < azimuthalThrustersCount; ++i )
+		{
+			data.servosAngles.emplace_back( std::make_pair( 0.0, dimensionsIndex::pitch ) );
+		}
 
 		delete desiredConfigFile;
 		busy.unlock();

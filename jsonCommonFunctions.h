@@ -19,8 +19,6 @@ extern "C"
 #include "ThrusterRegulator/src/LQRRegulator.h"
 #include "ThrusterRegulator/src/VehiclePhysicalModel.h"
 
-using namespace network;
-
 class configFile;
 
 namespace jsonFunctions
@@ -36,8 +34,8 @@ namespace ROS
 } // namespace ROS
 namespace network
 {
-	extern uint16_t readDevicePortNumber( configFiles::fileID configID, Device device );
-	extern std::string readDeviceIPNumber( configFiles::fileID configID, Device device );
+	extern uint16_t readDevicePortNumber( configFiles::fileID configID, ::network::Device device );
+	extern std::string readDeviceIPNumber( configFiles::fileID configID, ::network::Device device );
 } // namespace network
 
 namespace vehicle

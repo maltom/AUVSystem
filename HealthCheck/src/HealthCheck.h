@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bitset>
+#include <chrono>
 #include <memory>
 
 #include <geometry_msgs/Twist.h>
@@ -23,6 +24,7 @@ public:
 		clearDump();
 		subscribeTopics();
 		advertiseTopics();
+		std::this_thread::sleep_for( std::chrono::seconds( 5 ) );
 	}
 	~HealthCheck() {}
 

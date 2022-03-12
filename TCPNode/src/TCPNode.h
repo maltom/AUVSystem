@@ -13,17 +13,13 @@
 #include "auvConfig/CommunicationCodes.h"
 #include "external/jsonxx/jsonxx.h"
 #include "CommonEnums.h"
+#include "jsonTCPFunctions.h"
 #include "NodeBase.h"
 #include "ROSEnums.h"
 #include "TCPClient.h"
 
 class TCPNode final : public NodeBase
 {
-	struct Frame
-	{
-		
-	};
-
 public:
 	TCPNode( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID, AUVROS::NodeIDs nID )
 	    : NodeBase( node, configID, nID )
@@ -33,11 +29,18 @@ public:
 
 		subscribeTopics();
 		advertiseTopics();
+		tcpClient->startClient();
 	}
 
 private:
-	std::queue< network::UDPincomingMessage > incomingMessages;
-	std::queue< network::UDPoutgoingMessage > outgoingMessages;
+
+	enum PublishersCodes
+	{
+		DVLDeadReckoning = 0
+	};
+
+	std::queue< network::TCPunstickedMessage > incomingMessages;
+	std::queue< network::TCPoutgoingMessage > outgoingMessages;
 
 	std::unique_ptr< TCPClient > tcpClient;
 
@@ -55,6 +58,6 @@ private:
 	void loadNetworkConfig();
 	void processIncomingMessages();
 	void processOutgoingMessages( const Frame& frameToSend );
-	Frame decomposeFrame( const network::UDPincomingMessage& incMsg );
+	Frame decomposeFrame( const network::TCPunstickedMessage& incMsg );
 	void processCommand( const Frame& frame );
 };

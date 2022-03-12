@@ -34,6 +34,7 @@ public:
 
 		subscribeTopics();
 		advertiseTopics();
+		this->udpServer->startServer();
 	}
 	~UDPNode() = default;
 
