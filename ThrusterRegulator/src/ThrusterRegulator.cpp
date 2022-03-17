@@ -13,13 +13,55 @@ void ThrusterRegulator::processInMainLoop()
 
 	if( ticks % regulatorTickSpan == 0 )
 	{
-		
+		// std::cout << "\n\n\n\n\n\nQ:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u <<"\n---------"<< std::endl;
 
-		
-		// allocateThrust2Azimuthal( dummyThrustSignal, dummyForces, this->model, this->penalizers );
+		this->lqrRegulator.calculate( this->currentState, this->model );
+		// std::cout << "Q:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u <<"\n---------"<< std::endl;
+		this->lqrRegulator.calculateError( this->currentPosition, this->positionToReach );
+		// std::cout << "Q:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u <<"\n---------"<< std::endl;
+		allocateThrust2Azimuthal( this->thrustValues_u, lqrRegulator.error, this->model, this->penalizers );
+		// std::cout << "Q:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u << std::endl;
 	}
 }
-void ThrusterRegulator::subscribeTopics() {}
+void ThrusterRegulator::subscribeTopics()
+{
+
+	// position - for now from DVL, eventually from PositioningSLAM
+	// TODO: change to SLAM
+	this->rosSubscribers.emplace_back(
+	    this->rosNode->subscribe( AUVROS::Topics::HardwareSignals::DVLDeadReckoningData,
+	                              AUVROS::QueueSize::StandardQueueSize,
+	                              &ThrusterRegulator::updateCurrentPositionAndAngularSpeed,
+	                              this ) );
+}
 
 void ThrusterRegulator::advertiseTopics()
 {
@@ -40,53 +82,39 @@ void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 	this->regulatorWorkingFrequency = jsonFunctions::regulator::readWorkingFrequency( config );
 	this->regulatorTickSpan         = static_cast< unsigned >( this->rosRate / this->regulatorWorkingFrequency );
 
-	this->thrustValues_u    = VectorXd::Zero( model.getModelThrusters().thrustersAmount, 1 );
+	this->thrustValues_u = VectorXd::Zero( model.getModelThrusters().thrustersAmount, 1 );
 }
 
-MatrixXd calculateNbar( const Matrix< double, stateDim, stateDim >& A,
-                        const Matrix< double, stateDim, controlDim >& B,
-                        const Matrix< double, controlDim, stateDim >& K )
+void ThrusterRegulator::updateCurrentPositionAndAngularSpeed(
+    const AUVROS::MessageTypes::DVLDeadReckoning& newPosition )
 {
-	MatrixXd C     = MatrixXd::Identity( stateDim, stateDim );
-	MatrixXd scale = MatrixXd::Identity( stateDim, controlDim );
+	auto newTimeStamp = newPosition.data.at( 6 );
+	auto deltaT       = newTimeStamp - this->timeStamp;
+	this->timeStamp   = newTimeStamp;
 
-	return -( C * ( A - B * K ).inverse() * B ).bdcSvd( ComputeThinU | ComputeThinV ).solve( scale );
+	// angular speed
+	this->currentSpeed( 3 ) = ( newPosition.data.at( 3 ) - this->currentSpeed( 3 ) ) / deltaT;
+	this->currentSpeed( 4 ) = ( newPosition.data.at( 4 ) - this->currentSpeed( 4 ) ) / deltaT;
+	this->currentSpeed( 5 ) = ( newPosition.data.at( 5 ) - this->currentSpeed( 5 ) ) / deltaT;
+
+	// position
+	this->currentPosition( 0 ) = newPosition.data.at( 0 );
+	this->currentPosition( 1 ) = newPosition.data.at( 1 );
+	this->currentPosition( 2 ) = newPosition.data.at( 2 );
+	this->currentPosition( 3 ) = newPosition.data.at( 3 );
+	this->currentPosition( 4 ) = newPosition.data.at( 4 );
+	this->currentPosition( 5 ) = newPosition.data.at( 5 );
+
+	this->currentState.block( 0, 0, 6, 1 ) = this->currentPosition;
+	this->currentState.block( 6, 0, 6, 1 ) = this->currentSpeed;
 }
 
-Matrix< double, stateDim, stateDim > calculateAStateMatrix( const VectorXd& currentState,
-                                                            const VehiclePhysicalModel& model )
+void ThrusterRegulator::updateVelocity( const AUVROS::MessageTypes::DVLVelocity& newVelocity )
 {
-	Matrix< double, stateDim, stateDim > A         = MatrixXd::Zero( stateDim, stateDim );
-	Matrix< double, sixDim, 1 > speed              = MatrixXd::Zero( sixDim, 1 );
-	Matrix< double, sixDim, sixDim > dampingCoeffs = MatrixXd::Zero( sixDim, sixDim );
-	MatrixXd speedDiag                             = MatrixXd::Zero( sixDim, sixDim );
-
-	// Obtaining velocity vector and putting it as diagonal into a speed_diag matrix
-	speed     = currentState.block( sixDim, 0, sixDim, 1 );
-	speedDiag = speed.asDiagonal();
-
-	// This definition can also be found in documentation
-	// First I create damping_coeffs matrix which is the sum
-	// Of all elements which create opposing forces
-	// Then I divide it by -M matrix which comes from State Space equation
-	dampingCoeffs = model.getModelDrag().Dnl * speedDiag.cwiseAbs() + model.calculateCoriolisMatrix( currentState )
-	    + model.getModelDrag().Dl;
-	dampingCoeffs = ( model.getModelInertial().Mrb + model.getModelDrag().addedMass.Ma ).inverse() * dampingCoeffs;
-
-	// State Space matrix
-	A << MatrixXd::Zero( sixDim, sixDim ), MatrixXd::Identity( sixDim, sixDim ), MatrixXd::Zero( sixDim, sixDim ),
-	    -dampingCoeffs;
-
-	return A;
-}
-
-Matrix< double, stateDim, controlDim > calculateBStateMatrix( const VehiclePhysicalModel& model )
-{
-	Matrix< double, stateDim, controlDim > B = MatrixXd::Zero( stateDim, controlDim );
-	B.block( controlDim, 0, controlDim, controlDim )
-	    = ( model.getModelInertial().Mrb + model.getModelDrag().addedMass.Ma ).inverse()
-	    * MatrixXd::Identity( controlDim, controlDim );
-	return B;
+	this->currentSpeed( 0 )                = newVelocity.linear.x;
+	this->currentSpeed( 1 )                = newVelocity.linear.y;
+	this->currentSpeed( 2 )                = newVelocity.linear.z;
+	this->currentState.block( 6, 0, 6, 1 ) = this->currentSpeed;
 }
 
 void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
@@ -204,5 +232,4 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 		}
 	}
 	// std::cout << "DONE\n" << quadProgSolution_x << std::endl;
-
 }

@@ -85,7 +85,7 @@ class ControlsFrame:
         self.sliders_frame = tk.Frame(temp)
         self.sliders_frame.pack(side=tk.LEFT)
         self.slider_controls(self.sliders_frame, "Thruster #", NUM_OF_THRUSTERS, -1.0, 1.0)
-        self.slider_controls(self.sliders_frame, "Servo #", NUM_OF_SERVOS, -90, 90)
+        self.slider_controls(self.sliders_frame, "Servo #", NUM_OF_SERVOS, 0, 3.141592)
         self.send_thruster_btn = tk.Button(self.sliders_frame, text="Send Thrusters")
         self.send_thruster_btn.pack(side=tk.LEFT)
         self.send_servos_btn = tk.Button(self.sliders_frame, text="Send Servos")

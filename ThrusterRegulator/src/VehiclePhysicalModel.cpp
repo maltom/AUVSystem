@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <iostream>
 
 #include "jsonCommonFunctions.h"
 
@@ -13,7 +14,11 @@ void VehiclePhysicalModel::loadPhysicalParameters( configFiles::fileID configID 
 	this->servos         = jsonFunctions::vehicle::readServosData( configID );
 }
 
-void VehiclePhysicalModel::adjustParametersForWorkingFrequency( const float freq ) {}
+void VehiclePhysicalModel::adjustParametersForWorkingFrequency( const float freq )
+{
+	this->servos.servoSpeed /= freq;
+	this->thrusterParams.deltaU /= freq;
+}
 
 void VehiclePhysicalModel::initMatrices()
 {
@@ -51,10 +56,13 @@ void VehiclePhysicalModel::initMatrices()
 	this->dragParams.Dnl = ( -vnl ).asDiagonal();
 
 	// Thrust matrix
-	// TODO: to musi byc odswiezane - trzeba dopisac funkcje osobna, ktora liczy i updateuje nie tylko macierz, ale tez
-	// TODO: wektory w oparciu o funkcje, ktore musza byc zdefiniowane w pliku. dorob nowy atrybut klasy, ktory bedzie
-	// TODO: przechowywal funkcje do przeliczenia wartosci (sin, cos, zero) jak i pochodne
 	calculateAllThrusterConfigutationMatrix();
+	std::cout << thrusterParams.AllThrustersConfigurationsMatrix << std::endl;
+	for( auto i = 0u; i < 5; ++i )
+	{
+		std::cout << thrusterParams.AllThrustersConfigurationsMatrix( 5, i ) << " ";
+	}
+	std::cout << std::endl;
 }
 
 VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState ) const

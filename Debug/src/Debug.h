@@ -19,7 +19,10 @@ namespace labels
 const std::array< std::string, 5 > thrusters{
 	"Thruster #1", "Thruster #2", "Thruster #3", "Thruster #4", "Thruster #5"
 };
-const std::array< std::string, 7 > DVLDeadReckoning{ "Time", "x", "y", "z", "roll", "pitch", "yaw" };
+const std::array< std::string, 2 > servos{
+	"Servo #1", "Servo #2"
+};
+const std::array< std::string, 6 > DVLDeadReckoning{ "x", "y", "z", "roll", "pitch", "yaw" };
 } // namespace labels
 
 class Debug final : public NodeBase
@@ -41,6 +44,7 @@ private:
 	{
 		Health,
 		ThrustersArbitrarly,
+		ServosArbitrarly,
 		DVLDeadReckoning
 	};
 
@@ -53,6 +57,7 @@ private:
 
 	void displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report );
 	void displayArbitrarlySetThrustersStatus( const AUVROS::MessageTypes::ThrustersSignal& message );
+	void displayArbitrarlySetServosStatus( const AUVROS::MessageTypes::ServosSignal& message );
 	void displayDVLDeadReckoningStatus( const AUVROS::MessageTypes::DVLDeadReckoning& message );
 
 	Displayer displayer;

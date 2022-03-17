@@ -18,6 +18,11 @@ constexpr int configFilesCount                      = 1;
 const static std::array< std::string, 1 > filePaths = { std::string( MAIN_CONFIG_FILE_PATH ) };
 } // namespace configFiles
 
+namespace math
+{
+constexpr double piNumber{ 3.141592 };
+}
+
 namespace network
 {
 using payloadWordType = uint16_t;
@@ -62,6 +67,7 @@ constexpr auto controlDim = 6u;
 constexpr auto sixDim = 6u;
 
 constexpr std::pair< float, float > regulatorOutputSignalMinMax{ -1.0f, 1.0f };
+constexpr std::pair< float, float > regulatorServoOutputSignalMinMax{ 0.0f, math::piNumber };
 
 } // namespace regulator
 
@@ -78,4 +84,6 @@ enum dimensionsIndex
 namespace hardware
 {
 constexpr std::pair< unsigned, unsigned > motorTorqueMinMax{ 0u, 2000u };
-};
+constexpr std::pair< unsigned, unsigned > servoMinMax{ 0u, 100u };
+
+}; // namespace hardware

@@ -15,8 +15,8 @@ UDPServer::UDPServer( const uint16_t serverPort,
 	// socket         = std::make_unique< udp::socket >( ioContext,
 	//   udp::endpoint( address::from_string( serverIpAdress ), serverPort ) );
 	socket         = std::make_unique< udp::socket >( ioContext, udp::endpoint( udp::v4(), serverPort ) );
-	clientEndpoint = udp::endpoint( udp::v4(), 38459 );
-	// clientEndpoint = udp::endpoint(address::from_string( clientIpAdress ), clientPort );
+	//clientEndpoint = udp::endpoint( udp::v4(), 38459 );
+	clientEndpoint = udp::endpoint(address::from_string( clientIpAdress ), clientPort );
 }
 
 void UDPServer::startServer()
