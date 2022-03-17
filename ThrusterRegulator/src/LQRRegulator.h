@@ -20,7 +20,7 @@ struct LQRRegulator
 	DiagonalMatrix< double, controlDim > R;
 	Matrix< double, controlDim, stateDim > K = Matrix< double, controlDim, stateDim >::Zero( controlDim, stateDim );
 
-	// feedbac error - desired forces
+	// feedback error - desired forces
 	VectorXd error = VectorXd::Zero( 6 );
 
 	ct::optcon::LQR< stateDim, controlDim > lqrSolver;
@@ -39,8 +39,8 @@ private:
 
 struct AllocationPenalizers
 {
-	VectorXd Q     = VectorXd::Zero( 3 ); // Penalizing the difference between desired tau and generated one
+	VectorXd Q     = VectorXd::Zero( 6 ); // Penalizing the difference between desired tau and generated one
 	VectorXd Omega = VectorXd::Zero( 2 ); // Penalizing too fast turn rate - not really important
 	VectorXd W     = VectorXd::Zero(
-        2 ); // Penalizing the power consumption of motors. Not really important as it's taken care of in LQR
+        5 ); // Penalizing the power consumption of motors. Not really important as it's taken care of in LQR
 };

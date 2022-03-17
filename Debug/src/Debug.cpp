@@ -33,6 +33,12 @@ void Debug::subscribeTopics()
 	                                                             this ) );
 
 	displayer.addInfoToDisplay(
+	    "Servos arbitrarly", std::vector< std::string >( labels::servos.begin(), labels::servos.end() ), "init" );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetServos,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &Debug::displayArbitrarlySetServosStatus,
+	                                                             this ) );
+	displayer.addInfoToDisplay(
 	    "DVL Dead Reckoning",
 	    std::vector< std::string >( labels::DVLDeadReckoning.begin(), labels::DVLDeadReckoning.end() ),
 	    "init" );
@@ -71,6 +77,17 @@ void Debug::displayArbitrarlySetThrustersStatus( const AUVROS::MessageTypes::Thr
 		values.emplace_back( std::to_string( message.data.at( i ) ) );
 	}
 	displayer.setMajorColumnValues( DisplayerDataPositions::ThrustersArbitrarly, values );
+}
+
+void Debug::displayArbitrarlySetServosStatus( const AUVROS::MessageTypes::ThrustersSignal& message )
+{
+	std::vector< DataType > values;
+
+	for( auto i = 0u; i < message.data.size(); ++i )
+	{
+		values.emplace_back( std::to_string( message.data.at( i ) ) );
+	}
+	displayer.setMajorColumnValues( DisplayerDataPositions::ServosArbitrarly, values );
 }
 
 void Debug::displayDVLDeadReckoningStatus( const AUVROS::MessageTypes::DVLDeadReckoning& message )

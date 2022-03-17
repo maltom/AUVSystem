@@ -49,13 +49,13 @@ private:
 	AllocationPenalizers penalizers;
 
 	// VectorXd::Zero( thrusterAmount, 1 ). u is vector of -1 to 1 values of how each thruster is working
-	VectorXd thrustValues_u;
+	VectorXd thrustValues_u            = VectorXd::Zero( 5 );
 	VectorXd currentState              = VectorXd::Zero( stateDim ); // state = position and speed
 	VectorXd currentPosition           = VectorXd::Zero( sixDim );
 	VectorXd currentSpeed              = VectorXd::Zero( sixDim );
-	VectorXd positionToReach           = VectorXd::Zero( sixDim );
+	VectorXd positionToReach           = VectorXd::Ones( sixDim );
 	VectorXd regulatorFeedbackPosition = VectorXd::Zero( sixDim );
-	
+
 	// VectorXd dummyForces       = VectorXd::Zero( 6 );
 	// VectorXd dummyThrustSignal = VectorXd::Zero( 5 );
 	double timeStamp{ 0.0 };

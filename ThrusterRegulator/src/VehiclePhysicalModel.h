@@ -161,10 +161,6 @@ private:
 	Drag dragParams;
 	Servos servos;
 
-	// Thrust configuration matrix;
-
-	MatrixXd KAll = MatrixXd::Zero( 5, 5 );
-
 	// public:
 	// 	VectorXd getThrustSignal() const;
 	// 	VectorXd getAzimuth() const;

@@ -1,5 +1,6 @@
 #include "LQRRegulator.h"
 
+#include <iostream>
 void LQRRegulator::calculate( const VectorXd& currentState, const VehiclePhysicalModel& model )
 {
 	calculateAStateMatrix( currentState, model );
@@ -16,7 +17,8 @@ VectorXd LQRRegulator::calculateRegulatorFeedbackPose( const VectorXd& currentSt
 
 void LQRRegulator::calculateError( const VectorXd& currentPosition, const VectorXd& positionToReach )
 {
-	this->error = calculateNbar() * positionToReach + currentPosition;
+	auto bar = calculateNbar();
+	this->error = bar * positionToReach + currentPosition;
 }
 
 void LQRRegulator::calculateAStateMatrix( const VectorXd& currentState, const VehiclePhysicalModel& model )
@@ -47,7 +49,9 @@ MatrixXd LQRRegulator::calculateNbar()
 	MatrixXd C     = MatrixXd::Identity( stateDim, stateDim );
 	MatrixXd scale = MatrixXd::Identity( stateDim, controlDim );
 
-	return -( C * ( this->A - this->B * this->K ).inverse() * this->B )
+	MatrixXd dynamicA = this->A, dynamicB = this->B, dynamicK = this->K;
+
+	return -( C * ( dynamicA - dynamicB * dynamicK ).inverse() * dynamicB )
 	            .bdcSvd( ComputeThinU | ComputeThinV )
 	            .solve( scale );
 }

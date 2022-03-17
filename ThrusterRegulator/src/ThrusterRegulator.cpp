@@ -13,8 +13,45 @@ void ThrusterRegulator::processInMainLoop()
 
 	if( ticks % regulatorTickSpan == 0 )
 	{
+		// std::cout << "\n\n\n\n\n\nQ:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u <<"\n---------"<< std::endl;
+
 		this->lqrRegulator.calculate( this->currentState, this->model );
-		allocateThrust2Azimuthal( this->thrustValues_u, lqrRegulator.error, this->model, this->penalizers );
+		// std::cout << "Q:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u <<"\n---------"<< std::endl;
+		this->lqrRegulator.calculateError( this->currentPosition, this->positionToReach );
+		// std::cout << "Q:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u <<"\n---------"<< std::endl;
+		allocateThrust2Azimuthal( this->thrustValues_u,
+		                          static_cast< decltype( lqrRegulator.error ) >( lqrRegulator.error ),
+		                          this->model,
+		                          this->penalizers );
+		// std::cout << "Q:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u << std::endl;
 	}
 }
 void ThrusterRegulator::subscribeTopics()
@@ -56,6 +93,7 @@ void ThrusterRegulator::updateCurrentPositionAndAngularSpeed(
 {
 	auto newTimeStamp = newPosition.data.at( 6 );
 	auto deltaT       = newTimeStamp - this->timeStamp;
+	this->timeStamp   = newTimeStamp;
 
 	// angular speed
 	this->currentSpeed( 3 ) = ( newPosition.data.at( 3 ) - this->currentSpeed( 3 ) ) / deltaT;

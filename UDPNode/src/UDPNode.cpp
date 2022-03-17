@@ -159,12 +159,24 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 		throw std::runtime_error( "Too many servos." );
 	}
 	Frame frame;
-	frame.commandCode = NORESPREQ_SET_SERVOS;
-	frame.payloadSize = length;
-	for( auto i = 0u; i < length; ++i )
-	{
-		frame.payload[ i ] = adjustServoValues( message.data[ i ] );
-	}
+	Frame frame2;
+	frame.commandCode  = NORESPREQ_SET_SERVOS;
+	frame2.commandCode = NORESPREQ_SET_SERVOS;
+	frame.payloadSize  = length;
+	frame2.payloadSize = length;
+	// for( auto i = 0u; i < length; ++i )
+	// {
+	// 	frame.payload[ i ] = adjustServoValues( message.data[ i ] );
+	// 	std::cout<<frame.payload[i]<<std::endl;
+	// }
+	frame.payload[ 0 ]  = 0;
+	frame.payload[ 1 ]  = hardware::servoMinMax.second - adjustServoValues( message.data[ 0 ] );
+	frame2.payload[ 0 ] = 1;
+	frame2.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );
+
+	std::cout << frame.payload[ 0 ] << std::endl;
+	std::cout << frame.payload[ 1 ] << std::endl;
 
 	this->processOutgoingMessages( frame );
+	this->processOutgoingMessages( frame2 );
 }
