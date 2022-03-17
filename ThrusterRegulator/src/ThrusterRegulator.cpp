@@ -40,10 +40,7 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->currentPosition << "\ndesired pos:\n"
 		//           << this->positionToReach << "\nthruster sig:\n"
 		//           << this->thrustValues_u <<"\n---------"<< std::endl;
-		allocateThrust2Azimuthal( this->thrustValues_u,
-		                          static_cast< decltype( lqrRegulator.error ) >( lqrRegulator.error ),
-		                          this->model,
-		                          this->penalizers );
+		allocateThrust2Azimuthal( this->thrustValues_u, lqrRegulator.error, this->model, this->penalizers );
 		// std::cout << "Q:\n"
 		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
 		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
