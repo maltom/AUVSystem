@@ -5,9 +5,15 @@ if [ ! -d "build" ]; then
 fi
 cd build
 
+<<<<<<< HEAD
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 # cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j12
+=======
+# cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j4
+>>>>>>> develop
 unset GLOBIGNORE
 
 for index in ${modulesList[@]}; do
