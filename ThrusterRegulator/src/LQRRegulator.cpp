@@ -6,7 +6,7 @@ void LQRRegulator::calculate( const VectorXd& currentState, const VehiclePhysica
 	calculateAStateMatrix( currentState, model );
 	calculateBStateMatrix( model );
 
-	this->lqrSolver.compute( this->Q, this->R, this->A, this->B, this->K );
+	this->lqrSolver.compute( this->Q, this->R, this->A, this->B, this->K, false, false );
 }
 
 // for simulation purpose only
@@ -17,8 +17,7 @@ VectorXd LQRRegulator::calculateRegulatorFeedbackPose( const VectorXd& currentSt
 
 void LQRRegulator::calculateError( const VectorXd& currentPosition, const VectorXd& positionToReach )
 {
-	auto bar = calculateNbar();
-	this->error = bar * positionToReach + currentPosition;
+	this->error = calculateNbar() * positionToReach + currentPosition;
 }
 
 void LQRRegulator::calculateAStateMatrix( const VectorXd& currentState, const VehiclePhysicalModel& model )

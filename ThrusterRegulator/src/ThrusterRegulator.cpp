@@ -49,6 +49,10 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->currentPosition << "\ndesired pos:\n"
 		//           << this->positionToReach << "\nthruster sig:\n"
 		//           << this->thrustValues_u << std::endl;
+		this->calculateSimulationState();
+		this->publishEstimatedPosition();
+		// simulation
+		this->currentState = simulationResultState;
 	}
 }
 void ThrusterRegulator::subscribeTopics()
@@ -72,6 +76,10 @@ void ThrusterRegulator::advertiseTopics()
 	this->rosPublishers.emplace_back(
 	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
 	        AUVROS::Topics::HardwareSignals::signalToServos, AUVROS::QueueSize::StandardQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::Position >(
+	        AUVROS::Topics::Positions::globalEstimatedPosition, AUVROS::QueueSize::StandardQueueSize ) ) );
 }
 void ThrusterRegulator::connectServices() {}
 
@@ -232,4 +240,30 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 		}
 	}
 	// std::cout << "DONE\n" << quadProgSolution_x << std::endl;
+}
+void ThrusterRegulator::calculateSimulationState()
+{
+	VectorXd tau = VectorXd::Zero( 6 );
+
+	tau = this->model.getModelThrusters().AllThrustersConfigurationsMatrix * model.getModelThrusters().KMax
+	    * this->thrustValues_u;
+	this->simulationResultState = this->currentState
+	    + ( this->lqrRegulator.A * currentState
+	        + this->lqrRegulator.B * ( tau - model.getRestoringForces( this->currentState ) ) )
+	        * ( 1.0 / this->regulatorWorkingFrequency );
+}
+
+void ThrusterRegulator::publishEstimatedPosition()
+{
+	AUVROS::MessageTypes::Position simResult;
+	simResult.linear.x  = this->simulationResultState( 0 );
+	simResult.linear.y  = this->simulationResultState( 1 );
+	simResult.linear.z  = this->simulationResultState( 2 );
+	simResult.angular.x = this->simulationResultState( 3 );
+	simResult.angular.y = this->simulationResultState( 4 );
+	simResult.angular.z = this->simulationResultState( 5 );
+
+	this->rosPublishers.at( advertisers::simulationPosition )->publish( simResult );
+
+	std::cout << this->simulationResultState << std::endl;
 }
