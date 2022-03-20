@@ -7,7 +7,7 @@ cd build
 
 # cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j12
+make -j4
 unset GLOBIGNORE
 
 for index in ${modulesList[@]}; do
