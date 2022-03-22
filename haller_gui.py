@@ -19,7 +19,7 @@ NUM_OF_SERVOS = 2
 THRUSTER_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrusters'
 SERVOS_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetServos'
 GLOBAL_POSITION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetGlobalPosition'
-THRUST_ALLOCATION_TOPIC = '/AUVInternalSystem/DevPC/allocateGlobalThrust'         # TODO: set actual thruster allocation topic
+THRUST_ALLOCATION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrust'
 AUV_SYSTEM_DIR = re.search(".*AUVSystem", os.getcwd())[0]
 AUV_CONFIG_DIR = os.path.join(AUV_SYSTEM_DIR, 'auvConfig', 'auvConfig.json')
 
