@@ -101,7 +101,7 @@ class ControlsFrame:
 
         self.thrust_frame = tk.Frame(temp)
         self.thrust_frame.pack(side=tk.LEFT)
-        self.slider_controls(self.thrust_frame, ['X Thrust', 'Y Thrust', 'Z Thrust', "X Torque", "Y Torque", "Z Torque"], 6, -100, 100)
+        self.slider_controls(self.thrust_frame, ['X Thrust', 'Y Thrust', 'Z Thrust', "X Torque", "Y Torque", "Z Torque"], 6, -50, 50)
         self.send_thrust_alloc_btn = tk.Button(self.thrust_frame, text="Send Thrust Alloc")
         self.send_thrust_alloc_btn.pack(fill=tk.BOTH)
 
@@ -153,7 +153,7 @@ class ControlsFrame:
 
     def update(self):
         for controls in self.sliders.values():
-            controls['value_label'].configure(text=int(controls['variable'].get()))
+            controls['value_label'].configure(text=f"{controls['variable'].get():.2f}")
         
         for entry in self.entries.values():
             try:
@@ -196,7 +196,7 @@ class RosHandler:
         self.controls_frame.send_servos_btn.configure(command=self.send_to_servos)
         self.global_position_Sender = rospy.Publisher(GLOBAL_POSITION_TOPIC, Twist, queue_size=10)
         self.controls_frame.send_globa_pos_btn.configure(command=self.send_global_pos)
-        self.thrust_alloc_Sender = rospy.Publisher(THRUST_ALLOCATION_TOPIC, Float32MultiArray, queue_size=10)
+        self.thrust_alloc_Sender = rospy.Publisher(THRUST_ALLOCATION_TOPIC, Twist, queue_size=10)
         self.controls_frame.send_thrust_alloc_btn.configure(command=self.send_thrust_alloc)
 
         self.thr_dim = MultiArrayDimension("dim", 5, 5)
@@ -237,7 +237,7 @@ class RosHandler:
     def send_thrust_alloc(self):
         values = [float(thruster['variable'].get()) for name, thruster in self.controls_frame.sliders.items()
                                                     if name in ['X Thrust', 'Y Thrust', 'Z Thrust', "X Torque", "Y Torque", "Z Torque"]]
-        thrust_alloc_msg = Float32MultiArray()
+        thrust_alloc_msg = Twist()
         thrust_alloc_msg.layout = self.alloc_lay
         thrust_alloc_msg.data = values
         self.thrust_alloc_Sender.publish(thrust_alloc_msg)

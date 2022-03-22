@@ -1,5 +1,4 @@
 #pragma once
-
 #include <memory>
 
 #include <ct/optcon/optcon.h>
@@ -79,6 +78,9 @@ private:
 	void calculateSimulationState();
 #ifndef NOLQR
 	void publishEstimatedPosition();
+
+	#else
+	void updateDesiredForcesError( const AUVROS::MessageTypes::ArbitrarlySetThrust& newForces);
 #endif
 #endif
 };

@@ -21,9 +21,7 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->currentPosition << "\ndesired pos:\n"
 		//           << this->positionToReach << "\nthruster sig:\n"
 		//           << this->thrustValues_u <<"\n---------"<< std::endl;
-#ifdef NOLQR
-
-#else
+#ifndef NOLQR
 		this->lqrRegulator.calculate( this->currentState, this->model );
 		// std::cout << "Q:\n"
 		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
@@ -42,8 +40,8 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->currentPosition << "\ndesired pos:\n"
 		//           << this->positionToReach << "\nthruster sig:\n"
 		//           << this->thrustValues_u <<"\n---------"<< std::endl;
-		allocateThrust2Azimuthal( this->thrustValues_u, lqrRegulator.error, this->model, this->penalizers );
 #endif
+		allocateThrust2Azimuthal( this->thrustValues_u, lqrRegulator.error, this->model, this->penalizers );
 // std::cout << "Q:\n"
 //           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
 //           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
@@ -72,6 +70,14 @@ void ThrusterRegulator::subscribeTopics()
 	                              AUVROS::QueueSize::StandardQueueSize,
 	                              &ThrusterRegulator::updateCurrentPositionAndAngularSpeed,
 	                              this ) );
+
+#ifdef NOLQR
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrust,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &ThrusterRegulator::updateDesiredForcesError,
+	                                                             this ) );
+
+#endif
 }
 
 void ThrusterRegulator::advertiseTopics()
@@ -275,6 +281,16 @@ void ThrusterRegulator::publishEstimatedPosition()
 	this->rosPublishers.at( advertisers::estimatedPosition )->publish( simResult );
 
 	std::cout << this->simulationResultState << std::endl;
+}
+#else
+void ThrusterRegulator::updateDesiredForcesError( const AUVROS::MessageTypes::ArbitrarlySetThrust& newForces )
+{
+	this->lqrRegulator.error( 0 ) = newForces.linear.x;
+	this->lqrRegulator.error( 1 ) = newForces.linear.y;
+	this->lqrRegulator.error( 2 ) = newForces.linear.z;
+	this->lqrRegulator.error( 3 ) = newForces.angular.x;
+	this->lqrRegulator.error( 4 ) = newForces.angular.y;
+	this->lqrRegulator.error( 5 ) = newForces.angular.z;
 }
 #endif
 #endif
