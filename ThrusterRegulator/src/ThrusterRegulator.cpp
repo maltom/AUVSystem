@@ -72,7 +72,7 @@ void ThrusterRegulator::subscribeTopics()
 	                              this ) );
 
 #ifdef NOLQR
-	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrust,
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrustForce,
 	                                                             AUVROS::QueueSize::StandardQueueSize,
 	                                                             &ThrusterRegulator::updateDesiredForcesError,
 	                                                             this ) );
@@ -283,7 +283,7 @@ void ThrusterRegulator::publishEstimatedPosition()
 	std::cout << this->simulationResultState << std::endl;
 }
 #else
-void ThrusterRegulator::updateDesiredForcesError( const AUVROS::MessageTypes::ArbitrarlySetThrust& newForces )
+void ThrusterRegulator::updateDesiredForcesError( const AUVROS::MessageTypes::arbitrarlySetThrustForce& newForces )
 {
 	this->lqrRegulator.error( 0 ) = newForces.linear.x;
 	this->lqrRegulator.error( 1 ) = newForces.linear.y;

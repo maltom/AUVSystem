@@ -65,11 +65,11 @@ namespace Topics
 
 namespace MessageTypes
 {
-	using ArbitrarlySetThrust = geometry_msgs::Twist;
-	using ThrustersSignal     = std_msgs::Float32MultiArray;
-	using ServosSignal        = std_msgs::Float32MultiArray;
-	using Position            = geometry_msgs::Twist;
-	using Waypoint            = geometry_msgs::Twist;
+	using arbitrarlySetThrustForce = geometry_msgs::Twist;
+	using ThrustersSignal          = std_msgs::Float32MultiArray;
+	using ServosSignal             = std_msgs::Float32MultiArray;
+	using Position                 = geometry_msgs::Twist;
+	using Waypoint                 = geometry_msgs::Twist;
 
 	using DVLDeadReckoning = std_msgs::Float32MultiArray;
 	using DVLVelocity      = geometry_msgs::Twist;

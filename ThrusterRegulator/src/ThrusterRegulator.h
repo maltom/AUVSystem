@@ -80,7 +80,7 @@ private:
 	void publishEstimatedPosition();
 
 	#else
-	void updateDesiredForcesError( const AUVROS::MessageTypes::ArbitrarlySetThrust& newForces);
+	void updateDesiredForcesError( const AUVROS::MessageTypes::arbitrarlySetThrustForce& newForces);
 #endif
 #endif
 };
