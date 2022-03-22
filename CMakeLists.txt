@@ -8,6 +8,9 @@ include_directories(external . /opt/ros/noetic/include /opt/ros/noetic/lib)
 
 set(NAME Commons)
 
+option(NOLQR "Working without LQR or model estimation" OFF)
+option(SIMULATION "Working in simulation mode" OFF)
+
 set(SOURCES
     CommonEnums.cpp
     jsonCommonFunctions.cpp
@@ -23,6 +26,13 @@ set(HEADERS
 )
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
+if(NOLQR)
+    add_definitions(-DNOLQR)
+endif()
+if(SIMULATION)
+    add_definitions(-DSIMULATION)
+endif()
 
 #add_subdirectory(AdditionalCameraProcessor)
 add_subdirectory(Debug)

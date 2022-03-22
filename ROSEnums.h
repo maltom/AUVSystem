@@ -45,6 +45,8 @@ namespace Topics
 		static const std::string arbitrarlySetThrusters      = Folders::DevPCSubFolder + "/arbitrarlySetThrusters";
 		static const std::string arbitrarlySetServos         = Folders::DevPCSubFolder + "/arbitrarlySetServos";
 		static const std::string arbitrarlySetGlobalPosition = Folders::DevPCSubFolder + "/arbitrarlySetGlobalPosition";
+		static const std::string arbitrarlySetThrust         = Folders::DevPCSubFolder + "/arbitrarlySetThrust";
+
 		static const std::string arbitrarlySetRelativePosition
 		    = Folders::DevPCSubFolder + "/arbitrarlySetRelativePosition";
 	} // namespace DevPC
@@ -63,10 +65,11 @@ namespace Topics
 
 namespace MessageTypes
 {
-	using ThrustersSignal = std_msgs::Float32MultiArray;
-	using ServosSignal    = std_msgs::Float32MultiArray;
-	using Position        = geometry_msgs::Twist;
-	using Waypoint        = geometry_msgs::Twist;
+	using ArbitrarlySetThrust = geometry_msgs::Twist;
+	using ThrustersSignal     = std_msgs::Float32MultiArray;
+	using ServosSignal        = std_msgs::Float32MultiArray;
+	using Position            = geometry_msgs::Twist;
+	using Waypoint            = geometry_msgs::Twist;
 
 	using DVLDeadReckoning = std_msgs::Float32MultiArray;
 	using DVLVelocity      = geometry_msgs::Twist;

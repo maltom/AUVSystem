@@ -57,12 +57,19 @@ void VehiclePhysicalModel::initMatrices()
 
 	// Thrust matrix
 	calculateAllThrusterConfigutationMatrix();
-	std::cout << thrusterParams.AllThrustersConfigurationsMatrix << std::endl;
-	for( auto i = 0u; i < 5; ++i )
-	{
-		std::cout << thrusterParams.AllThrustersConfigurationsMatrix( 5, i ) << " ";
-	}
-	std::cout << std::endl;
+
+	// simulation max thrust matrix
+	const auto& maxThrust = thrusterParams.maxThrust;
+	VectorXd KMaxDiag = VectorXd::Zero(5);
+	KMaxDiag << maxThrust, maxThrust, maxThrust, maxThrust, maxThrust;
+	thrusterParams.KMax = KMaxDiag.asDiagonal();
+
+	// std::cout << thrusterParams.AllThrustersConfigurationsMatrix << std::endl;
+	// for( auto i = 0u; i < 5; ++i )
+	// {
+	// 	std::cout << thrusterParams.AllThrustersConfigurationsMatrix( 5, i ) << " ";
+	// }
+	// std::cout << std::endl;
 }
 
 VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState ) const

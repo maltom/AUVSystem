@@ -21,7 +21,7 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->currentPosition << "\ndesired pos:\n"
 		//           << this->positionToReach << "\nthruster sig:\n"
 		//           << this->thrustValues_u <<"\n---------"<< std::endl;
-
+#ifndef NOLQR
 		this->lqrRegulator.calculate( this->currentState, this->model );
 		// std::cout << "Q:\n"
 		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
@@ -40,15 +40,24 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->currentPosition << "\ndesired pos:\n"
 		//           << this->positionToReach << "\nthruster sig:\n"
 		//           << this->thrustValues_u <<"\n---------"<< std::endl;
+#endif
 		allocateThrust2Azimuthal( this->thrustValues_u, lqrRegulator.error, this->model, this->penalizers );
-		// std::cout << "Q:\n"
-		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
-		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
-		//           << lqrRegulator.A << "\nB:\n"
-		//           << lqrRegulator.B << "\ncurrent pos:\n"
-		//           << this->currentPosition << "\ndesired pos:\n"
-		//           << this->positionToReach << "\nthruster sig:\n"
-		//           << this->thrustValues_u << std::endl;
+// std::cout << "Q:\n"
+//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+//           << lqrRegulator.A << "\nB:\n"
+//           << lqrRegulator.B << "\ncurrent pos:\n"
+//           << this->currentPosition << "\ndesired pos:\n"
+//           << this->positionToReach << "\nthruster sig:\n"
+//           << this->thrustValues_u << std::endl;
+#ifdef SIMULATION
+		this->calculateSimulationState();
+#ifndef NOLQR
+		this->publishEstimatedPosition();
+#endif
+#endif
+		// simulation
+		this->currentState = simulationResultState;
 	}
 }
 void ThrusterRegulator::subscribeTopics()
@@ -61,6 +70,14 @@ void ThrusterRegulator::subscribeTopics()
 	                              AUVROS::QueueSize::StandardQueueSize,
 	                              &ThrusterRegulator::updateCurrentPositionAndAngularSpeed,
 	                              this ) );
+
+#ifdef NOLQR
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetThrust,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &ThrusterRegulator::updateDesiredForcesError,
+	                                                             this ) );
+
+#endif
 }
 
 void ThrusterRegulator::advertiseTopics()
@@ -72,6 +89,10 @@ void ThrusterRegulator::advertiseTopics()
 	this->rosPublishers.emplace_back(
 	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
 	        AUVROS::Topics::HardwareSignals::signalToServos, AUVROS::QueueSize::StandardQueueSize ) ) );
+
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::Position >(
+	        AUVROS::Topics::Positions::globalEstimatedPosition, AUVROS::QueueSize::StandardQueueSize ) ) );
 }
 void ThrusterRegulator::connectServices() {}
 
@@ -233,3 +254,43 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	}
 	// std::cout << "DONE\n" << quadProgSolution_x << std::endl;
 }
+
+#ifdef SIMULATION
+void ThrusterRegulator::calculateSimulationState()
+{
+	VectorXd tau = VectorXd::Zero( 6 );
+
+	tau = this->model.getModelThrusters().AllThrustersConfigurationsMatrix * model.getModelThrusters().KMax
+	    * this->thrustValues_u;
+	this->simulationResultState = this->currentState
+	    + ( this->lqrRegulator.A * currentState
+	        + this->lqrRegulator.B * ( tau - model.getRestoringForces( this->currentState ) ) )
+	        * ( 1.0 / this->regulatorWorkingFrequency );
+}
+#ifndef NOLQR
+void ThrusterRegulator::publishEstimatedPosition()
+{
+	AUVROS::MessageTypes::Position simResult;
+	simResult.linear.x  = this->simulationResultState( 0 );
+	simResult.linear.y  = this->simulationResultState( 1 );
+	simResult.linear.z  = this->simulationResultState( 2 );
+	simResult.angular.x = this->simulationResultState( 3 );
+	simResult.angular.y = this->simulationResultState( 4 );
+	simResult.angular.z = this->simulationResultState( 5 );
+
+	this->rosPublishers.at( advertisers::estimatedPosition )->publish( simResult );
+
+	std::cout << this->simulationResultState << std::endl;
+}
+#else
+void ThrusterRegulator::updateDesiredForcesError( const AUVROS::MessageTypes::ArbitrarlySetThrust& newForces )
+{
+	this->lqrRegulator.error( 0 ) = newForces.linear.x;
+	this->lqrRegulator.error( 1 ) = newForces.linear.y;
+	this->lqrRegulator.error( 2 ) = newForces.linear.z;
+	this->lqrRegulator.error( 3 ) = newForces.angular.x;
+	this->lqrRegulator.error( 4 ) = newForces.angular.y;
+	this->lqrRegulator.error( 5 ) = newForces.angular.z;
+}
+#endif
+#endif

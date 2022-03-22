@@ -100,6 +100,9 @@ public:
 		std::vector< AzimuthalThrusterFunctions > azimuthalBaseFunctions;
 		std::vector< AzimuthalThrusterFunctions > azimuthalDerivativeFunctions;
 
+		// thrusters config matrix containing max thrust values - only for simulation
+		Matrix< double, 5, 5 > KMax = Matrix< double, 5, 5 >::Zero();
+
 		// inertia of thruster - how fast can thrusters change their generated thrust per deltaT
 		double deltaU{ 0.0 };
 		double maxThrust{ 0.0 };
@@ -127,6 +130,7 @@ public:
 	MatrixXd getAzimuthalThrustersConfig() const;
 	void calculateAllThrusterConfigutationMatrix();
 	void updateAzimuthalThrusterConfig( const std::vector< double >& newServosAngles );
+	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 
 	const Drag& getModelDrag() const
 	{
@@ -151,8 +155,6 @@ public:
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
 	void adjustParametersForWorkingFrequency( const float freq );
-
-	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 
 	void initMatrices();
 
