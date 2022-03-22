@@ -19,7 +19,7 @@ NUM_OF_SERVOS = 2
 THRUSTER_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrusters'
 SERVOS_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetServos'
 GLOBAL_POSITION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetGlobalPosition'
-THRUST_ALLOCATION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrust'
+THRUST_ALLOCATION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrustForce'
 AUV_SYSTEM_DIR = re.search(".*AUVSystem", os.getcwd())[0]
 AUV_CONFIG_DIR = os.path.join(AUV_SYSTEM_DIR, 'auvConfig', 'auvConfig.json')
 
@@ -238,8 +238,8 @@ class RosHandler:
         values = [float(thruster['variable'].get()) for name, thruster in self.controls_frame.sliders.items()
                                                     if name in ['X Thrust', 'Y Thrust', 'Z Thrust', "X Torque", "Y Torque", "Z Torque"]]
         thrust_alloc_msg = Twist()
-        thrust_alloc_msg.layout = self.alloc_lay
-        thrust_alloc_msg.data = values
+        thrust_alloc_msg.linear = Vector3(values[0], values[1], values[2])
+        thrust_alloc_msg.angular = Vector3(values[3], values[4], values[5])
         self.thrust_alloc_Sender.publish(thrust_alloc_msg)
 
 class HallerGui:

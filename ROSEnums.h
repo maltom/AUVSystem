@@ -45,7 +45,7 @@ namespace Topics
 		static const std::string arbitrarlySetThrusters      = Folders::DevPCSubFolder + "/arbitrarlySetThrusters";
 		static const std::string arbitrarlySetServos         = Folders::DevPCSubFolder + "/arbitrarlySetServos";
 		static const std::string arbitrarlySetGlobalPosition = Folders::DevPCSubFolder + "/arbitrarlySetGlobalPosition";
-		static const std::string arbitrarlySetThrust         = Folders::DevPCSubFolder + "/arbitrarlySetThrust";
+		static const std::string arbitrarlySetThrustForce    = Folders::DevPCSubFolder + "/arbitrarlySetThrustForce";
 
 		static const std::string arbitrarlySetRelativePosition
 		    = Folders::DevPCSubFolder + "/arbitrarlySetRelativePosition";
