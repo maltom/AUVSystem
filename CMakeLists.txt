@@ -10,6 +10,10 @@ set(NAME Commons)
 
 option(NOLQR "Working without LQR or model estimation" OFF)
 option(SIMULATION "Working in simulation mode" OFF)
+option(NOSTM "Working without STM" OFF)
+option(NODVL "Working without DVL" OFF)
+option(NOZED "Working without ZED" OFF)
+option(NOHYDROPHONES "Working without hydrophones" OFF)
 
 set(SOURCES
     CommonEnums.cpp
@@ -33,6 +37,19 @@ endif()
 if(SIMULATION)
     add_definitions(-DSIMULATION)
 endif()
+if(NOSTM)
+    add_definitions(-DNOSTM)
+endif()
+if(NODVL)
+    add_definitions(-DNODVL)
+endif()
+if(NOZED)
+    add_definitions(-DNOZED)
+endif()
+if(NOHYDROPHONES)
+    add_definitions(-DNOHYDROPHONES)
+endif()
+
 
 #add_subdirectory(AdditionalCameraProcessor)
 add_subdirectory(Debug)

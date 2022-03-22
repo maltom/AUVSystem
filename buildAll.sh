@@ -15,7 +15,23 @@ case $index in
     ;;
 
   "NOSTM")
-    buildParams=$buildParams"-DSIMULATION=ON "
+    buildParams=$buildParams"-DNOSTM=ON "
+    ;;
+
+  "NODVL")
+    buildParams=$buildParams"-DNODVL=ON "
+    ;;
+
+  "NOZED")
+    buildParams=$buildParams"-DNOZED=ON "
+    ;;
+
+  "NOHYDROPHONES")
+    buildParams=$buildParams"-DNOHYDROPHONES=ON "
+    ;;
+
+  "NOHARDWARE")
+    buildParams=$buildParams"-DNOSTM=ON -DNODVL=ON -DNOZED=ON -DNOHYDROPHONES=ON "
     ;;
 
   "SIMULATION")
