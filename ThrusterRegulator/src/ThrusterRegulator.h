@@ -29,9 +29,6 @@ public:
 
 		subscribeTopics();
 		advertiseTopics();
-
-		// dummyForces << 20.0, 0.0, 20.0, 0.0, 0.0, 0.0;
-		// dummyThrustSignal << 0.0, 0.0, 0.0, 0.0, 0.0;
 	}
 	~ThrusterRegulator() {}
 
@@ -41,7 +38,13 @@ private:
 	{
 		signalToThrusters,
 		signalToServos,
-		simulationPosition
+
+#ifdef SIMULATION
+		estimatedPosition,
+#endif
+#ifdef NOLQR
+		forcesGenerated,
+#endif
 	};
 
 	VehiclePhysicalModel model;
@@ -55,7 +58,7 @@ private:
 	VectorXd currentSpeed              = VectorXd::Zero( sixDim );
 	VectorXd positionToReach           = VectorXd::Ones( sixDim );
 	VectorXd regulatorFeedbackPosition = VectorXd::Zero( sixDim );
-	VectorXd simulationResultState = VectorXd::Zero( stateDim );
+	VectorXd simulationResultState     = VectorXd::Zero( stateDim );
 
 	// VectorXd dummyForces       = VectorXd::Zero( 6 );
 	// VectorXd dummyThrustSignal = VectorXd::Zero( 5 );
@@ -71,6 +74,11 @@ private:
 	// TODO: change to SLAM
 	void updateCurrentPositionAndAngularSpeed( const AUVROS::MessageTypes::DVLDeadReckoning& newPosition );
 	void updateVelocity( const AUVROS::MessageTypes::DVLVelocity& newVelocity );
+
+#ifdef SIMULATION
 	void calculateSimulationState();
+#ifndef NOLQR
 	void publishEstimatedPosition();
+#endif
+#endif
 };

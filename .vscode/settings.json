@@ -76,5 +76,6 @@
         "**/external": true
     },
     "ros.distro": "noetic",
-    "C_Cpp.codeAnalysis.clangTidy.enabled": true
+    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+    "C_Cpp.dimInactiveRegions": false
 }
