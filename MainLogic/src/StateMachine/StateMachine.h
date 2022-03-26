@@ -16,5 +16,5 @@ public:
 
 protected:
 private:
-	std::unique_ptr< StateStack< StateBase > > stateStack;
+	StateStack< StateBase > stateStack;
 };

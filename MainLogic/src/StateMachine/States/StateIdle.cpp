@@ -1,7 +1,9 @@
 #include "StateIdle.h"
 #include <iostream>
 
-void StateIdle::process()
+StateReturnType StateIdle::process()
 {
-    // std::cout<<"I am Idle ";
+	// std::cout<<"I am Idle ";
 }
+
+void StateIdle::checkExitCondition() {}

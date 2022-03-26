@@ -10,7 +10,7 @@
 #include "States/StateEnums.h"
 
 // functions
-std::shared_ptr< StateBase > createState( StateEnums stateNum );
+std::shared_ptr< StateBase > createState( const StateType type );
 
 // class StateStack
 template< typename T >
@@ -20,11 +20,10 @@ public:
 	StateStack();
 
 	std::shared_ptr< T > getCurrentState() const;
-	void setStateInsteadOfCurrent( StateEnums stateEnum );
-	void pushStateOnTop( StateEnums stateEnum );
+	void setStateInsteadOfCurrent( const StateType type );
+	void pushStateOnTop( const StateType type );
 	void popState();
-	void popMultipleStates( unsigned number );
-	void clearStateStack();
+	void popMultipleStates( const unsigned number );
 
 private:
 	std::stack< std::shared_ptr< T > > stateStack;
@@ -34,7 +33,7 @@ private:
 template< typename T >
 StateStack< T >::StateStack()
 {
-	pushStateOnTop( StateEnums::StartingState );
+	pushStateOnTop( StateType::StartingState );
 }
 
 template< typename T >
@@ -44,12 +43,12 @@ std::shared_ptr< T > StateStack< T >::getCurrentState() const
 }
 
 template< typename T >
-void StateStack< T >::setStateInsteadOfCurrent( StateEnums stateEnum )
+void StateStack< T >::setStateInsteadOfCurrent( const StateType type )
 {
 	if( this->stateStack.size() > 0 )
 	{
 		this->stateStack.pop();
-		pushStateOnTop( createState( stateEnum ) );
+		pushStateOnTop( createState( type ) );
 	}
 	else
 	{
@@ -71,7 +70,7 @@ void StateStack< T >::popState()
 }
 
 template< typename T >
-void StateStack< T >::popMultipleStates( unsigned number )
+void StateStack< T >::popMultipleStates( const unsigned number )
 {
 	if( this->stateStack.size() > number )
 	{
@@ -87,7 +86,7 @@ void StateStack< T >::popMultipleStates( unsigned number )
 }
 
 template< typename T >
-void StateStack< T >::pushStateOnTop( StateEnums stateEnum )
+void StateStack< T >::pushStateOnTop( const StateType type )
 {
-	this->stateStack.emplace( createState( stateEnum ) );
+	this->stateStack.emplace( createState( type ) );
 }

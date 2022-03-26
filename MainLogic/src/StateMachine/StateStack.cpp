@@ -1,10 +1,12 @@
 #include "StateStack.h"
 
-std::shared_ptr< StateBase > createState( StateEnums stateNum )
+std::shared_ptr< StateBase > createState( const StateType type,
+                                          LogicCommonData* const data,
+                                          const AdditionalDataParameter param )
 {
-	switch( stateNum )
+	switch( type )
 	{
-	case StateEnums::StateIdle:
+	case StateType::idle:
 		return std::make_shared< StateIdle >();
 		break;
 	default:

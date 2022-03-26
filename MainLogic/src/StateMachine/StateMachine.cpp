@@ -1,13 +1,22 @@
 #include "StateMachine.h"
+
 #include "States/StateBase.h"
 #include "StateStack.h"
 
-StateMachine::StateMachine()
-{
-	this->stateStack = std::make_unique< StateStack< StateBase > >();
-}
+StateMachine::StateMachine() {}
 
 void StateMachine::process()
 {
-    this->stateStack->getCurrentState()->process();
+	auto result = this->stateStack.getCurrentState()->process();
+
+	switch( result )
+	{
+	case StateReturnType::goToNextState:
+		stateStack.popState();
+
+		break;
+
+	default:
+		break;
+	}
 }
