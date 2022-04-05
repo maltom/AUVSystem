@@ -96,8 +96,10 @@ public:
 		// Influence is calculated from position and rotations
 
 		// MatrixXd azimuthalThrustersConfigMatrix;
-
+		// useless - probably
 		std::vector< AzimuthalThrusterFunctions > azimuthalBaseFunctions;
+
+		// useful
 		std::vector< AzimuthalThrusterFunctions > azimuthalDerivativeFunctions;
 
 		// thrusters config matrix containing max thrust values - only for simulation
