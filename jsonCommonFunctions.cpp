@@ -484,7 +484,7 @@ namespace vehicle
 		// awfully bad practice - but very specific to project's hardware
 		for( auto i = 0u; i < azimuthalThrustersCount; ++i )
 		{
-			data.servosAngles.emplace_back( std::make_pair( 0.0, dimensionsIndex::pitch ) );
+			data.servosAngles.emplace_back( std::make_pair( math::piNumber / 2.0, dimensionsIndex::pitch ) );
 		}
 
 		delete desiredConfigFile;

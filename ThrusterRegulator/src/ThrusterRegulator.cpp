@@ -186,7 +186,6 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	Aeq.transposeInPlace();
 	VectorXd Beq = VectorXd::Zero( sixDim );
 
-	// TODO: ustalić czy spada z rowerka. jak spada, to znaczy, że trzeba transponować u
 	Beq = -( desiredForces_tau - allThrustersConfig_T * uPrev );
 
 	// Inequality constraints
@@ -233,12 +232,15 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	VectorXd quadProgSolution_x = VectorXd::Zero( 13 ); // Initializing solution vector
 
 	QP::solve_quadprog( H, f, Aeq, Beq, Ci, ci0, quadProgSolution_x );
-
+	std::cout << "========QUADPROG BEGIN=======================\n"
+	          << quadProgSolution_x << "\n========QUADPROG END===========\n"
+	          << std::endl;
 	thrustSignal_u += quadProgSolution_x.head( 5 )
 	    / maxThrust; // Adding values of calculated change in force. 5 is number of thrusters
 
 	model.updateAzimuthalThrusterConfig( { servoCurrentAngles.at( 0 ).first + quadProgSolution_x( 11 ),
-	                                       servoCurrentAngles.at( 1 ).first + quadProgSolution_x( 12 ) } );
+	                                       servoCurrentAngles.at( 1 ).first + quadProgSolution_x( 12 ) },
+	                                     thrustSignal_u );
 
 	// Making sure that we cannot demand 110% of power
 	for( auto i{ 0u }; i < model.getModelThrusters().thrustersAmount; ++i )

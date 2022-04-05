@@ -25,7 +25,7 @@ public:
 	    : NodeBase( node, configID, nID ), model( configID )
 	{
 		loadRegulatorParameters( this->configFileID );
-
+		model.adjustParametersForWorkingFrequency( this->regulatorWorkingFrequency );
 		subscribeTopics();
 		advertiseTopics();
 	}
@@ -79,8 +79,8 @@ private:
 #ifndef NOLQR
 	void publishEstimatedPosition();
 
-	#else
-	void updateDesiredForcesError( const AUVROS::MessageTypes::arbitrarlySetThrustForce& newForces);
+#else
+	void updateDesiredForcesError( const AUVROS::MessageTypes::arbitrarlySetThrustForce& newForces );
 #endif
 #endif
 };
