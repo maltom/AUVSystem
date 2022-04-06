@@ -271,7 +271,7 @@ namespace vehicle
 		auto thrustersPosRot = thrustersData.get< jsonxx::Array >( "positionsAndRotations" );
 
 		data.maxThrust       = thrustersData.get< jsonxx::Number >( "maxThrust" );
-		data.deltaU          = thrustersData.get< jsonxx::Number >( "deltaU" );
+		data.deltaU          = thrustersData.get< jsonxx::Number >( "deltaUPerSecond" );
 		int thrustersAmount  = thrustersPosRot.size();
 		data.thrustersAmount = thrustersAmount;
 
