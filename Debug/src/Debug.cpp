@@ -46,6 +46,21 @@ void Debug::subscribeTopics()
 	                                                             AUVROS::QueueSize::StandardQueueSize,
 	                                                             &Debug::displayDVLDeadReckoningStatus,
 	                                                             this ) );
+
+	displayer.addInfoToDisplay( "Thrusters regulator",
+	                            std::vector< std::string >( labels::thrusters.begin(), labels::thrusters.end() ),
+	                            "init" );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::HardwareSignals::signalToThrusters,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &Debug::displaySetThrustersRegulatorStatus,
+	                                                             this ) );
+
+	displayer.addInfoToDisplay(
+	    "Servos regulator", std::vector< std::string >( labels::servos.begin(), labels::servos.end() ), "init" );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::HardwareSignals::signalToServos,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &Debug::displaySetServosRegulatorStatus,
+	                                                             this ) );
 }
 
 void Debug::displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report )
@@ -79,7 +94,7 @@ void Debug::displayArbitrarlySetThrustersStatus( const AUVROS::MessageTypes::Thr
 	displayer.setMajorColumnValues( DisplayerDataPositions::ThrustersArbitrarly, values );
 }
 
-void Debug::displayArbitrarlySetServosStatus( const AUVROS::MessageTypes::ThrustersSignal& message )
+void Debug::displayArbitrarlySetServosStatus( const AUVROS::MessageTypes::ServosSignal& message )
 {
 	std::vector< DataType > values;
 
@@ -102,6 +117,28 @@ void Debug::displayDVLDeadReckoningStatus( const AUVROS::MessageTypes::DVLDeadRe
 	values.emplace_back( std::to_string( message.data.at( 5 ) ) );
 
 	displayer.setMajorColumnValues( DisplayerDataPositions::DVLDeadReckoning, values );
+}
+
+void Debug::displaySetThrustersRegulatorStatus( const AUVROS::MessageTypes::ThrustersSignal& message )
+{
+	std::vector< DataType > values;
+
+	for( auto i = 0u; i < message.data.size(); ++i )
+	{
+		values.emplace_back( std::to_string( message.data.at( i ) ) );
+	}
+	displayer.setMajorColumnValues( DisplayerDataPositions::ThrustersRegulator, values );
+}
+
+void Debug::displaySetServosRegulatorStatus( const AUVROS::MessageTypes::ThrustersSignal& message )
+{
+	std::vector< DataType > values;
+
+	for( auto i = 0u; i < message.data.size(); ++i )
+	{
+		values.emplace_back( std::to_string( message.data.at( i ) ) );
+	}
+	displayer.setMajorColumnValues( DisplayerDataPositions::ServosRegulator, values );
 }
 
 void Debug::advertiseTopics() {}
