@@ -216,13 +216,13 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	lowerServoAnglesBoundary = temporaryVector.asDiagonal();
 	upperServoAnglesBoundary = -lowerServoAnglesBoundary;
 
-	temp_Ci << lowerBoundary, upperBoundary, lowerServoAnglesBoundary, upperServoAnglesBoundary;
+	temp_Ci << upperBoundary, lowerBoundary, lowerServoAnglesBoundary, upperServoAnglesBoundary;
 	Ci = temp_Ci.transpose();
 
 	const auto infinity = std::numeric_limits< double >::max();
 
-	ci0 << -deltaU, -deltaU, -deltaU, -deltaU, -deltaU, -infinity, -infinity, -infinity, -infinity, -infinity,
-	    -infinity, -deltaA, -deltaA, deltaU, deltaU, deltaU, deltaU, deltaU, infinity, infinity, infinity, infinity,
+	ci0 << deltaU, deltaU, deltaU, deltaU, deltaU, infinity, infinity, infinity, infinity, infinity,
+	    infinity, deltaA, deltaA, deltaU, deltaU, deltaU, deltaU, deltaU, infinity, infinity, infinity, infinity,
 	    infinity, infinity, deltaA, deltaA, VectorXd::Zero( 11 ),
 	    -( servoMaxAngles.first - servoCurrentAngles.at( 0 ).first ),
 	    -( servoMaxAngles.first - servoCurrentAngles.at( 1 ).first ), VectorXd::Zero( 11 ),
@@ -230,11 +230,22 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	    ( servoMaxAngles.second - servoCurrentAngles.at( 1 ).first ); // Vector of boundary values
 
 	VectorXd quadProgSolution_x = VectorXd::Zero( 13 ); // Initializing solution vector
+	//std::cout << "========PARAMETERS BEGIN'====================\n"
+			  //<< temp_Ci << "\n"
+			  //<< ci0 << "\n"
+			  //<< Aeq << "\n"
+			  //<< Beq << "\n" << std::endl;
 
 	QP::solve_quadprog( H, f, Aeq, Beq, Ci, ci0, quadProgSolution_x );
 	std::cout << "========QUADPROG BEGIN=======================\n"
 	          << quadProgSolution_x << "\n========QUADPROG END===========\n"
 	          << std::endl;
+	
+	std::cout << "====SERWA====\n"
+			  << servoCurrentAngles.at( 0 ).first << "\n"
+			  << servoCurrentAngles.at( 1 ).first << "\n"
+			  << std::endl;
+			  
 	thrustSignal_u += quadProgSolution_x.head( 5 )
 	    / maxThrust; // Adding values of calculated change in force. 5 is number of thrusters
 
