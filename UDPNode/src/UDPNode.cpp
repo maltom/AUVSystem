@@ -108,6 +108,9 @@ void UDPNode::processCommand( const Frame& frame )
 	{
 	case Command::HEARTBEAT:
 		break;
+	case Command::NORESPREQ_PRESSURE_SENSOR_VALUE_REGULAR_REPORT:
+		std::cout << "Mam cisnienie mordo:" << static_cast< int >( frame.payload.at( 0 ) + frame.payload.at( 1 ) << 16 )
+		          << std::endl;
 	default:
 		break;
 	}
