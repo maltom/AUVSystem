@@ -12,9 +12,11 @@
 
 void UDPNode::processInMainLoop()
 {
+#ifndef NOSTM
 	udpServer->sendOutgoingMessages( outgoingMessages );
 	udpServer->getIncomingMessages( incomingMessages );
 	this->processIncomingMessages();
+#endif
 }
 
 void UDPNode::subscribeTopics()
@@ -140,6 +142,10 @@ void UDPNode::processOutgoingMessages( const Frame& frame )
 void UDPNode::sendThrustersSignalToMicroController( const AUVROS::MessageTypes::ThrustersSignal& message )
 {
 	auto length = message.layout.dim.begin()->size;
+	if( length != 5 )
+	{
+		throw std::runtime_error( "Too many thrusters." );
+	}
 	Frame frame;
 	frame.commandCode = NORESPREQ_SET_THRUSTERS;
 	frame.payloadSize = length;
@@ -147,7 +153,6 @@ void UDPNode::sendThrustersSignalToMicroController( const AUVROS::MessageTypes::
 	{
 		frame.payload[ i ] = adjustThrusterValues( message.data[ i ] );
 	}
-	frame.payload[ 3 ] = frame.payload[ 4 ];
 
 	this->processOutgoingMessages( frame );
 }

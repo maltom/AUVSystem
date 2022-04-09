@@ -68,6 +68,7 @@ private:
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;
+	void publishSignalsToHardware();
 	void loadRegulatorParameters( configFiles::fileID configID );
 
 	// TODO: change to SLAM
