@@ -6,7 +6,7 @@ void LQRRegulator::calculate( const VectorXd& currentState, const VehiclePhysica
 	calculateAStateMatrix( currentState, model );
 	calculateBStateMatrix( model );
 
-	this->lqrSolver.compute( this->Q, this->R, this->A, this->B, this->K, false, false );
+	this->lqrSolver.compute( this->Q, this->R, this->A, this->B, this->K, true, true );
 }
 
 // for simulation purpose only
