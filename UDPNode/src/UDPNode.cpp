@@ -156,6 +156,16 @@ void UDPNode::sendThrustersSignalToMicroController( const AUVROS::MessageTypes::
 	{
 		frame.payload[ i ] = adjustThrusterValues( message.data[ i ] );
 	}
+	// korekcja
+	frame.payload[ 0 ]               = hardware::motorTorqueMinMax.second - frame.payload[ 0 ];
+	network::payloadWordType zamiana = frame.payload[ 4 ];
+	frame.payload[ 4 ]               = frame.payload[ 1 ];
+	frame.payload[ 2 ]               = hardware::motorTorqueMinMax.second - frame.payload[ 2 ];
+	frame.payload[ 1 ]               = zamiana;
+	frame.payload[ 3 ]               = hardware::motorTorqueMinMax.second - frame.payload[ 3 ];
+
+	// std::cout << " Thrust: " << frame.payload[ 0 ] << "   " << frame.payload[ 1 ] << "   " << frame.payload[ 2 ]
+	//           << "   " << frame.payload[ 3 ] << "   " << frame.payload[ 4 ] << std::endl;
 
 	this->processOutgoingMessages( frame );
 }
@@ -167,7 +177,7 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 	{
 		throw std::runtime_error( "Too many servos." );
 	}
-	/*Frame frame;
+	Frame frame;
 	Frame frame2;
 	frame.commandCode  = NORESPREQ_SET_SERVOS;
 	frame2.commandCode = NORESPREQ_SET_SERVOS;
@@ -183,14 +193,14 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 	frame2.payload[ 0 ] = 1;
 	frame2.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );
 
-	std::cout << frame.payload[ 0 ] << std::endl;
-	std::cout << frame.payload[ 1 ] << std::endl;
+	// std::cout << frame.payload[ 0 ] << std::endl;
+	// std::cout << frame.payload[ 1 ] << std::endl;
 
 	this->processOutgoingMessages( frame );
-	this->processOutgoingMessages( frame2 );*/
-	Frame frame;
+	this->processOutgoingMessages( frame2 );
+	/*Frame frame;
 	frame.commandCode  = NORESPREQ_SET_AZIMUTHAL_SERVOS;
 	frame.payload[ 0 ] = hardware::servoMinMax.second - adjustServoValues( message.data[ 0 ] );
-	frame.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );
+	frame.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );*/
 	this->processOutgoingMessages( frame );
 }

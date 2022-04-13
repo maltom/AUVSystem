@@ -61,6 +61,15 @@ void Debug::subscribeTopics()
 	                                                             AUVROS::QueueSize::StandardQueueSize,
 	                                                             &Debug::displaySetServosRegulatorStatus,
 	                                                             this ) );
+
+	displayer.addInfoToDisplay(
+	    "Global estimated position",
+	    std::vector< std::string >( labels::DVLDeadReckoning.begin(), labels::DVLDeadReckoning.end() ),
+	    "init" );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::Positions::globalEstimatedPosition,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &Debug::displayEstimatedPositionStatus,
+	                                                             this ) );
 }
 
 void Debug::displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report )
@@ -139,6 +148,20 @@ void Debug::displaySetServosRegulatorStatus( const AUVROS::MessageTypes::Thruste
 		values.emplace_back( std::to_string( message.data.at( i ) ) );
 	}
 	displayer.setMajorColumnValues( DisplayerDataPositions::ServosRegulator, values );
+}
+
+void Debug::displayEstimatedPositionStatus( const AUVROS::MessageTypes::Position& message )
+{
+	std::vector< DataType > values;
+
+	values.emplace_back( std::to_string( message.linear.x ) );
+	values.emplace_back( std::to_string( message.linear.y ) );
+	values.emplace_back( std::to_string( message.linear.z ) );
+	values.emplace_back( std::to_string( message.angular.x ) );
+	values.emplace_back( std::to_string( message.angular.y ) );
+	values.emplace_back( std::to_string( message.angular.z ) );
+
+	displayer.setMajorColumnValues( DisplayerDataPositions::GlobalEstimatedPosition, values );
 }
 
 void Debug::advertiseTopics() {}

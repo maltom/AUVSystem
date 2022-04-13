@@ -76,7 +76,7 @@ private:
 	void updateVelocity( const AUVROS::MessageTypes::DVLVelocity& newVelocity );
 
 #ifdef SIMULATION
-	void calculateSimulationState();
+	void calculateSimulationState( const float simulationFrequency );
 #ifndef NOLQR
 	void publishEstimatedPosition();
 

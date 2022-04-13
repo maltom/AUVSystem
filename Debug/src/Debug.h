@@ -45,7 +45,8 @@ private:
 		ServosArbitrarly,
 		DVLDeadReckoning,
 		ThrustersRegulator,
-		ServosRegulator
+		ServosRegulator,
+		GlobalEstimatedPosition
 	};
 
 	void processInMainLoop() override;
@@ -61,6 +62,7 @@ private:
 	void displayDVLDeadReckoningStatus( const AUVROS::MessageTypes::DVLDeadReckoning& message );
 	void displaySetThrustersRegulatorStatus( const AUVROS::MessageTypes::ThrustersSignal& message );
 	void displaySetServosRegulatorStatus( const AUVROS::MessageTypes::ServosSignal& message );
+	void displayEstimatedPositionStatus( const AUVROS::MessageTypes::Position& message );
 
 	Displayer displayer;
 

@@ -53,11 +53,18 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->thrustValues_u << std::endl;
 
 #ifdef SIMULATION
-		this->calculateSimulationState();
-		// simulation
-		this->currentState = simulationResultState;
-		currentPosition    = currentState.head< 6 >();
-		currentSpeed       = currentState.tail< 6 >();
+		auto simulationFrequency = 1000.0f;
+		for( auto i = 0u; i < simulationFrequency / this->regulatorWorkingFrequency; ++i )
+		{
+			this->calculateSimulationState( simulationFrequency );
+			// simulation
+			this->currentState = simulationResultState;
+			currentPosition    = currentState.head< 6 >();
+			currentSpeed       = currentState.tail< 6 >();
+			// std::cout << "STAN: " << currentState << "\nPOZYCJA: " << currentPosition << "\nPREDKOSC: " <<
+			// currentSpeed
+			//   << std::endl;
+		}
 #ifndef NOLQR
 		this->publishEstimatedPosition();
 #endif
@@ -311,7 +318,7 @@ void ThrusterRegulator::publishSignalsToHardware()
 }
 
 #ifdef SIMULATION
-void ThrusterRegulator::calculateSimulationState()
+void ThrusterRegulator::calculateSimulationState( const float simulationFrequency )
 {
 	VectorXd tau = VectorXd::Zero( 6 );
 
@@ -320,7 +327,7 @@ void ThrusterRegulator::calculateSimulationState()
 	this->simulationResultState = this->currentState
 	    + ( this->lqrRegulator.A * currentState
 	        + this->lqrRegulator.B * ( tau - model.getRestoringForces( this->currentState ) ) )
-	        * ( 1.0 / this->regulatorWorkingFrequency );
+	        * ( 1.0 / simulationFrequency );
 }
 #ifndef NOLQR
 void ThrusterRegulator::publishEstimatedPosition()

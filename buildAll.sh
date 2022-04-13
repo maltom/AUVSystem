@@ -47,7 +47,7 @@ for index in ${params[@]}; do
       buildParams=$buildParams"-DCMAKE_BUILD_TYPE=Release "
       buildTypeIsSet=true
     else
-      echo "Set proper build type (RELEASE or DEBUG, you have to use one and only one of them)"
+      echo "Set proper build type (RELEASE, DEBUG or RELEASE_DEBUG_INFO, you have to use one and only one of them)"
       exit 3
     fi
     ;;
@@ -57,7 +57,17 @@ for index in ${params[@]}; do
       buildParams=$buildParams"-DCMAKE_BUILD_TYPE=Debug "
       buildTypeIsSet=true
     else
-      echo "Set proper build type (RELEASE or DEBUG, you have to use one and only one of them)"
+      echo "Set proper build type (RELEASE, DEBUG or RELEASE_DEBUG_INFO, you have to use one and only one of them)"
+      exit 3
+    fi
+    ;;
+
+  "RELEASE_DEBUG_INFO")
+    if [ $buildTypeIsSet = false ]; then
+      buildParams=$buildParams"-DCMAKE_BUILD_TYPE=RelWithDebInfo "
+      buildTypeIsSet=true
+    else
+      echo "Set proper build type (RELEASE, DEBUG or RELEASE_DEBUG_INFO, you have to use one and only one of them)"
       exit 3
     fi
     ;;
