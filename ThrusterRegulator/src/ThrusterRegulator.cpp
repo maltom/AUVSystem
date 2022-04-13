@@ -239,7 +239,7 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	    -( servoMaxAngles.first - servoCurrentAngles.at( 1 ).first ), VectorXd::Zero( 11 ),
 	    ( servoMaxAngles.second - servoCurrentAngles.at( 0 ).first ),
 	    ( servoMaxAngles.second - servoCurrentAngles.at( 1 ).first ); // Vector of boundary values
-
+	// std::cout << "=========BEFORE QUADPROG================\n";
 	VectorXd quadProgSolution_x = VectorXd::Zero( 13 ); // Initializing solution vector
 	// std::cout << "========PARAMETERS BEGIN'====================\n"
 	//<< temp_Ci << "\n"
@@ -248,14 +248,15 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	//<< Beq << "\n" << std::endl;
 
 	QP::solve_quadprog( H, f, Aeq, Beq, Ci, ci0, quadProgSolution_x );
-	// std::cout << "========QUADPROG BEGIN=======================\n"
-	//           << quadProgSolution_x << "\n========QUADPROG END===========\n"
-	//           << std::endl;
+	// std::cout<<"===========AFTER QUADPROG============\n";
+	//  std::cout << "========QUADPROG BEGIN=======================\n"
+	//            << quadProgSolution_x << "\n========QUADPROG END===========\n"
+	//            << std::endl;
 
 	// std::cout << "====SERWA====\n"
-	//           << servoCurrentAngles.at( 0 ).first << "\n"
-	//           << servoCurrentAngles.at( 1 ).first << "\n"
-	//           << std::endl;
+	// 		  << servoCurrentAngles.at( 0 ).first << "\n"
+	// 		  << servoCurrentAngles.at( 1 ).first << "\n"
+	// 		  << std::endl;
 
 	thrustSignal_u += quadProgSolution_x.head( 5 )
 	    / maxThrust; // Adding values of calculated change in force. 5 is number of thrusters

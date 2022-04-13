@@ -70,7 +70,8 @@
         "bit": "cpp",
         "csignal": "cpp",
         "codecvt": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "any": "cpp"
     },
     "files.exclude": {
         "**/external": true
