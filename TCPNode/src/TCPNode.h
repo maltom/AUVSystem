@@ -29,11 +29,14 @@ public:
 
 		subscribeTopics();
 		advertiseTopics();
+#ifndef NODVL
 		tcpClient->startClient();
+		this->resetDeadReckoning();
+
+#endif
 	}
 
 private:
-
 	enum PublishersCodes
 	{
 		DVLDeadReckoning = 0,
@@ -62,4 +65,5 @@ private:
 	void processOutgoingMessages( const Frame& frameToSend );
 	Frame decomposeFrame( const network::TCPunstickedMessage& incMsg );
 	void processCommand( const Frame& frame );
+	void resetDeadReckoning();
 };

@@ -93,6 +93,12 @@ void ThrusterRegulator::subscribeTopics()
 	                                                             this ) );
 
 #endif
+
+	this->rosSubscribers.emplace_back(
+	    this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetGlobalPosition,
+	                              AUVROS::QueueSize::StandardQueueSize,
+	                              &ThrusterRegulator::updateCurrentPositionAndAngularSpeed,
+	                              this ) );
 }
 
 void ThrusterRegulator::advertiseTopics()
@@ -356,3 +362,13 @@ void ThrusterRegulator::updateDesiredForcesError( const AUVROS::MessageTypes::ar
 }
 #endif
 #endif
+
+void ThrusterRegulator::updateTargetPosition( const AUVROS::MessageTypes::Position& newPos )
+{
+	this->positionToReach( 0 ) = newPos.linear.x;
+	this->positionToReach( 1 ) = newPos.linear.y;
+	this->positionToReach( 2 ) = newPos.linear.z;
+	this->positionToReach( 3 ) = newPos.angular.x;
+	this->positionToReach( 4 ) = newPos.angular.y;
+	this->positionToReach( 5 ) = newPos.angular.z;
+}
