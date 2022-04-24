@@ -35,7 +35,11 @@ def load_config():
         for file in files:
             if file == 'auvConfig.json':
                 AUV_CONFIG_DIR = os.path.join(root, file)
-
+            elif file == 'simulationConfig.json':
+                with open(os.path.join(root, file)) as simulation_file:
+                    data = json.load(simulation_file)
+                    GLOBAL_POSITION_TOPIC = data["rovTransformTopic"]
+                    CAMERA_IMAGE_TOPIC = data["videoImageTopic"]
 
 class MainGuiTabs:
     def __init__(self, root):
