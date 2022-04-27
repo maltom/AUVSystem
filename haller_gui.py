@@ -20,8 +20,26 @@ THRUSTER_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrusters'
 SERVOS_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetServos'
 GLOBAL_POSITION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetGlobalPosition'
 THRUST_ALLOCATION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrustForce'
+CAMERA_IMAGE_TOPIC = '/auvCameraImage'
 AUV_SYSTEM_DIR = re.search(".*AUVSystem", os.getcwd())[0]
-AUV_CONFIG_DIR = os.path.join(AUV_SYSTEM_DIR, 'auvConfig', 'auvConfig.json')
+AUV_CONFIG_DIR = None
+
+
+def load_config():
+    auvConfigFile = None
+    simulationConfigFile = None
+
+    print(f"CWD: {os.getcwd()}")
+
+    for root, dir, files in os.walk(os.getcwd()):
+        for file in files:
+            if file == 'auvConfig.json':
+                AUV_CONFIG_DIR = os.path.join(root, file)
+            elif file == 'simulationConfig.json':
+                with open(os.path.join(root, file)) as simulation_file:
+                    data = json.load(simulation_file)
+                    GLOBAL_POSITION_TOPIC = data["rovTransformTopic"]
+                    CAMERA_IMAGE_TOPIC = data["videoImageTopic"]
 
 
 class MainGuiTabs:
@@ -183,7 +201,7 @@ class RosHandler:
         self.controls_frame: ControlsFrame = controls_frame
 
         rospy.init_node('haller_gui', anonymous=True)
-        rospy.Subscriber('sim_image', ImageMsg,
+        rospy.Subscriber(CAMERA_IMAGE_TOPIC, ImageMsg,
                          self.camera_frame.update_img_msg)
 
         self.thruster_Sender = rospy.Publisher(
@@ -284,5 +302,7 @@ class HallerGui:
 
 
 if __name__ == "__main__":
+    load_config()
+
     gui = HallerGui()
     gui.run()
