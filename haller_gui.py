@@ -33,12 +33,13 @@ class MainGuiTabs:
         for name, gui_element in tabs.items():
             self.tab_root.add(gui_element, text=name)
 
+
 class CameraFrame:
     def __init__(self, root) -> None:
         self.root = root
         self.stereo_camera = False
         self.br = CvBridge()
-        
+
         self.my_frame: tk.Frame = tk.Frame(self.root)
         self.my_frame.pack(fill='both', expand=True)
 
@@ -58,8 +59,8 @@ class CameraFrame:
                 img_hight = self.left_camera.winfo_height()
                 self.img_size = (img_width, img_hight)
             cv_img = self.br.imgmsg_to_cv2(self.img_msg)
-            b,g,r = cv2.split(cv_img)
-            img = cv2.resize(cv2.merge((r,g,b)), self.img_size)
+            b, g, r = cv2.split(cv_img)
+            img = cv2.resize(cv2.merge((r, g, b)), self.img_size)
             pil_img = Image.fromarray(img)
             tk_img = ImageTk.PhotoImage(image=pil_img)
 
@@ -75,6 +76,7 @@ class CameraFrame:
         self.img_msg = img_msg
         self.new_image = True
 
+
 class ControlsFrame:
     def __init__(self, root) -> None:
         self.root = root
@@ -88,27 +90,35 @@ class ControlsFrame:
         thruster_names = [f"Thruster #{n}" for n in range(NUM_OF_THRUSTERS)]
         servos_names = [f"Servo #{n}" for n in range(NUM_OF_SERVOS)]
 
-        self.input_controls(thruster_names, self.individual_controls, self.individual_controls_frame)
-        self.input_controls(servos_names, self.individual_controls, self.individual_controls_frame)
-        self.send_thruster_btn = tk.Button(self.individual_controls_frame, text="Send Thrusters")
+        self.input_controls(
+            thruster_names, self.individual_controls, self.individual_controls_frame)
+        self.input_controls(
+            servos_names, self.individual_controls, self.individual_controls_frame)
+        self.send_thruster_btn = tk.Button(
+            self.individual_controls_frame, text="Send Thrusters")
         self.send_thruster_btn.pack(side=tk.LEFT)
-        self.send_servos_btn = tk.Button(self.individual_controls_frame, text="Send Servos")
+        self.send_servos_btn = tk.Button(
+            self.individual_controls_frame, text="Send Servos")
         self.send_servos_btn.pack(side=tk.LEFT)
 
         self.global_twist_set = {}
         self.global_twist_set_frame = tk.Frame(temp)
         self.global_twist_set_frame.pack(side=tk.LEFT)
-        self.input_controls(['X pos', 'Y pos', 'Z pos'], self.global_twist_set, self.global_twist_set_frame)
-        self.input_controls(['Pitch', 'Yaw', 'Roll'], self.global_twist_set, self.global_twist_set_frame)
-        self.send_globa_pos_btn = tk.Button(self.global_twist_set_frame, text="Send Global Twist")
+        self.input_controls(['X pos', 'Y pos', 'Z pos'],
+                            self.global_twist_set, self.global_twist_set_frame)
+        self.input_controls(['Pitch', 'Yaw', 'Roll'],
+                            self.global_twist_set, self.global_twist_set_frame)
+        self.send_globa_pos_btn = tk.Button(
+            self.global_twist_set_frame, text="Send Global Twist")
         self.send_globa_pos_btn.pack(fill=tk.BOTH)
 
         self.global_thrust_controls = {}
         self.global_thrust_alloc_frame = tk.Frame(temp)
         self.global_thrust_alloc_frame.pack(side=tk.LEFT)
         self.input_controls(['X Thrust', 'Y Thrust', 'Z Thrust', "X Torque", "Y Torque", "Z Torque"],
-                                self.global_thrust_controls, self.global_thrust_alloc_frame)
-        self.send_thrust_alloc_btn = tk.Button(self.global_thrust_alloc_frame, text="Send Thrust Alloc")
+                            self.global_thrust_controls, self.global_thrust_alloc_frame)
+        self.send_thrust_alloc_btn = tk.Button(
+            self.global_thrust_alloc_frame, text="Send Thrust Alloc")
         self.send_thrust_alloc_btn.pack(fill=tk.BOTH)
 
     def input_controls(self, names, lookup, root):
@@ -143,7 +153,8 @@ class ControlsFrame:
                 else:
                     try:
                         entry['variable'].set(float(entry_val))
-                        entry['value_label'].configure(text=f"{entry['variable'].get():.2f}")
+                        entry['value_label'].configure(
+                            text=f"{entry['variable'].get():.2f}")
                     except ValueError:
                         pass
 
@@ -156,12 +167,11 @@ class AuvConfigSettings:
         self.entry: tk.Text = tk.Text(root)
         self.entry.insert(tk.END, json.dumps(config_data, indent=4))
         self.entry.pack(fill=tk.BOTH, expand=True)
-        
 
     def update(config):
         with open(AUV_CONFIG_DIR, 'w') as file:
             json.dump(config, file, indent=4)
-    
+
     def load_config():
         with open(AUV_CONFIG_DIR, 'r') as file:
             return json.load(file)
@@ -173,16 +183,25 @@ class RosHandler:
         self.controls_frame: ControlsFrame = controls_frame
 
         rospy.init_node('haller_gui', anonymous=True)
-        rospy.Subscriber('image_msg', ImageMsg, self.camera_frame.update_img_msg)
+        rospy.Subscriber('sim_image', ImageMsg,
+                         self.camera_frame.update_img_msg)
 
-        self.thruster_Sender = rospy.Publisher(THRUSTER_TOPIC, Float32MultiArray, queue_size=10)
-        self.controls_frame.send_thruster_btn.configure(command=self.send_to_thrusters)
-        self.servos_Sender = rospy.Publisher(SERVOS_TOPIC, Float32MultiArray, queue_size=10)
-        self.controls_frame.send_servos_btn.configure(command=self.send_to_servos)
-        self.global_position_Sender = rospy.Publisher(GLOBAL_POSITION_TOPIC, Twist, queue_size=10)
-        self.controls_frame.send_globa_pos_btn.configure(command=self.send_global_pos)
-        self.thrust_alloc_Sender = rospy.Publisher(THRUST_ALLOCATION_TOPIC, Twist, queue_size=10)
-        self.controls_frame.send_thrust_alloc_btn.configure(command=self.send_thrust_alloc)
+        self.thruster_Sender = rospy.Publisher(
+            THRUSTER_TOPIC, Float32MultiArray, queue_size=10)
+        self.controls_frame.send_thruster_btn.configure(
+            command=self.send_to_thrusters)
+        self.servos_Sender = rospy.Publisher(
+            SERVOS_TOPIC, Float32MultiArray, queue_size=10)
+        self.controls_frame.send_servos_btn.configure(
+            command=self.send_to_servos)
+        self.global_position_Sender = rospy.Publisher(
+            GLOBAL_POSITION_TOPIC, Twist, queue_size=10)
+        self.controls_frame.send_globa_pos_btn.configure(
+            command=self.send_global_pos)
+        self.thrust_alloc_Sender = rospy.Publisher(
+            THRUST_ALLOCATION_TOPIC, Twist, queue_size=10)
+        self.controls_frame.send_thrust_alloc_btn.configure(
+            command=self.send_thrust_alloc)
 
         self.thr_dim = MultiArrayDimension("dim", 5, 5)
         self.thr_lay = MultiArrayLayout([self.thr_dim], 0)
@@ -192,36 +211,43 @@ class RosHandler:
         self.alloc_lay = MultiArrayLayout([self.alloc_dim], 0)
 
     def send_to_thrusters(self):
-        values = [float(thruster['variable'].get()) for name, thruster in self.controls_frame.individual_controls.items() if 'Thruster' in name]
+        values = [float(thruster['variable'].get()) for name,
+                  thruster in self.controls_frame.individual_controls.items() if 'Thruster' in name]
         thruster_msg = Float32MultiArray()
         thruster_msg.layout = self.thr_lay
         thruster_msg.data = values
         self.thruster_Sender.publish(thruster_msg)
 
     def send_to_servos(self):
-        values = [servo['variable'].get() for name, servo in self.controls_frame.individual_controls.items()if 'Servo' in name]
+        values = [servo['variable'].get(
+        ) for name, servo in self.controls_frame.individual_controls.items()if 'Servo' in name]
         servo_msg = Float32MultiArray()
         servo_msg.layout = self.srv_lay
         servo_msg.data = values
         self.servos_Sender.publish(servo_msg)
-        
+
     def send_global_pos(self):
-        values = [coord['variable'].get() for name, coord in self.controls_frame.global_twist_set.items() if 'pos' in name]
-        values_ang = [float(angle['variable'].get()) for name, angle in self.controls_frame.global_twist_set.items() if 'pos' not in name]
+        values = [coord['variable'].get(
+        ) for name, coord in self.controls_frame.global_twist_set.items() if 'pos' in name]
+        values_ang = [float(angle['variable'].get(
+        )) for name, angle in self.controls_frame.global_twist_set.items() if 'pos' not in name]
 
         assert len(values) == 3 and len(values_ang) == 3
         global_pos_msg = Twist()
         global_pos_msg.linear = Vector3(values[0], values[1], values[2])
-        global_pos_msg.angular = Vector3(values_ang[0], values_ang[1], values_ang[2])
+        global_pos_msg.angular = Vector3(
+            values_ang[0], values_ang[1], values_ang[2])
 
         self.global_position_Sender.publish(global_pos_msg)
 
     def send_thrust_alloc(self):
-        values = [float(thruster['variable'].get()) for name, thruster in self.controls_frame.global_thrust_controls.items()]
+        values = [float(thruster['variable'].get()) for name,
+                  thruster in self.controls_frame.global_thrust_controls.items()]
         thrust_alloc_msg = Twist()
         thrust_alloc_msg.linear = Vector3(values[0], values[1], values[2])
         thrust_alloc_msg.angular = Vector3(values[3], values[4], values[5])
         self.thrust_alloc_Sender.publish(thrust_alloc_msg)
+
 
 class HallerGui:
     def __init__(self):
@@ -252,7 +278,7 @@ class HallerGui:
         while True:
             self.controls_frame.update()
             self.camera_frame.update()
-            
+
             self.root.update_idletasks()
             self.root.update()
 

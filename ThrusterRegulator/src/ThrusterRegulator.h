@@ -74,6 +74,7 @@ private:
 	// TODO: change to SLAM
 	void updateCurrentPositionAndAngularSpeed( const AUVROS::MessageTypes::DVLDeadReckoning& newPosition );
 	void updateVelocity( const AUVROS::MessageTypes::DVLVelocity& newVelocity );
+	void updateTargetPosition( const AUVROS::MessageTypes::Position& newPos );
 
 #ifdef SIMULATION
 	void calculateSimulationState( const float simulationFrequency );
