@@ -26,16 +26,16 @@ AUV_CONFIG_DIR = None
 
 
 def load_config():
-    auvConfigFile = None
-    simulationConfigFile = None
-
-    print(f"CWD: {os.getcwd()}")
+    global AUV_CONFIG_DIR
+    global GLOBAL_POSITION_TOPIC
+    global CAMERA_IMAGE_TOPIC
 
     for root, dir, files in os.walk(os.getcwd()):
         for file in files:
             if file == 'auvConfig.json':
                 AUV_CONFIG_DIR = os.path.join(root, file)
             elif file == 'simulationConfig.json':
+                print("znalazl simconfig")
                 with open(os.path.join(root, file)) as simulation_file:
                     data = json.load(simulation_file)
                     GLOBAL_POSITION_TOPIC = data["rovTransformTopic"]
@@ -303,6 +303,5 @@ class HallerGui:
 
 if __name__ == "__main__":
     load_config()
-
     gui = HallerGui()
     gui.run()
