@@ -55,7 +55,7 @@ private:
 	VectorXd currentState              = VectorXd::Zero( stateDim ); // state = position and speed
 	VectorXd currentPosition           = VectorXd::Zero( sixDim );
 	VectorXd currentSpeed              = VectorXd::Zero( sixDim );
-	VectorXd positionToReach           = VectorXd::Ones( sixDim );
+	VectorXd positionToReach           = VectorXd::Zero( sixDim );
 	VectorXd regulatorFeedbackPosition = VectorXd::Zero( sixDim );
 	VectorXd simulationResultState     = VectorXd::Zero( stateDim );
 
