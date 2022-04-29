@@ -38,8 +38,8 @@ def load_config():
                 print("znalazl simconfig")
                 with open(os.path.join(root, file)) as simulation_file:
                     data = json.load(simulation_file)
-                    GLOBAL_POSITION_TOPIC = data["rovTransformTopic"]
-                    CAMERA_IMAGE_TOPIC = data["videoImageTopic"]
+                    GLOBAL_POSITION_TOPIC = data["auvSimulationPositionTopic"]
+                    CAMERA_IMAGE_TOPIC = data["videoROSTopic"]
 
 
 class MainGuiTabs:
