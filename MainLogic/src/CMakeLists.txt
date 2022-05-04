@@ -3,7 +3,6 @@ set(NAME StateMachine)
 
 set(SOURCES
     StateMachine/LogicCommonData.cpp
-    StateMachine/StateMachine.cpp
     StateMachine/StateStack.cpp
     StateMachine/States/StateBase.cpp
     StateMachine/States/StateIdle.cpp
@@ -12,7 +11,6 @@ set(SOURCES
 
 set(HEADERS
     StateMachine/LogicCommonData.h
-    StateMachine/StateMachine.h
     StateMachine/StateStack.h
     StateMachine/States/StateBase.h
     StateMachine/States/StateIdle.h

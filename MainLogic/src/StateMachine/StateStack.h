@@ -25,6 +25,8 @@ public:
 	void popState();
 	void popMultipleStates( const unsigned number );
 
+	void process();
+
 private:
 	std::stack< std::shared_ptr< T > > stateStack;
 };
@@ -89,4 +91,21 @@ template< typename T >
 void StateStack< T >::pushStateOnTop( const StateType type )
 {
 	this->stateStack.emplace( createState( type ) );
+}
+
+template< typename T >
+void StateStack< T >::process()
+{
+	auto result = this->getCurrentState()->process();
+
+	switch( result )
+	{
+	case StateReturnType::goToNextState:
+		this->popState();
+
+		break;
+
+	default:
+		break;
+	}
 }

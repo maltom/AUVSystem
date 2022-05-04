@@ -10,7 +10,7 @@
 #include "NodeBase.h"
 #include "ROSEnums.h"
 #include "StateMachine/LogicCommonData.h"
-#include "StateMachine/StateMachine.h"
+#include "StateMachine/StateStack.h"
 
 class MainLogic final : public NodeBase
 {
@@ -32,7 +32,7 @@ protected:
 
 private:
 	LogicCommonData logicData;
-	StateMachine stateMachine;
+	StateStack< StateBase > stateMachine;
 
 	void globalEstimatedPositionObtained( const geometry_msgs::Twist& position );
 };
