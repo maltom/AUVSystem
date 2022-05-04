@@ -94,11 +94,10 @@ void ThrusterRegulator::subscribeTopics()
 
 #endif
 
-	this->rosSubscribers.emplace_back(
-	    this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetGlobalPosition,
-	                              AUVROS::QueueSize::StandardQueueSize,
-	                              &ThrusterRegulator::updateCurrentPositionAndAngularSpeed,
-	                              this ) );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetGlobalPosition,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &ThrusterRegulator::updateTargetPosition,
+	                                                             this ) );
 }
 
 void ThrusterRegulator::advertiseTopics()
