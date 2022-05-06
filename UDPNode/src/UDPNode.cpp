@@ -37,6 +37,10 @@ void UDPNode::subscribeTopics()
 	                                                             AUVROS::QueueSize::StandardQueueSize,
 	                                                             &UDPNode::sendServosSignalToMicroController,
 	                                                             this ) );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlyLaunchTorpedo,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &UDPNode::sendServosSignalToMicroController,
+	                                                             this ) );
 }
 void UDPNode::advertiseTopics()
 {
@@ -201,6 +205,17 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 	/*Frame frame;
 	frame.commandCode  = NORESPREQ_SET_AZIMUTHAL_SERVOS;
 	frame.payload[ 0 ] = hardware::servoMinMax.second - adjustServoValues( message.data[ 0 ] );
-	frame.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );*/
+	frame.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );
+	this->processOutgoingMessages( frame );*/
+}
+
+void UDPNode::sendLaunchTorpedoSignalToMicroController( const AUVROS::MessageTypes::Torpedo& message )
+{
+	Frame frame;
+	frame.commandCode = NORESPREQ_LAUNCH_TORPEDO;
+	frame.payloadSize = 1;
+
+	frame.payload.at( 0 ) = static_cast< network::payloadWordType >( message.data );
+
 	this->processOutgoingMessages( frame );
 }
