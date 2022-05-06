@@ -18,7 +18,7 @@ namespace Folders
 	static const std::string CameraSubFolder          = MainFolder + "/Camera";
 	static const std::string HardwareSignalsSubFolder = MainFolder + "/HardwareSignals";
 	static const std::string DevPCSubFolder           = MainFolder + "/DevPC";
-	static const std::string TorpedoSubFolder         = MainFolder + "/Torpedo";
+	static const std::string Peripherals              = MainFolder + "/Peripherals";
 	static const std::string HealthSubFolder          = MainFolder + "/Health";
 } // namespace Folders
 namespace Topics
@@ -46,6 +46,7 @@ namespace Topics
 		static const std::string arbitrarlySetServos         = Folders::DevPCSubFolder + "/arbitrarlySetServos";
 		static const std::string arbitrarlySetGlobalPosition = Folders::DevPCSubFolder + "/arbitrarlySetGlobalPosition";
 		static const std::string arbitrarlySetThrustForce    = Folders::DevPCSubFolder + "/arbitrarlySetThrustForce";
+		static const std::string arbitrarlySetThrustForce    = Folders::DevPCSubFolder + "/arbitrarlyLaunchTorpedo";
 
 		static const std::string arbitrarlySetRelativePosition
 		    = Folders::DevPCSubFolder + "/arbitrarlySetRelativePosition";
@@ -61,6 +62,11 @@ namespace Topics
 		    = Folders::HealthSubFolder + "/healthHardwareReportSummary";
 	} // namespace Health
 
+	namespace Peripherals
+	{
+		static const std::string launchTorpedo = Folders::Peripherals + "/launchTorpedo";
+	}
+
 } // namespace Topics
 
 namespace MessageTypes
@@ -74,6 +80,8 @@ namespace MessageTypes
 	using DVLDeadReckoning = std_msgs::Float32MultiArray;
 	using DVLVelocity      = geometry_msgs::Twist;
 	using DVLDRTimeStamp   = std_msgs::Float64;
+
+	using Torpedo = std_msgs::Int32;
 	// using OccupancyGrid
 	// this type depends on number of nodes. max number of nodes for Int32 is 32, can be increased to Int64
 	using HealthReport = std_msgs::Int32;
