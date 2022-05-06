@@ -5,8 +5,8 @@ from cv_bridge import CvBridge
 import cv2
 import json
 import tkinter as tk
-from tkinter import ttk
-from std_msgs.msg import Float32MultiArray, MultiArrayDimension, MultiArrayLayout
+from tkinter import LEFT, ttk
+from std_msgs.msg import Float32MultiArray, MultiArrayDimension, MultiArrayLayout, Int32
 from geometry_msgs.msg import Twist, Vector3
 from sensor_msgs.msg import Image as ImageMsg
 from PIL import Image, ImageTk
@@ -20,6 +20,7 @@ THRUSTER_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrusters'
 SERVOS_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetServos'
 GLOBAL_POSITION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetGlobalPosition'
 THRUST_ALLOCATION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrustForce'
+TORPEDO_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlyLaunchTorpedo'
 CAMERA_IMAGE_TOPIC = '/auvCameraImage'
 AUV_SYSTEM_DIR = re.search(".*AUVSystem", os.getcwd())[0]
 AUV_CONFIG_DIR = None
@@ -139,6 +140,19 @@ class ControlsFrame:
             self.global_thrust_alloc_frame, text="Send Thrust Alloc")
         self.send_thrust_alloc_btn.pack(fill=tk.BOTH)
 
+        self.torpedo_controls_frame = tk.Frame(temp)
+        self.torpedo_controls_frame.pack(side=LEFT, fill=tk.Y)
+        self.torpedo_controls_label = tk.Label(self.torpedo_controls_frame, text="TORPEDOS")
+        self.torpedo_controls_label.pack()
+        self.launch_left_torpedo_btn = tk.Button(
+            self.torpedo_controls_frame, text="LEFT"
+        )
+        self.launch_left_torpedo_btn.pack(side=tk.LEFT, fill=tk.Y)
+        self.launch_right_torpedo_btn = tk.Button(
+            self.torpedo_controls_frame, text="RIGHT"
+        )
+        self.launch_right_torpedo_btn.pack(side=tk.RIGHT, fill=tk.Y)
+
     def input_controls(self, names, lookup, root):
         for c in names:
             name = f"Set {c}: "
@@ -218,6 +232,11 @@ class RosHandler:
             command=self.send_global_pos)
         self.thrust_alloc_Sender = rospy.Publisher(
             THRUST_ALLOCATION_TOPIC, Twist, queue_size=10)
+        self.torpedo_launch_Sender = rospy.Publisher(
+            TORPEDO_TOPIC, Int32, queue_size=10
+        )
+        self.controls_frame.launch_left_torpedo_btn.configure(command= lambda: self.send_torpedo_launch(0))
+        self.controls_frame.launch_right_torpedo_btn.configure(command= lambda: self.send_torpedo_launch(1))
         self.controls_frame.send_thrust_alloc_btn.configure(
             command=self.send_thrust_alloc)
 
@@ -265,6 +284,11 @@ class RosHandler:
         thrust_alloc_msg.linear = Vector3(values[0], values[1], values[2])
         thrust_alloc_msg.angular = Vector3(values[3], values[4], values[5])
         self.thrust_alloc_Sender.publish(thrust_alloc_msg)
+
+    def send_torpedo_launch(self, idx):
+        torpedo_msg = Int32()
+        torpedo_msg.data = idx
+        self.torpedo_launch_Sender.publish(torpedo_msg)
 
 
 class HallerGui:
