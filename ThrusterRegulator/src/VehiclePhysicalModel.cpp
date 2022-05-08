@@ -60,7 +60,7 @@ void VehiclePhysicalModel::initMatrices()
 
 	// simulation max thrust matrix
 	const auto& maxThrust = thrusterParams.maxThrust;
-	VectorXd KMaxDiag = VectorXd::Zero(5);
+	VectorXd KMaxDiag     = VectorXd::Zero( 5 );
 	KMaxDiag << maxThrust, maxThrust, maxThrust, maxThrust, maxThrust;
 	thrusterParams.KMax = KMaxDiag.asDiagonal();
 
@@ -150,7 +150,8 @@ void VehiclePhysicalModel::calculateAllThrusterConfigutationMatrix()
 	}
 }
 
-void VehiclePhysicalModel::updateAzimuthalThrusterConfig( const std::vector< double >& newServosAngles )
+void VehiclePhysicalModel::updateAzimuthalThrusterConfig( const std::vector< double >& newServosAngles,
+                                                          const VectorXd& thrustSignal_u )
 {
 	if( newServosAngles.size() != this->thrusterParams.numberOfAzimuthalThrusters )
 	{
@@ -163,6 +164,114 @@ void VehiclePhysicalModel::updateAzimuthalThrusterConfig( const std::vector< dou
 	}
 
 	calculateAllThrusterConfigutationMatrix();
+	updateAzimuthalThrustersDifferentialMatrix( thrustSignal_u );
+}
+
+void VehiclePhysicalModel::updateAzimuthalThrustersDifferentialMatrix( const VectorXd& thrustSignal_u )
+{
+	Matrix< double, sixDim, 1 > firstThruster  = Matrix< double, sixDim, 1 >::Zero();
+	Matrix< double, sixDim, 1 > secondThruster = Matrix< double, sixDim, 1 >::Zero();
+
+	firstThruster << thrusterParams.azimuthalDerivativeFunctions.at( 0 ).linearForces.at( 0 ).minusFactor
+	        * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).linearForces.at( 0 ).trigonometricFunction(
+	            this->servos.servosAngles.at( 0 ).first )
+	        * thrustSignal_u( 0 ),
+	    thrusterParams.azimuthalDerivativeFunctions.at( 0 ).linearForces.at( 1 ).minusFactor
+	    * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).linearForces.at( 1 ).trigonometricFunction(
+	        this->servos.servosAngles.at( 0 ).first )
+	    * thrustSignal_u( 0 ),
+	    thrusterParams.azimuthalDerivativeFunctions.at( 0 ).linearForces.at( 2 ).minusFactor
+	    * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).linearForces.at( 2 ).trigonometricFunction(
+	        this->servos.servosAngles.at( 0 ).first )
+	    * thrustSignal_u( 0 ),
+
+	    ( thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 0 ).first.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 0 ).first.trigonometricFunction(
+	              this->servos.servosAngles.at( 0 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 0 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 0 ).first.dimensionToMultiply )
+	      + thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 0 ).second.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 0 ).second.trigonometricFunction(
+	              this->servos.servosAngles.at( 0 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 0 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 0 ).second.dimensionToMultiply ) )
+	    * thrustSignal_u( 0 ),
+
+	    ( thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 1 ).first.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 1 ).first.trigonometricFunction(
+	              this->servos.servosAngles.at( 0 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 0 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 1 ).first.dimensionToMultiply )
+	      + thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 1 ).second.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 1 ).second.trigonometricFunction(
+	              this->servos.servosAngles.at( 0 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 0 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 1 ).second.dimensionToMultiply ) )
+	    * thrustSignal_u( 0 ),
+
+	    ( thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 2 ).first.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 2 ).first.trigonometricFunction(
+	              this->servos.servosAngles.at( 0 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 0 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 2 ).first.dimensionToMultiply )
+	      + thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 2 ).second.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 2 ).second.trigonometricFunction(
+	              this->servos.servosAngles.at( 0 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 0 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 0 ).torques.at( 2 ).second.dimensionToMultiply ) )
+	    * thrustSignal_u( 0 );
+
+	secondThruster << thrusterParams.azimuthalDerivativeFunctions.at( 1 ).linearForces.at( 0 ).minusFactor
+	        * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).linearForces.at( 0 ).trigonometricFunction(
+	            this->servos.servosAngles.at( 1 ).first )
+	        * thrustSignal_u( 1 ),
+	    thrusterParams.azimuthalDerivativeFunctions.at( 1 ).linearForces.at( 1 ).minusFactor
+	    * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).linearForces.at( 1 ).trigonometricFunction(
+	        this->servos.servosAngles.at( 1 ).first )
+	    * thrustSignal_u( 1 ),
+	    thrusterParams.azimuthalDerivativeFunctions.at( 1 ).linearForces.at( 2 ).minusFactor
+	    * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).linearForces.at( 2 ).trigonometricFunction(
+	        this->servos.servosAngles.at( 1 ).first )
+	    * thrustSignal_u( 1 ),
+
+	    ( thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 0 ).first.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 0 ).first.trigonometricFunction(
+	              this->servos.servosAngles.at( 1 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 1 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 0 ).first.dimensionToMultiply )
+	      + thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 0 ).second.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 0 ).second.trigonometricFunction(
+	              this->servos.servosAngles.at( 1 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 1 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 0 ).second.dimensionToMultiply ) )
+	    * thrustSignal_u( 1 ),
+
+	    ( thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 1 ).first.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 1 ).first.trigonometricFunction(
+	              this->servos.servosAngles.at( 1 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 1 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 1 ).first.dimensionToMultiply )
+	      + thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 1 ).second.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 1 ).second.trigonometricFunction(
+	              this->servos.servosAngles.at( 1 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 1 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 1 ).second.dimensionToMultiply ) )
+	    * thrustSignal_u( 1 ),
+
+	    ( thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 2 ).first.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 2 ).first.trigonometricFunction(
+	              this->servos.servosAngles.at( 1 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 1 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 2 ).first.dimensionToMultiply )
+	      + thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 2 ).second.minusFactor
+	          * thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 2 ).second.trigonometricFunction(
+	              this->servos.servosAngles.at( 1 ).first )
+	          * this->thrusterParams.positionsAndRotations.at( 1 )(
+	              thrusterParams.azimuthalDerivativeFunctions.at( 1 ).torques.at( 2 ).second.dimensionToMultiply ) )
+	    * thrustSignal_u( 1 );
+
+	this->thrusterParams.AzimuthalThrustersDifferentialConfig.block< sixDim, 1 >( 0, 0 ) = firstThruster;
+	this->thrusterParams.AzimuthalThrustersDifferentialConfig.block< sixDim, 1 >( 0, 1 ) = secondThruster;
 }
 
 Matrix< double, sixDim, sixDim > VehiclePhysicalModel::calculateCoriolisMatrix( const VectorXd& currentState ) const

@@ -66,7 +66,8 @@ Available options:
 - RELEASE - setting build type to Release (default)
 - DEBUG - setting build type to Debug
 - NOLQR - switching off LQR in **ThrusterRegulator** Node. Instead of taking new target position from ROS Topics, it takes forces to set from ArbitrarlySetThrustForces Topic which is published by haller_gui.
-- SIMULATION - switches on some things. For now, it switches updating state of the AUV based on Model, not from proper feedback and publishing estimated global position which is calculated by LQR and model.
+- SIMULATION - switches on some things. For now, it switches updating state of the AUV based on Model, not from proper feedback and publishing estimated global position which is calculated by LQR and model
+- MANUAL - switches off thrusters regulator messages to thrusters and servos
 - NOSTM - switches down hardware checks for STM. Use when the STM32 is not connected
 - NODVL - the same as above but for DVL
 - NOZED - the same as above but for ZED

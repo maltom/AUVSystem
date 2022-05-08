@@ -74,14 +74,14 @@ public:
 	}
 
 	void addInfoToDisplay( const std::string& header, const std::vector< std::string >& labels, const DataType& init );
-	void setMajorColumnValues( unsigned dataColumnIndex, const std::vector< DataType >& dataForDisplayer );
+	void setMajorColumnValues( const unsigned dataColumnIndex, const std::vector< DataType >& dataForDisplayer );
 
 	void fillMajorDataRow( std::string& display );
 	void displayDebugInfo( bool isNumberOfSubscribedTopicsGood ) const;
 
 private:
-	std::string createUtilityRow( display::rowType type ) const;
-	std::string createMajorRow( unsigned dataRowNumber = 0u ) const;
+	std::string createUtilityRow( const display::rowType type ) const;
+	std::string createMajorRow( const unsigned dataRowNumber = 0u ) const;
 
 	void setupDisplayPositions();
 	void setupDisplayLabels();

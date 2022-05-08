@@ -63,4 +63,5 @@ private:
 
 	void sendThrustersSignalToMicroController( const AUVROS::MessageTypes::ThrustersSignal& message );
 	void sendServosSignalToMicroController( const AUVROS::MessageTypes::ServosSignal& mesagge );
+	void sendLaunchTorpedoSignalToMicroController( const AUVROS::MessageTypes::Torpedo& mesagge );
 };

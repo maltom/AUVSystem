@@ -103,3 +103,8 @@ void TCPNode::processCommand( const Frame& frame )
 		break;
 	}
 }
+
+void TCPNode::resetDeadReckoning()
+{
+	this->outgoingMessages.emplace( "{\"command\": \"reset_dead_reckoning\"}" );
+}

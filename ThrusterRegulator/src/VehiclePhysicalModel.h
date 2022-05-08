@@ -96,8 +96,10 @@ public:
 		// Influence is calculated from position and rotations
 
 		// MatrixXd azimuthalThrustersConfigMatrix;
-
+		// useless - probably
 		std::vector< AzimuthalThrusterFunctions > azimuthalBaseFunctions;
+
+		// useful
 		std::vector< AzimuthalThrusterFunctions > azimuthalDerivativeFunctions;
 
 		// thrusters config matrix containing max thrust values - only for simulation
@@ -129,7 +131,8 @@ public:
 
 	MatrixXd getAzimuthalThrustersConfig() const;
 	void calculateAllThrusterConfigutationMatrix();
-	void updateAzimuthalThrusterConfig( const std::vector< double >& newServosAngles );
+	void updateAzimuthalThrusterConfig( const std::vector< double >& newServosAngles, const VectorXd& thrustSignal_u );
+	void updateAzimuthalThrustersDifferentialMatrix( const VectorXd& thrustSignal_u );
 	VectorXd getRestoringForces( const VectorXd& currentState ) const; // Getting restoring forces vector
 
 	const Drag& getModelDrag() const
@@ -152,9 +155,10 @@ public:
 		return this->servos;
 	}
 
+	void adjustParametersForWorkingFrequency( const float freq );
+
 private:
 	void loadPhysicalParameters( configFiles::fileID configID );
-	void adjustParametersForWorkingFrequency( const float freq );
 
 	void initMatrices();
 

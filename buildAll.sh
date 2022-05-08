@@ -4,7 +4,7 @@ buildParams=""
 buildTypeIsSet=false
 
 for index in ${params[@]}; do
-case $index in
+  case $index in
 
   "NOLQR")
     buildParams=$buildParams"-DNOLQR=ON "
@@ -12,6 +12,10 @@ case $index in
 
   "SIMULATION")
     buildParams=$buildParams"-DSIMULATION=ON "
+    ;;
+
+  "MANUAL")
+    buildParams=$buildParams"-DMANUAL=ON "
     ;;
 
   "NOSTM")
@@ -39,30 +43,40 @@ case $index in
     ;;
 
   "RELEASE")
-  if [ $buildTypeIsSet = false ]; then
+    if [ $buildTypeIsSet = false ]; then
       buildParams=$buildParams"-DCMAKE_BUILD_TYPE=Release "
       buildTypeIsSet=true
-  else
-  echo "Set proper build type (RELEASE or DEBUG, you have to use one and only one of them)"
-  exit 3
-  fi
+    else
+      echo "Set proper build type (RELEASE, DEBUG or RELEASE_DEBUG_INFO, you have to use one and only one of them)"
+      exit 3
+    fi
     ;;
 
   "DEBUG")
-  if [ $buildTypeIsSet = false ]; then
-    buildParams=$buildParams"-DCMAKE_BUILD_TYPE=Debug "
-    buildTypeIsSet=true
-  else
-  echo "Set proper build type (RELEASE or DEBUG, you have to use one and only one of them)"
-  exit 3
-  fi
+    if [ $buildTypeIsSet = false ]; then
+      buildParams=$buildParams"-DCMAKE_BUILD_TYPE=Debug "
+      buildTypeIsSet=true
+    else
+      echo "Set proper build type (RELEASE, DEBUG or RELEASE_DEBUG_INFO, you have to use one and only one of them)"
+      exit 3
+    fi
+    ;;
+
+  "RELEASE_DEBUG_INFO")
+    if [ $buildTypeIsSet = false ]; then
+      buildParams=$buildParams"-DCMAKE_BUILD_TYPE=RelWithDebInfo "
+      buildTypeIsSet=true
+    else
+      echo "Set proper build type (RELEASE, DEBUG or RELEASE_DEBUG_INFO, you have to use one and only one of them)"
+      exit 3
+    fi
     ;;
 
   *)
     echo "Unknow parameter: $index"
     exit 2
     ;;
-esac
+  esac
 done
 
 if [ $buildTypeIsSet = false ]; then
@@ -74,7 +88,7 @@ echo "Building with parameters" $buildParams
 modulesList=($(ls -d */))
 
 if [ ! -d "build" ]; then
-    mkdir build
+  mkdir build
 fi
 cd build
 
@@ -86,8 +100,8 @@ make -j$jobs
 unset GLOBIGNORE
 
 for index in ${modulesList[@]}; do
-    ignored=${index%/*}
-    GLOBIGNORE=$GLOBIGNORE:$ignored
+  ignored=${index%/*}
+  GLOBIGNORE=$GLOBIGNORE:$ignored
 done
 
 additional+="Commons"
@@ -99,12 +113,12 @@ rm -r *
 GLOBIGNORE=$GLOBIGNORE:*.so
 
 for index in ${modulesList[@]}; do
-    if [ -d $index ]; then
+  if [ -d $index ]; then
 
-        cd $index
-        rm -r *
-        cd ..
-    fi
+    cd $index
+    rm -r *
+    cd ..
+  fi
 done
 
 unset GLOBIGNORE

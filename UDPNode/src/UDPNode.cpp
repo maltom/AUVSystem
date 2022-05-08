@@ -12,9 +12,11 @@
 
 void UDPNode::processInMainLoop()
 {
+#ifndef NOSTM
 	udpServer->sendOutgoingMessages( outgoingMessages );
 	udpServer->getIncomingMessages( incomingMessages );
 	this->processIncomingMessages();
+#endif
 }
 
 void UDPNode::subscribeTopics()
@@ -32,6 +34,10 @@ void UDPNode::subscribeTopics()
 	                                                             &UDPNode::sendThrustersSignalToMicroController,
 	                                                             this ) );
 	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetServos,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &UDPNode::sendServosSignalToMicroController,
+	                                                             this ) );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlyLaunchTorpedo,
 	                                                             AUVROS::QueueSize::StandardQueueSize,
 	                                                             &UDPNode::sendServosSignalToMicroController,
 	                                                             this ) );
@@ -106,6 +112,9 @@ void UDPNode::processCommand( const Frame& frame )
 	{
 	case Command::HEARTBEAT:
 		break;
+	case Command::NORESPREQ_PRESSURE_SENSOR_VALUE_REGULAR_REPORT:
+		std::cout << "Mam cisnienie mordo:" << static_cast< int >( frame.payload.at( 0 ) + frame.payload.at( 1 ) << 16 )
+		          << std::endl;
 	default:
 		break;
 	}
@@ -140,6 +149,10 @@ void UDPNode::processOutgoingMessages( const Frame& frame )
 void UDPNode::sendThrustersSignalToMicroController( const AUVROS::MessageTypes::ThrustersSignal& message )
 {
 	auto length = message.layout.dim.begin()->size;
+	if( length != 5 )
+	{
+		throw std::runtime_error( "Too many thrusters." );
+	}
 	Frame frame;
 	frame.commandCode = NORESPREQ_SET_THRUSTERS;
 	frame.payloadSize = length;
@@ -147,6 +160,16 @@ void UDPNode::sendThrustersSignalToMicroController( const AUVROS::MessageTypes::
 	{
 		frame.payload[ i ] = adjustThrusterValues( message.data[ i ] );
 	}
+	// korekcja
+	frame.payload[ 0 ]               = hardware::motorTorqueMinMax.second - frame.payload[ 0 ];
+	network::payloadWordType zamiana = frame.payload[ 4 ];
+	frame.payload[ 4 ]               = frame.payload[ 1 ];
+	frame.payload[ 2 ]               = hardware::motorTorqueMinMax.second - frame.payload[ 2 ];
+	frame.payload[ 1 ]               = zamiana;
+	frame.payload[ 3 ]               = hardware::motorTorqueMinMax.second - frame.payload[ 3 ];
+
+	// std::cout << " Thrust: " << frame.payload[ 0 ] << "   " << frame.payload[ 1 ] << "   " << frame.payload[ 2 ]
+	//           << "   " << frame.payload[ 3 ] << "   " << frame.payload[ 4 ] << std::endl;
 
 	this->processOutgoingMessages( frame );
 }
@@ -158,7 +181,7 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 	{
 		throw std::runtime_error( "Too many servos." );
 	}
-	/*Frame frame;
+	Frame frame;
 	Frame frame2;
 	frame.commandCode  = NORESPREQ_SET_SERVOS;
 	frame2.commandCode = NORESPREQ_SET_SERVOS;
@@ -174,14 +197,25 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 	frame2.payload[ 0 ] = 1;
 	frame2.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );
 
-	std::cout << frame.payload[ 0 ] << std::endl;
-	std::cout << frame.payload[ 1 ] << std::endl;
+	// std::cout << frame.payload[ 0 ] << std::endl;
+	// std::cout << frame.payload[ 1 ] << std::endl;
 
 	this->processOutgoingMessages( frame );
-	this->processOutgoingMessages( frame2 );*/
-	Frame frame;
+	this->processOutgoingMessages( frame2 );
+	/*Frame frame;
 	frame.commandCode  = NORESPREQ_SET_AZIMUTHAL_SERVOS;
 	frame.payload[ 0 ] = hardware::servoMinMax.second - adjustServoValues( message.data[ 0 ] );
 	frame.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );
+	this->processOutgoingMessages( frame );*/
+}
+
+void UDPNode::sendLaunchTorpedoSignalToMicroController( const AUVROS::MessageTypes::Torpedo& message )
+{
+	Frame frame;
+	frame.commandCode = NORESPREQ_LAUNCH_TORPEDO;
+	frame.payloadSize = 1;
+
+	frame.payload.at( 0 ) = static_cast< network::payloadWordType >( message.data );
+
 	this->processOutgoingMessages( frame );
 }

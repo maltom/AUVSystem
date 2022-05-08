@@ -19,9 +19,7 @@ namespace labels
 const std::array< std::string, 5 > thrusters{
 	"Thruster #1", "Thruster #2", "Thruster #3", "Thruster #4", "Thruster #5"
 };
-const std::array< std::string, 2 > servos{
-	"Servo #1", "Servo #2"
-};
+const std::array< std::string, 2 > servos{ "Servo #1", "Servo #2" };
 const std::array< std::string, 6 > DVLDeadReckoning{ "x", "y", "z", "roll", "pitch", "yaw" };
 } // namespace labels
 
@@ -45,7 +43,10 @@ private:
 		Health,
 		ThrustersArbitrarly,
 		ServosArbitrarly,
-		DVLDeadReckoning
+		DVLDeadReckoning,
+		ThrustersRegulator,
+		ServosRegulator,
+		GlobalEstimatedPosition
 	};
 
 	void processInMainLoop() override;
@@ -59,6 +60,9 @@ private:
 	void displayArbitrarlySetThrustersStatus( const AUVROS::MessageTypes::ThrustersSignal& message );
 	void displayArbitrarlySetServosStatus( const AUVROS::MessageTypes::ServosSignal& message );
 	void displayDVLDeadReckoningStatus( const AUVROS::MessageTypes::DVLDeadReckoning& message );
+	void displaySetThrustersRegulatorStatus( const AUVROS::MessageTypes::ThrustersSignal& message );
+	void displaySetServosRegulatorStatus( const AUVROS::MessageTypes::ServosSignal& message );
+	void displayEstimatedPositionStatus( const AUVROS::MessageTypes::Position& message );
 
 	Displayer displayer;
 

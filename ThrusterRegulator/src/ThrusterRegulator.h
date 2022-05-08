@@ -25,7 +25,7 @@ public:
 	    : NodeBase( node, configID, nID ), model( configID )
 	{
 		loadRegulatorParameters( this->configFileID );
-
+		model.adjustParametersForWorkingFrequency( this->regulatorWorkingFrequency );
 		subscribeTopics();
 		advertiseTopics();
 	}
@@ -55,7 +55,7 @@ private:
 	VectorXd currentState              = VectorXd::Zero( stateDim ); // state = position and speed
 	VectorXd currentPosition           = VectorXd::Zero( sixDim );
 	VectorXd currentSpeed              = VectorXd::Zero( sixDim );
-	VectorXd positionToReach           = VectorXd::Ones( sixDim );
+	VectorXd positionToReach           = VectorXd::Zero( sixDim );
 	VectorXd regulatorFeedbackPosition = VectorXd::Zero( sixDim );
 	VectorXd simulationResultState     = VectorXd::Zero( stateDim );
 
@@ -68,19 +68,21 @@ private:
 	void subscribeTopics() override;
 	void advertiseTopics() override;
 	void connectServices() override;
+	void publishSignalsToHardware();
 	void loadRegulatorParameters( configFiles::fileID configID );
 
 	// TODO: change to SLAM
 	void updateCurrentPositionAndAngularSpeed( const AUVROS::MessageTypes::DVLDeadReckoning& newPosition );
 	void updateVelocity( const AUVROS::MessageTypes::DVLVelocity& newVelocity );
+	void updateTargetPosition( const AUVROS::MessageTypes::Position& newPos );
 
 #ifdef SIMULATION
-	void calculateSimulationState();
+	void calculateSimulationState( const float simulationFrequency );
 #ifndef NOLQR
 	void publishEstimatedPosition();
 
-	#else
-	void updateDesiredForcesError( const AUVROS::MessageTypes::arbitrarlySetThrustForce& newForces);
+#else
+	void updateDesiredForcesError( const AUVROS::MessageTypes::arbitrarlySetThrustForce& newForces );
 #endif
 #endif
 };

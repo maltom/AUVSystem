@@ -31,6 +31,7 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->currentPosition << "\ndesired pos:\n"
 		//           << this->positionToReach << "\nthruster sig:\n"
 		//           << this->thrustValues_u <<"\n---------"<< std::endl;
+
 		this->lqrRegulator.calculateError( this->currentPosition, this->positionToReach );
 		// std::cout << "Q:\n"
 		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
@@ -42,22 +43,36 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->thrustValues_u <<"\n---------"<< std::endl;
 #endif
 		allocateThrust2Azimuthal( this->thrustValues_u, lqrRegulator.error, this->model, this->penalizers );
-// std::cout << "Q:\n"
-//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
-//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
-//           << lqrRegulator.A << "\nB:\n"
-//           << lqrRegulator.B << "\ncurrent pos:\n"
-//           << this->currentPosition << "\ndesired pos:\n"
-//           << this->positionToReach << "\nthruster sig:\n"
-//           << this->thrustValues_u << std::endl;
+		// std::cout << "Q:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
+		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
+		//           << lqrRegulator.A << "\nB:\n"
+		//           << lqrRegulator.B << "\ncurrent pos:\n"
+		//           << this->currentPosition << "\ndesired pos:\n"
+		//           << this->positionToReach << "\nthruster sig:\n"
+		//           << this->thrustValues_u << std::endl;
+
 #ifdef SIMULATION
-		this->calculateSimulationState();
+		auto simulationFrequency = 1000.0f;
+		for( auto i = 0u; i < simulationFrequency / this->regulatorWorkingFrequency; ++i )
+		{
+			this->calculateSimulationState( simulationFrequency );
+			// simulation
+			this->currentState = simulationResultState;
+			currentPosition    = currentState.head< 6 >();
+			currentSpeed       = currentState.tail< 6 >();
+			// std::cout << "STAN: " << currentState << "\nPOZYCJA: " << currentPosition << "\nPREDKOSC: " <<
+			// currentSpeed
+			//   << std::endl;
+		}
 #ifndef NOLQR
 		this->publishEstimatedPosition();
 #endif
 #endif
-		// simulation
-		this->currentState = simulationResultState;
+
+#ifndef MANUAL
+		publishSignalsToHardware();
+#endif
 	}
 }
 void ThrusterRegulator::subscribeTopics()
@@ -78,6 +93,11 @@ void ThrusterRegulator::subscribeTopics()
 	                                                             this ) );
 
 #endif
+
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlySetGlobalPosition,
+	                                                             AUVROS::QueueSize::StandardQueueSize,
+	                                                             &ThrusterRegulator::updateTargetPosition,
+	                                                             this ) );
 }
 
 void ThrusterRegulator::advertiseTopics()
@@ -90,9 +110,13 @@ void ThrusterRegulator::advertiseTopics()
 	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::ServosSignal >(
 	        AUVROS::Topics::HardwareSignals::signalToServos, AUVROS::QueueSize::StandardQueueSize ) ) );
 
+#ifdef SIMULATION
+#ifndef NOLQR
 	this->rosPublishers.emplace_back(
 	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::Position >(
 	        AUVROS::Topics::Positions::globalEstimatedPosition, AUVROS::QueueSize::StandardQueueSize ) ) );
+#endif
+#endif
 }
 void ThrusterRegulator::connectServices() {}
 
@@ -186,7 +210,6 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	Aeq.transposeInPlace();
 	VectorXd Beq = VectorXd::Zero( sixDim );
 
-	// TODO: ustalić czy spada z rowerka. jak spada, to znaczy, że trzeba transponować u
 	Beq = -( desiredForces_tau - allThrustersConfig_T * uPrev );
 
 	// Inequality constraints
@@ -217,28 +240,42 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	lowerServoAnglesBoundary = temporaryVector.asDiagonal();
 	upperServoAnglesBoundary = -lowerServoAnglesBoundary;
 
-	temp_Ci << lowerBoundary, upperBoundary, lowerServoAnglesBoundary, upperServoAnglesBoundary;
+	temp_Ci << upperBoundary, lowerBoundary, lowerServoAnglesBoundary, upperServoAnglesBoundary;
 	Ci = temp_Ci.transpose();
 
 	const auto infinity = std::numeric_limits< double >::max();
 
-	ci0 << -deltaU, -deltaU, -deltaU, -deltaU, -deltaU, -infinity, -infinity, -infinity, -infinity, -infinity,
-	    -infinity, -deltaA, -deltaA, deltaU, deltaU, deltaU, deltaU, deltaU, infinity, infinity, infinity, infinity,
-	    infinity, infinity, deltaA, deltaA, VectorXd::Zero( 11 ),
-	    -( servoMaxAngles.first - servoCurrentAngles.at( 0 ).first ),
+	ci0 << deltaU, deltaU, deltaU, deltaU, deltaU, infinity, infinity, infinity, infinity, infinity, infinity, deltaA,
+	    deltaA, deltaU, deltaU, deltaU, deltaU, deltaU, infinity, infinity, infinity, infinity, infinity, infinity,
+	    deltaA, deltaA, VectorXd::Zero( 11 ), -( servoMaxAngles.first - servoCurrentAngles.at( 0 ).first ),
 	    -( servoMaxAngles.first - servoCurrentAngles.at( 1 ).first ), VectorXd::Zero( 11 ),
 	    ( servoMaxAngles.second - servoCurrentAngles.at( 0 ).first ),
 	    ( servoMaxAngles.second - servoCurrentAngles.at( 1 ).first ); // Vector of boundary values
-
+	// std::cout << "=========BEFORE QUADPROG================\n";
 	VectorXd quadProgSolution_x = VectorXd::Zero( 13 ); // Initializing solution vector
+	// std::cout << "========PARAMETERS BEGIN'====================\n"
+	//<< temp_Ci << "\n"
+	//<< ci0 << "\n"
+	//<< Aeq << "\n"
+	//<< Beq << "\n" << std::endl;
 
 	QP::solve_quadprog( H, f, Aeq, Beq, Ci, ci0, quadProgSolution_x );
+	// std::cout<<"===========AFTER QUADPROG============\n";
+	//  std::cout << "========QUADPROG BEGIN=======================\n"
+	//            << quadProgSolution_x << "\n========QUADPROG END===========\n"
+	//            << std::endl;
+
+	// std::cout << "====SERWA====\n"
+	// 		  << servoCurrentAngles.at( 0 ).first << "\n"
+	// 		  << servoCurrentAngles.at( 1 ).first << "\n"
+	// 		  << std::endl;
 
 	thrustSignal_u += quadProgSolution_x.head( 5 )
 	    / maxThrust; // Adding values of calculated change in force. 5 is number of thrusters
 
 	model.updateAzimuthalThrusterConfig( { servoCurrentAngles.at( 0 ).first + quadProgSolution_x( 11 ),
-	                                       servoCurrentAngles.at( 1 ).first + quadProgSolution_x( 12 ) } );
+	                                       servoCurrentAngles.at( 1 ).first + quadProgSolution_x( 12 ) },
+	                                     thrustSignal_u );
 
 	// Making sure that we cannot demand 110% of power
 	for( auto i{ 0u }; i < model.getModelThrusters().thrustersAmount; ++i )
@@ -255,8 +292,38 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	// std::cout << "DONE\n" << quadProgSolution_x << std::endl;
 }
 
+void ThrusterRegulator::publishSignalsToHardware()
+{
+	AUVROS::MessageTypes::ThrustersSignal thrusterSignal;
+	thrusterSignal.layout.data_offset = 0;
+	std_msgs::MultiArrayDimension dimThrust;
+	dimThrust.label  = "thrust";
+	dimThrust.size   = 5;
+	dimThrust.stride = 0;
+	thrusterSignal.layout.dim.emplace_back( dimThrust );
+	for( auto i = 0u; i < thrustValues_u.size(); ++i )
+	{
+		thrusterSignal.data.emplace_back( thrustValues_u( i ) );
+	}
+	this->rosPublishers.at( advertisers::signalToThrusters )->publish( thrusterSignal );
+
+	AUVROS::MessageTypes::ThrustersSignal servoSignal;
+	servoSignal.layout.data_offset = 0;
+	std_msgs::MultiArrayDimension dimServos;
+	dimServos.label  = "servos";
+	dimServos.size   = 2;
+	dimServos.stride = 0;
+	servoSignal.layout.dim.emplace_back( dimServos );
+	const auto& servos = this->model.getModelServos().servosAngles;
+	for( auto i = 0u; i < servos.size(); ++i )
+	{
+		servoSignal.data.emplace_back( servos.at( i ).first );
+	}
+	this->rosPublishers.at( advertisers::signalToServos )->publish( servoSignal );
+}
+
 #ifdef SIMULATION
-void ThrusterRegulator::calculateSimulationState()
+void ThrusterRegulator::calculateSimulationState( const float simulationFrequency )
 {
 	VectorXd tau = VectorXd::Zero( 6 );
 
@@ -265,7 +332,7 @@ void ThrusterRegulator::calculateSimulationState()
 	this->simulationResultState = this->currentState
 	    + ( this->lqrRegulator.A * currentState
 	        + this->lqrRegulator.B * ( tau - model.getRestoringForces( this->currentState ) ) )
-	        * ( 1.0 / this->regulatorWorkingFrequency );
+	        * ( 1.0 / simulationFrequency );
 }
 #ifndef NOLQR
 void ThrusterRegulator::publishEstimatedPosition()
@@ -280,7 +347,7 @@ void ThrusterRegulator::publishEstimatedPosition()
 
 	this->rosPublishers.at( advertisers::estimatedPosition )->publish( simResult );
 
-	std::cout << this->simulationResultState << std::endl;
+	// std::cout << this->simulationResultState << std::endl;
 }
 #else
 void ThrusterRegulator::updateDesiredForcesError( const AUVROS::MessageTypes::arbitrarlySetThrustForce& newForces )
@@ -294,3 +361,13 @@ void ThrusterRegulator::updateDesiredForcesError( const AUVROS::MessageTypes::ar
 }
 #endif
 #endif
+
+void ThrusterRegulator::updateTargetPosition( const AUVROS::MessageTypes::Position& newPos )
+{
+	this->positionToReach( 0 ) = newPos.linear.x;
+	this->positionToReach( 1 ) = newPos.linear.y;
+	this->positionToReach( 2 ) = newPos.linear.z;
+	this->positionToReach( 3 ) = newPos.angular.x;
+	this->positionToReach( 4 ) = newPos.angular.y;
+	this->positionToReach( 5 ) = newPos.angular.z;
+}
