@@ -1,4 +1,5 @@
 #pragma once
+#include <utility>
 #include <variant>
 
 #include "CommonEnums.h"
@@ -17,6 +18,10 @@ enum class StateType
 
 	// task[N] intermediate types,
 	// final types
+
+	// test and qualification
+	test,
+	qualificationTask,
 
 	task1, // with moxy - coin flip - get out of dock
 	diveToDepth,
@@ -93,10 +98,11 @@ enum class StateLevel
 
 };
 
-enum class StateReturnType
+enum class StateProcessed
 {
 	keepCurrentState,
-	goToNextState,
+	finished,
+	pushChild,
 };
 
 template< typename T >
@@ -113,3 +119,5 @@ constexpr T getStateName( const StateType type )
 		break;
 	}
 }
+
+using StateReturnType = std::pair< StateProcessed, StateType >;

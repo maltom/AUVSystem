@@ -712,5 +712,75 @@ namespace cameras
 	// 	return data;
 	// }
 } // namespace cameras
+namespace states
+{
+	std::vector< StateType > readMission( configFiles::fileID configID )
+	{
+		busy.lock();
+		ConfigFile* desiredConfigFile = new ConfigFile( configID );
+
+		std::vector< StateType > data;
+
+		auto mission = desiredConfigFile->parsedFile.get< jsonxx::Array >( "mission" );
+
+		for( auto i = 0u; i < mission.size(); ++i )
+		{
+			auto task = mission.get< jsonxx::String >( i );
+
+			if( task == "test" )
+			{
+				data.emplace_back( StateType::test );
+			}
+			else if( task == "qualificationTask" )
+			{
+				data.emplace_back( StateType::qualificationTask );
+			}
+			else if( task == "task1" )
+			{
+				data.emplace_back( StateType::task1 );
+			}
+			else if( task == "task2" )
+			{
+				data.emplace_back( StateType::task2 );
+			}
+			else if( task == "task3" )
+			{
+				data.emplace_back( StateType::task3 );
+			}
+			else if( task == "task4" )
+			{
+				data.emplace_back( StateType::task4 );
+			}
+			else if( task == "task5" )
+			{
+				data.emplace_back( StateType::task5 );
+			}
+			else if( task == "task6" )
+			{
+				data.emplace_back( StateType::task6 );
+			}
+			else if( task == "task7" )
+			{
+				data.emplace_back( StateType::task7 );
+			}
+			else if( task == "task8" )
+			{
+				data.emplace_back( StateType::task8 );
+			}
+			else if( task == "task9" )
+			{
+				data.emplace_back( StateType::task9 );
+			}
+			else if( task == "task10" )
+			{
+				data.emplace_back( StateType::task10 );
+			}
+		}
+
+		delete desiredConfigFile;
+		busy.unlock();
+		return data;
+	}
+} // namespace states
 
 } // namespace jsonFunctions

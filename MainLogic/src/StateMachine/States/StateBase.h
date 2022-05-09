@@ -10,11 +10,12 @@ private:
 	const AdditionalDataParameter parameter;
 	const std::shared_ptr< LogicCommonData > commonData;
 	const std::shared_ptr< StateBase > parentState;
-	std::vector< std::shared_ptr< StateBase > > childStates;
 	const StateLevel stateLevel;
 	const StateType stateType;
 
 protected:
+	std::vector< StateType > childStates;
+
 public:
 	explicit StateBase( StateBase* const parent,
 	                    LogicCommonData* const data,

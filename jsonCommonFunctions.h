@@ -16,6 +16,7 @@ extern "C"
 #include "external/jsonxx/jsonxx.h"
 
 #include "CommonEnums.h"
+#include "MainLogic/src/StateMachine/States/StateEnums.h"
 #include "ThrusterRegulator/src/LQRRegulator.h"
 #include "ThrusterRegulator/src/VehiclePhysicalModel.h"
 
@@ -59,6 +60,11 @@ namespace cameras
 	extern uint8_t countAdditionalCameras( configFiles::fileID configID );
 	// extern std::vector< float > getFOV( configFiles::fileID configID );
 } // namespace cameras
+
+namespace states
+{
+	extern std::vector< StateType > readMission( configFiles::fileID configID );
+}
 
 } // namespace jsonFunctions
 

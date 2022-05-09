@@ -9,9 +9,6 @@
 #include "States/StateIdle.h"
 #include "States/StateEnums.h"
 
-// functions
-std::shared_ptr< StateBase > createState( const StateType type );
-
 // class StateStack
 template< typename T >
 class StateStack final
@@ -98,13 +95,16 @@ void StateStack< T >::process()
 {
 	auto result = this->getCurrentState()->process();
 
-	switch( result )
+	switch( result.first )
 	{
-	case StateReturnType::goToNextState:
+	case StateProcessed::finished:
 		this->popState();
-
 		break;
-
+	case StateProcessed::keepCurrentState:
+		break;
+	case StateProcessed::pushChild:
+		this->pushStateOnTop( result.second );
+		break;
 	default:
 		break;
 	}
