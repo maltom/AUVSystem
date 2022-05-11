@@ -8,6 +8,8 @@ set(SOURCES
     StateMachine/States/StateIdle.cpp
     StateMachine/States/StateEnums.cpp
     StateMachine/States/StateMission.cpp
+    StateMachine/States/StateTask1.cpp
+    StateMachine/States/StateTask2.cpp
 )
 
 set(HEADERS
@@ -17,6 +19,8 @@ set(HEADERS
     StateMachine/States/StateIdle.h
     StateMachine/States/StateEnums.h
     StateMachine/States/StateMission.h
+    StateMachine/States/StateTask1.h
+    StateMachine/States/StateTask2.h
 )
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs rospy)
 

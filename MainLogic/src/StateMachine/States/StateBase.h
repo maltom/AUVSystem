@@ -24,6 +24,7 @@ public:
 	                    const AdditionalDataParameter param )
 	    : parameter( param ), commonData( data ), parentState( parent ), stateLevel( level ), stateType( type )
 	{
+		commonData->currentStateName = getStateName< std::string >( stateType );
 	}
 
 	virtual StateReturnType process() = 0;

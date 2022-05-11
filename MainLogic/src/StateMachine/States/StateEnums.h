@@ -86,7 +86,7 @@ enum class StateType
 	        // putFourthBottleOnCorrectPlatform,	// proposition
 	surfaceInsideOctagon,
 
-	StartingState = idle
+	StartingState = mission
 };
 
 enum class StateLevel
@@ -112,11 +112,80 @@ constexpr T getStateName( const StateType type )
 	{
 	case StateType::idle:
 		return "Idle";
-		break;
 	case StateType::mission:
 		return "Mission";
+	case StateType::startup:
+		return "Start-up";
+	case StateType::emergency:
+		return "Emergency";
+	case StateType::surfaceTheBoat:
+		return "Surface The Boat";
+	case StateType::test:
+		return "Test";
+	case StateType::qualificationTask:
+		return "QualificationTask";
+	case StateType::task1:
+		return "Task1";
+	case StateType::diveToDepth:
+		return "Dive To Depth";
+	case StateType::findGate:
+		return "Find Gate";
+	case StateType::goLittleTowardsGate:
+		return "GoLittleTowardsGate";
+	case StateType::task2:
+		return "Task2";
+	case StateType::detectGate:
+		return "Detect Gate";
+	case StateType::getToThePositionBeforeGate:
+		return "GetToThePositionBeforeGate";
+	case StateType::chooseGateSide:
+		return "Choose Gate Side";
+	case StateType::getThroughGate:
+		return "GetThroughGate";
+	case StateType::task3:
+		return "";
+	case StateType::detectMarker:
+		return "";
+	case StateType::getOverMarker:
+		return "";
+	case StateType::reachCorrectAzimuth:
+		return "";
+	case StateType::task4:
+		return "";
+	case StateType::travelAzimuthUntilObstacleDetected:
+		return "";
+	case StateType::chooseBuoy:
+		return "";
+	case StateType::bumpBuoy:
+		return "";
+	case StateType::moveAsideFromBuoys:
+		return "";
+	case StateType::task5:
+		return "";
+	case StateType::task6:
+		return "";
+	case StateType::task7:
+		return "";
+	case StateType::getAzimuthToPinger:
+		return "";
+	case StateType::task8:
+		return "";
+	case StateType::getToThePositionBeforeTargets:
+		return "";
+	case StateType::positionBeforeCorrectTarget:
+		return "";
+	case StateType::aimAndFireTorpedoes:
+		return "";
+	case StateType::moveAsideFromTargets:
+		return "";
+	case StateType::task9:
+		return "";
+	case StateType::task10:
+		return "";
+	case StateType::surfaceInsideOctagon:
+		return "";
 	default:
-		break;
+		return "incorrect name";
 	}
 }
 

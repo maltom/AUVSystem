@@ -5,16 +5,23 @@
 #include <memory>
 #include <stack>
 
+#include "LogicCommonData.h"
 #include "States/StateBase.h"
 #include "States/StateIdle.h"
+#include "States/StateMission.h"
 #include "States/StateEnums.h"
+#include "States/StateTask1.h"
+#include "States/StateTask2.h"
 
 // class StateStack
 template< typename T >
 class StateStack final
 {
 public:
-	StateStack();
+	StateStack( LogicCommonData* const data ) : commonData( data )
+	{
+		pushStateOnTop( StateType::StartingState );
+	}
 
 	std::shared_ptr< T > getCurrentState() const;
 	void setStateInsteadOfCurrent( const StateType type );
@@ -26,15 +33,10 @@ public:
 
 private:
 	std::stack< std::shared_ptr< T > > stateStack;
+	std::shared_ptr< LogicCommonData > commonData;
 };
 
 // definitions
-template< typename T >
-StateStack< T >::StateStack()
-{
-	pushStateOnTop( StateType::StartingState );
-}
-
 template< typename T >
 std::shared_ptr< T > StateStack< T >::getCurrentState() const
 {
@@ -47,7 +49,7 @@ void StateStack< T >::setStateInsteadOfCurrent( const StateType type )
 	if( this->stateStack.size() > 0 )
 	{
 		this->stateStack.pop();
-		pushStateOnTop( createState( type ) );
+		pushStateOnTop( this->pushStateOnTop( type ) );
 	}
 	else
 	{
@@ -87,13 +89,31 @@ void StateStack< T >::popMultipleStates( const unsigned number )
 template< typename T >
 void StateStack< T >::pushStateOnTop( const StateType type )
 {
-	this->stateStack.emplace( createState( type ) );
+	switch( type )
+	{
+	case StateType::idle:
+		this->stateStack.emplace( std::make_shared< StateIdle >( this->commonData.get(), 0.0 ) );
+		break;
+	case StateType::startup:
+		break;
+	case StateType::mission:
+		this->stateStack.emplace( std::make_shared< StateMission >( this->commonData.get(), 0.0 ) );
+		break;
+	case StateType::task1:
+		this->stateStack.emplace( std::make_shared< StateTask1 >( this->commonData.get(), 0.0, &(*stateStack.top()) ) );
+		break;
+	case StateType::task2:
+		this->stateStack.emplace( std::make_shared< StateTask2 >( this->commonData.get(), 0.0, &(*stateStack.top()) ) );
+		break;
+	default:
+		break;
+	}
 }
 
 template< typename T >
 void StateStack< T >::process()
 {
-	auto result = this->getCurrentState()->process();
+	auto result = this->stateStack.top()->process();
 
 	switch( result.first )
 	{

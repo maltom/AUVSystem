@@ -3,7 +3,7 @@
 
 void MainLogic::processInMainLoop()
 {
-	stateMachine.process();
+	stateMachine->process();
 }
 
 void MainLogic::subscribeTopics()

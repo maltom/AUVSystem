@@ -1,9 +1,9 @@
-#include "StateMission.h"
+#include "StateTask2.h"
 #include <iostream>
 #include <utility>
 
-StateReturnType StateMission::process()
+StateReturnType StateTask2::process()
 {
 	return { StateProcessed::pushChild, *this->childStates.begin() };
 }
-void StateMission::checkExitCondition() {}
+void StateTask2::checkExitCondition() {}
