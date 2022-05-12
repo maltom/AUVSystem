@@ -15,6 +15,7 @@ private:
 
 protected:
 	std::vector< StateType > childStates;
+	std::vector< StateType >::iterator currentChild = childStates.begin();
 
 public:
 	explicit StateBase( StateBase* const parent,
@@ -27,7 +28,7 @@ public:
 		commonData->currentStateName = getStateName< std::string >( stateType );
 	}
 
-	virtual StateReturnType process() = 0;
+	virtual StateReturnType process();
 	virtual void checkExitCondition() = 0;
 
 	StateLevel getHierarchy() const

@@ -14,8 +14,8 @@ public:
 	explicit StateTask1( LogicCommonData* const data, AdditionalDataParameter param, StateBase* const parentState )
 	    : StateBase( parentState, data, StateLevel::intermediate, StateType::task1, param )
 	{
-		this->childStates.emplace_back( StateType::idle );
+		this->childStates.insert( this->childStates.begin(),
+		                          { StateType::diveToDepth, StateType::findGate, StateType::goLittleTowardsGate } );
 	}
-	StateReturnType process() override;
 	void checkExitCondition() override;
 };

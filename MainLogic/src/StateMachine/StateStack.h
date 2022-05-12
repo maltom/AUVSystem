@@ -10,6 +10,10 @@
 #include "States/StateIdle.h"
 #include "States/StateMission.h"
 #include "States/StateEnums.h"
+
+#include "States/StateDiveToDepth.h"
+#include "States/StateFindGate.h"
+#include "States/StateGoLittleTowardsGate.h"
 #include "States/StateTask1.h"
 #include "States/StateTask2.h"
 
@@ -100,10 +104,12 @@ void StateStack< T >::pushStateOnTop( const StateType type )
 		this->stateStack.emplace( std::make_shared< StateMission >( this->commonData.get(), 0.0 ) );
 		break;
 	case StateType::task1:
-		this->stateStack.emplace( std::make_shared< StateTask1 >( this->commonData.get(), 0.0, &(*stateStack.top()) ) );
+		this->stateStack.emplace(
+		    std::make_shared< StateTask1 >( this->commonData.get(), 0.0, &( *stateStack.top() ) ) );
 		break;
 	case StateType::task2:
-		this->stateStack.emplace( std::make_shared< StateTask2 >( this->commonData.get(), 0.0, &(*stateStack.top()) ) );
+		this->stateStack.emplace(
+		    std::make_shared< StateTask2 >( this->commonData.get(), 0.0, &( *stateStack.top() ) ) );
 		break;
 	default:
 		break;

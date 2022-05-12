@@ -5,8 +5,11 @@ set(SOURCES
     StateMachine/LogicCommonData.cpp
     StateMachine/StateStack.cpp
     StateMachine/States/StateBase.cpp
-    StateMachine/States/StateIdle.cpp
+    StateMachine/States/StateDiveToDepth.cpp
     StateMachine/States/StateEnums.cpp
+    StateMachine/States/StateFindGate.cpp
+    StateMachine/States/StateGoLittleTowardsGate.cpp
+    StateMachine/States/StateIdle.cpp
     StateMachine/States/StateMission.cpp
     StateMachine/States/StateTask1.cpp
     StateMachine/States/StateTask2.cpp
@@ -16,8 +19,11 @@ set(HEADERS
     StateMachine/LogicCommonData.h
     StateMachine/StateStack.h
     StateMachine/States/StateBase.h
-    StateMachine/States/StateIdle.h
+    StateMachine/States/StateDiveToDepth.h
     StateMachine/States/StateEnums.h
+    StateMachine/States/StateFindGate.h
+    StateMachine/States/StateGoLittleTowardsGate.h
+    StateMachine/States/StateIdle.h
     StateMachine/States/StateMission.h
     StateMachine/States/StateTask1.h
     StateMachine/States/StateTask2.h
