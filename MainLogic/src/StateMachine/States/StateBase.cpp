@@ -9,25 +9,23 @@ StateReturnType StateBase::process()
 	switch( this->stateLevel )
 	{
 	case StateLevel::fundamental:
-		if( this->currentChild == this->childStates.end() )
+		if( this->currentChildIndex < this->childStates.size() )
 		{
-			return { StateProcessed::finished, this->stateType };
+			return { StateProcessed::pushChild, this->childStates.at( currentChildIndex++ ) };
 		}
 		else
 		{
-			++currentChild;
-			return { StateProcessed::pushChild, *this->currentChild };
+			return { StateProcessed::finished, this->stateType };
 		}
 		break;
 	case StateLevel::intermediate:
-		if( this->currentChild == this->childStates.end() )
+		if( this->currentChildIndex < this->childStates.size() )
 		{
-			return { StateProcessed::finished, this->stateType };
+			return { StateProcessed::pushChild, this->childStates.at( currentChildIndex++ ) };
 		}
 		else
 		{
-			++currentChild;
-			return { StateProcessed::pushChild, *this->currentChild };
+			return { StateProcessed::finished, this->stateType };
 		}
 		break;
 	case StateLevel::final:

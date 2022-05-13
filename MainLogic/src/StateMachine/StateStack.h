@@ -22,7 +22,7 @@ template< typename T >
 class StateStack final
 {
 public:
-	StateStack( LogicCommonData* const data ) : commonData( data )
+	StateStack( const std::shared_ptr< LogicCommonData >& data ) : commonData( data )
 	{
 		pushStateOnTop( StateType::StartingState );
 	}
@@ -96,20 +96,30 @@ void StateStack< T >::pushStateOnTop( const StateType type )
 	switch( type )
 	{
 	case StateType::idle:
-		this->stateStack.emplace( std::make_shared< StateIdle >( this->commonData.get(), 0.0 ) );
+		this->stateStack.emplace( std::make_shared< StateIdle >( this->commonData, 0.0 ) );
 		break;
 	case StateType::startup:
 		break;
 	case StateType::mission:
-		this->stateStack.emplace( std::make_shared< StateMission >( this->commonData.get(), 0.0 ) );
+		this->stateStack.emplace( std::make_shared< StateMission >( this->commonData, 0.0 ) );
 		break;
+
 	case StateType::task1:
-		this->stateStack.emplace(
-		    std::make_shared< StateTask1 >( this->commonData.get(), 0.0, &( *stateStack.top() ) ) );
+		this->stateStack.emplace( std::make_shared< StateTask1 >( this->commonData, 0.0, stateStack.top() ) );
 		break;
-	case StateType::task2:
+	case StateType::diveToDepth:
+		this->stateStack.emplace( std::make_shared< StateDiveToDepth >( this->commonData, 1.5, stateStack.top() ) );
+		break;
+	case StateType::findGate:
+		this->stateStack.emplace( std::make_shared< StateFindGate >( this->commonData, 0.0, stateStack.top() ) );
+		break;
+	case StateType::goLittleTowardsGate:
 		this->stateStack.emplace(
-		    std::make_shared< StateTask2 >( this->commonData.get(), 0.0, &( *stateStack.top() ) ) );
+		    std::make_shared< StateGoLittleTowardsGate >( this->commonData, 0.0, stateStack.top() ) );
+		break;
+
+	case StateType::task2:
+		this->stateStack.emplace( std::make_shared< StateTask2 >( this->commonData, 0.0, stateStack.top() ) );
 		break;
 	default:
 		break;

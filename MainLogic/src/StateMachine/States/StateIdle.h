@@ -8,7 +8,7 @@ class StateIdle : public StateBase
 private:
 protected:
 public:
-	explicit StateIdle( LogicCommonData* const data, AdditionalDataParameter param )
+	explicit StateIdle( const std::shared_ptr< LogicCommonData >& data, AdditionalDataParameter param )
 	    : StateBase( nullptr, data, StateLevel::fundamental, StateType::idle, param )
 	{
 	}

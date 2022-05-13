@@ -11,8 +11,10 @@ class StateFindGate : public StateBase
 private:
 protected:
 public:
-	explicit StateFindGate( LogicCommonData* const data, AdditionalDataParameter param, StateBase* const parentState )
-	    : StateBase( parentState, data, StateLevel::final, StateType::findGate, param )
+	explicit StateFindGate( const std::shared_ptr< LogicCommonData >& data,
+	                        AdditionalDataParameter param,
+	                        const std::shared_ptr< StateBase >& parent )
+	    : StateBase( parent, data, StateLevel::final, StateType::findGate, param )
 	{
 	}
 	StateReturnType process() override;

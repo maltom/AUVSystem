@@ -11,10 +11,10 @@ class StateDiveToDepth : public StateBase
 private:
 protected:
 public:
-	explicit StateDiveToDepth( LogicCommonData* const data,
+	explicit StateDiveToDepth( const std::shared_ptr< LogicCommonData >& data,
 	                           AdditionalDataParameter param,
-	                           StateBase* const parentState )
-	    : StateBase( parentState, data, StateLevel::final, StateType::diveToDepth, param )
+	                           const std::shared_ptr< StateBase >& parent )
+	    : StateBase( parent, data, StateLevel::final, StateType::diveToDepth, param )
 	{
 	}
 	StateReturnType process() override;

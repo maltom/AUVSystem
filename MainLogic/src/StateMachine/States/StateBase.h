@@ -15,11 +15,11 @@ private:
 
 protected:
 	std::vector< StateType > childStates;
-	std::vector< StateType >::iterator currentChild = childStates.begin();
+	int currentChildIndex{ 0 };
 
 public:
-	explicit StateBase( StateBase* const parent,
-	                    LogicCommonData* const data,
+	explicit StateBase( const std::shared_ptr< StateBase >& parent,
+	                    const std::shared_ptr< LogicCommonData >& data,
 	                    const StateLevel level,
 	                    const StateType type,
 	                    const AdditionalDataParameter param )

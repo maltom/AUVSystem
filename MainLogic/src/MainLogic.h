@@ -21,7 +21,8 @@ public:
 
 		subscribeTopics();
 		advertiseTopics();
-		stateMachine = std::make_unique< StateStack< StateBase > >( &this->logicData );
+		logicData    = std::make_shared< LogicCommonData >();
+		stateMachine = std::make_unique< StateStack< StateBase > >( this->logicData );
 	}
 	~MainLogic() = default;
 
@@ -32,7 +33,7 @@ protected:
 	void connectServices() override;
 
 private:
-	LogicCommonData logicData;
+	std::shared_ptr< LogicCommonData > logicData;
 	std::unique_ptr< StateStack< StateBase > > stateMachine;
 
 	void globalEstimatedPositionObtained( const geometry_msgs::Twist& position );

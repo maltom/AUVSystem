@@ -11,10 +11,10 @@ class StateGoLittleTowardsGate : public StateBase
 private:
 protected:
 public:
-	explicit StateGoLittleTowardsGate( LogicCommonData* const data,
+	explicit StateGoLittleTowardsGate( const std::shared_ptr< LogicCommonData >& data,
 	                                   AdditionalDataParameter param,
-	                                   StateBase* const parentState )
-	    : StateBase( parentState, data, StateLevel::final, StateType::goLittleTowardsGate, param )
+	                                   const std::shared_ptr< StateBase >& parent )
+	    : StateBase( parent, data, StateLevel::final, StateType::goLittleTowardsGate, param )
 	{
 	}
 	StateReturnType process() override;
