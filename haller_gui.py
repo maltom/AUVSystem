@@ -142,7 +142,8 @@ class ControlsFrame:
 
         self.torpedo_controls_frame = tk.Frame(temp)
         self.torpedo_controls_frame.pack(side=LEFT, fill=tk.Y)
-        self.torpedo_controls_label = tk.Label(self.torpedo_controls_frame, text="TORPEDOS")
+        self.torpedo_controls_label = tk.Label(
+            self.torpedo_controls_frame, text="TORPEDOS")
         self.torpedo_controls_label.pack()
         self.launch_left_torpedo_btn = tk.Button(
             self.torpedo_controls_frame, text="LEFT"
@@ -235,8 +236,10 @@ class RosHandler:
         self.torpedo_launch_Sender = rospy.Publisher(
             TORPEDO_TOPIC, Int32, queue_size=10
         )
-        self.controls_frame.launch_left_torpedo_btn.configure(command= lambda: self.send_torpedo_launch(0))
-        self.controls_frame.launch_right_torpedo_btn.configure(command= lambda: self.send_torpedo_launch(1))
+        self.controls_frame.launch_left_torpedo_btn.configure(
+            command=lambda: self.send_torpedo_launch(1))
+        self.controls_frame.launch_right_torpedo_btn.configure(
+            command=lambda: self.send_torpedo_launch(2))
         self.controls_frame.send_thrust_alloc_btn.configure(
             command=self.send_thrust_alloc)
 

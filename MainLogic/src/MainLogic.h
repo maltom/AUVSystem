@@ -18,11 +18,11 @@ public:
 	MainLogic( std::shared_ptr< ros::NodeHandle >& node, configFiles::fileID configID, AUVROS::NodeIDs nID )
 	    : NodeBase( node, configID, nID )
 	{
+		logicData    = std::make_shared< LogicCommonData >();
+		stateMachine = std::make_unique< StateStack< StateBase > >( this->logicData );
 
 		subscribeTopics();
 		advertiseTopics();
-		logicData    = std::make_shared< LogicCommonData >();
-		stateMachine = std::make_unique< StateStack< StateBase > >( this->logicData );
 	}
 	~MainLogic() = default;
 

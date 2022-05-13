@@ -39,7 +39,7 @@ void UDPNode::subscribeTopics()
 	                                                             this ) );
 	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::DevPC::arbitrarlyLaunchTorpedo,
 	                                                             AUVROS::QueueSize::StandardQueueSize,
-	                                                             &UDPNode::sendServosSignalToMicroController,
+	                                                             &UDPNode::sendLaunchTorpedoSignalToMicroController,
 	                                                             this ) );
 }
 void UDPNode::advertiseTopics()
@@ -181,7 +181,7 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 	{
 		throw std::runtime_error( "Too many servos." );
 	}
-	Frame frame;
+	/*Frame frame;
 	Frame frame2;
 	frame.commandCode  = NORESPREQ_SET_SERVOS;
 	frame2.commandCode = NORESPREQ_SET_SERVOS;
@@ -201,12 +201,14 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 	// std::cout << frame.payload[ 1 ] << std::endl;
 
 	this->processOutgoingMessages( frame );
-	this->processOutgoingMessages( frame2 );
-	/*Frame frame;
+	this->processOutgoingMessages( frame2 );*/
+	Frame frame;
 	frame.commandCode  = NORESPREQ_SET_AZIMUTHAL_SERVOS;
+	frame.payloadSize  = length;
 	frame.payload[ 0 ] = hardware::servoMinMax.second - adjustServoValues( message.data[ 0 ] );
 	frame.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );
-	this->processOutgoingMessages( frame );*/
+	std::cout << frame.payload[ 0 ] << "   " << frame.payload[ 1 ] << std::endl;
+	this->processOutgoingMessages( frame );
 }
 
 void UDPNode::sendLaunchTorpedoSignalToMicroController( const AUVROS::MessageTypes::Torpedo& message )
