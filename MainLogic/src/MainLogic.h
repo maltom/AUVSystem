@@ -33,6 +33,10 @@ protected:
 	void connectServices() override;
 
 private:
+enum PublishersCodes
+	{
+		stateName
+	};
 	std::shared_ptr< LogicCommonData > logicData;
 	std::unique_ptr< StateStack< StateBase > > stateMachine;
 

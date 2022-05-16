@@ -3,7 +3,13 @@
 
 void MainLogic::processInMainLoop()
 {
-	stateMachine->process();
+	auto stateChanged = stateMachine->process();
+	if( stateChanged == StackProcessResult::stateChanged )
+	{
+		AUVROS::MessageTypes::StateNames stateName;
+		stateName.data = this->logicData->currentStateName;
+		this->rosPublishers.at( PublishersCodes::stateName )->publish( stateName );
+	}
 }
 
 void MainLogic::subscribeTopics()
@@ -14,7 +20,12 @@ void MainLogic::subscribeTopics()
 	//     AUVROS::Topics::Positions::globalEstimatedPosition, 1000, &MainLogic::globalEstimatedPositionObtained, this
 	//     );
 }
-void MainLogic::advertiseTopics() {}
+void MainLogic::advertiseTopics()
+{
+	this->rosPublishers.emplace_back(
+	    std::make_unique< ros::Publisher >( this->rosNode->advertise< AUVROS::MessageTypes::StateNames >(
+	        AUVROS::Topics::States::currentStateName, AUVROS::QueueSize::SmallQueue, true ) ) );
+}
 void MainLogic::connectServices() {}
 
 void MainLogic::globalEstimatedPositionObtained( const geometry_msgs::Twist& position ) {}

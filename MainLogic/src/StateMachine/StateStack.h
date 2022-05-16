@@ -17,6 +17,12 @@
 #include "States/StateTask1.h"
 #include "States/StateTask2.h"
 
+enum StackProcessResult
+{
+	noChange,
+	stateChanged
+};
+
 // class StateStack
 template< typename T >
 class StateStack final
@@ -33,7 +39,7 @@ public:
 	void popState();
 	void popMultipleStates( const unsigned number );
 
-	void process();
+	StackProcessResult process();
 
 private:
 	std::stack< std::shared_ptr< T > > stateStack;
@@ -67,10 +73,15 @@ void StateStack< T >::popState()
 	if( this->stateStack.size() > 1 )
 	{
 		this->stateStack.pop();
+
+		if( this->stateStack.size() == 0 )
+		{
+			this->pushStateOnTop( StateType::idle );
+		}
 	}
 	else
 	{
-		throw std::runtime_error( "StateStack can't be empty!" );
+		throw std::runtime_error( "StateStack is empty!" );
 	}
 }
 
@@ -127,21 +138,24 @@ void StateStack< T >::pushStateOnTop( const StateType type )
 }
 
 template< typename T >
-void StateStack< T >::process()
+StackProcessResult StateStack< T >::process()
 {
-	auto result = this->stateStack.top()->process();
-
+	auto result   = this->stateStack.top()->process();
+	auto toReturn = StackProcessResult::noChange;
 	switch( result.first )
 	{
 	case StateProcessed::finished:
 		this->popState();
+		toReturn = StackProcessResult::stateChanged;
 		break;
 	case StateProcessed::keepCurrentState:
 		break;
 	case StateProcessed::pushChild:
 		this->pushStateOnTop( result.second );
+		toReturn = StackProcessResult::stateChanged;
 		break;
 	default:
 		break;
 	}
+	return toReturn;
 }
