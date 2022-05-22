@@ -38,6 +38,8 @@ public:
 	void pushStateOnTop( const StateType type );
 	void popState();
 	void popMultipleStates( const unsigned number );
+	void popToFundamental();
+	void nextTask();
 
 	StackProcessResult process();
 
@@ -88,7 +90,7 @@ void StateStack< T >::popState()
 template< typename T >
 void StateStack< T >::popMultipleStates( const unsigned number )
 {
-	if( this->stateStack.size() > number )
+	if( this->stateStack.size() >= number )
 	{
 		for( auto i = 0u; i < number; ++i )
 		{
@@ -98,6 +100,36 @@ void StateStack< T >::popMultipleStates( const unsigned number )
 	else
 	{
 		throw std::runtime_error( "Too few states on stack to pop!" );
+	}
+}
+
+template< typename T >
+
+void StateStack< T >::popToFundamental()
+{
+	while( this->getCurrentState()->getHierarchy() != StateLevel::fundamental )
+	{
+		this->popState();
+	}
+}
+
+template< typename T >
+void StateStack< T >::nextTask()
+{
+	bool isDuringMission{ false };
+	for( auto dummy = this->stateStack; !dummy.empty(); dummy.pop() )
+	{
+		if( dummy.top()->getType() == StateType::mission )
+		{
+			isDuringMission = true;
+		}
+	}
+	if( isDuringMission )
+	{
+		while( stateStack.top()->getType() != StateType::mission )
+		{
+			stateStack.pop();
+		}
 	}
 }
 

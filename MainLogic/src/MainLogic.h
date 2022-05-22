@@ -33,10 +33,18 @@ protected:
 	void connectServices() override;
 
 private:
-enum PublishersCodes
+	enum PublishersCodes
 	{
 		stateName
 	};
+
+	void popState( const AUVROS::MessageTypes::States& state );
+	void popToFundamental( const AUVROS::MessageTypes::States& state );
+	void nextTask( const AUVROS::MessageTypes::States& state );
+	void pushEmergency( const AUVROS::MessageTypes::States& state );
+	void pushMission( const AUVROS::MessageTypes::States& state );
+	void pushSpecificState( const AUVROS::MessageTypes::States& state );
+
 	std::shared_ptr< LogicCommonData > logicData;
 	std::unique_ptr< StateStack< StateBase > > stateMachine;
 
