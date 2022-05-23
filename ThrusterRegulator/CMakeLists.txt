@@ -30,4 +30,4 @@ include_directories(include ${catkin_INCLUDE_DIRS} )
 add_executable(${NODENAME} ${SOURCES} ${HEADERS})
 set_target_properties( ${NODENAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${NODENAME}/" )
 
-target_link_libraries(${NODENAME} ${catkin_LIBRARIES} ${MODULES} Eigen3::Eigen ct_optcon)
+target_link_libraries(${NODENAME} ${catkin_LIBRARIES} ${MODULES} Eigen3::Eigen ct_optcon lapack)

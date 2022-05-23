@@ -7,6 +7,7 @@
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Int32.h>
+#include <std_msgs/String.h>
 
 namespace AUVROS
 {
@@ -18,8 +19,9 @@ namespace Folders
 	static const std::string CameraSubFolder          = MainFolder + "/Camera";
 	static const std::string HardwareSignalsSubFolder = MainFolder + "/HardwareSignals";
 	static const std::string DevPCSubFolder           = MainFolder + "/DevPC";
-	static const std::string Peripherals              = MainFolder + "/Peripherals";
+	static const std::string PeripheralsFolder        = MainFolder + "/Peripherals";
 	static const std::string HealthSubFolder          = MainFolder + "/Health";
+	static const std::string StatesFolder             = MainFolder + "/States";
 } // namespace Folders
 namespace Topics
 {
@@ -50,6 +52,14 @@ namespace Topics
 
 		static const std::string arbitrarlySetRelativePosition
 		    = Folders::DevPCSubFolder + "/arbitrarlySetRelativePosition";
+
+		static const std::string arbitrarlyPopOneState       = Folders::DevPCSubFolder + "/arbitrarlyPopOneState";
+		static const std::string arbitrarlyPopToFundamental  = Folders::DevPCSubFolder + "/arbitrarlyPopToFundamental";
+		static const std::string arbitrarlyNextTask          = Folders::DevPCSubFolder + "/arbitrarlyNextTask";
+		static const std::string arbitrarlyPushEmergency     = Folders::DevPCSubFolder + "/arbitrarlyPushEmergency";
+		static const std::string arbitrarlyPushMission       = Folders::DevPCSubFolder + "/arbitrarlyPushMission";
+		static const std::string arbitrarlyPushSpecificState = Folders::DevPCSubFolder + "/arbitrarlyPushSpecificState";
+
 	} // namespace DevPC
 
 	namespace Health
@@ -64,7 +74,12 @@ namespace Topics
 
 	namespace Peripherals
 	{
-		static const std::string launchTorpedo = Folders::Peripherals + "/launchTorpedo";
+		static const std::string launchTorpedo = Folders::PeripheralsFolder + "/launchTorpedo";
+	}
+
+	namespace States
+	{
+		static const std::string currentStateName = Folders::StatesFolder + "/currentStateName";
 	}
 
 } // namespace Topics
@@ -82,6 +97,9 @@ namespace MessageTypes
 	using DVLDRTimeStamp   = std_msgs::Float64;
 
 	using Torpedo = std_msgs::Int32;
+
+	using States     = std_msgs::Int32;
+	using StateNames = std_msgs::String;
 	// using OccupancyGrid
 	// this type depends on number of nodes. max number of nodes for Int32 is 32, can be increased to Int64
 	using HealthReport = std_msgs::Int32;
@@ -93,6 +111,7 @@ namespace QueueSize
 	static constexpr auto HealthQueueSize       = 10;
 	static constexpr auto DVLQueueSize          = 50;
 	static constexpr auto GlobalHealthQueueSize = 100;
+	static constexpr auto SmallQueue            = 5;
 
 	namespace Images
 	{

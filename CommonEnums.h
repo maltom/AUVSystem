@@ -9,13 +9,16 @@ namespace configFiles
 {
 enum fileID
 {
-	main_file = 0
+	main_file = 0,
+	mission_planner
 };
 
 constexpr std::string_view MAIN_CONFIG_FILE_PATH{ "../../auvConfig/auvConfig.json" };
+constexpr std::string_view MISSION_PLANNER_FILE_PATH{ "../../auvConfig/missionPlanner.json" };
 
-constexpr int configFilesCount                      = 1;
-const static std::array< std::string, 1 > filePaths = { std::string( MAIN_CONFIG_FILE_PATH ) };
+constexpr int configFilesCount = 2;
+const static std::array< std::string, configFilesCount > filePaths
+    = { std::string( MAIN_CONFIG_FILE_PATH ), std::string( MISSION_PLANNER_FILE_PATH ) };
 } // namespace configFiles
 
 namespace math

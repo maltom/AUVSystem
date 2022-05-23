@@ -70,6 +70,13 @@ void Debug::subscribeTopics()
 	                                                             AUVROS::QueueSize::StandardQueueSize,
 	                                                             &Debug::displayEstimatedPositionStatus,
 	                                                             this ) );
+
+	displayer.addInfoToDisplay(
+	    "State Machine", std::vector< std::string >( labels::states.begin(), labels::states.end() ), "init" );
+	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::States::currentStateName,
+	                                                             AUVROS::QueueSize::SmallQueue,
+	                                                             &Debug::displayEstimatedPositionStatus,
+	                                                             this ) );
 }
 
 void Debug::displayNodeHealthStatus( const AUVROS::MessageTypes::HealthReport& report )
@@ -162,6 +169,15 @@ void Debug::displayEstimatedPositionStatus( const AUVROS::MessageTypes::Position
 	values.emplace_back( std::to_string( message.angular.z ) );
 
 	displayer.setMajorColumnValues( DisplayerDataPositions::GlobalEstimatedPosition, values );
+}
+
+void Debug::displayCurrentStateStatus( const AUVROS::MessageTypes::StateNames& message )
+{
+	std::vector< DataType > values;
+
+	values.emplace_back( message.data );
+
+	displayer.setMajorColumnValues( DisplayerDataPositions::State, values );
 }
 
 void Debug::advertiseTopics() {}

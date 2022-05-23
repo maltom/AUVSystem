@@ -21,6 +21,8 @@ const std::array< std::string, 5 > thrusters{
 };
 const std::array< std::string, 2 > servos{ "Servo #1", "Servo #2" };
 const std::array< std::string, 6 > DVLDeadReckoning{ "x", "y", "z", "roll", "pitch", "yaw" };
+const std::array< std::string, 1 > states{ "Current State" };
+
 } // namespace labels
 
 class Debug final : public NodeBase
@@ -46,7 +48,8 @@ private:
 		DVLDeadReckoning,
 		ThrustersRegulator,
 		ServosRegulator,
-		GlobalEstimatedPosition
+		GlobalEstimatedPosition,
+		State
 	};
 
 	void processInMainLoop() override;
@@ -63,6 +66,7 @@ private:
 	void displaySetThrustersRegulatorStatus( const AUVROS::MessageTypes::ThrustersSignal& message );
 	void displaySetServosRegulatorStatus( const AUVROS::MessageTypes::ServosSignal& message );
 	void displayEstimatedPositionStatus( const AUVROS::MessageTypes::Position& message );
+	void displayCurrentStateStatus( const AUVROS::MessageTypes::StateNames& message );
 
 	Displayer displayer;
 
