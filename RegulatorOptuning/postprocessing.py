@@ -7,7 +7,7 @@ from regulator_optuning import write_regulator_params_to_file
 
 def visualise(study):
     fig = optuna.visualization.plot_slice(study)
-    # fig.update_yaxes(type="log")
+    fig.update_yaxes(type="log")
     fig.show()
 
 
@@ -25,7 +25,7 @@ ARG_TO_FUNCT_MAPPER = {
 
 
 if __name__ == "__main__":
-    study = optuna.load_study("Regulator Optuning Test", storage="sqlite:///example.db")
+    study = optuna.load_study("Regulator Optuning Phase 2", storage="sqlite:///example.db")
     for arg in sys.argv:
         if arg in ARG_TO_FUNCT_MAPPER:
             ARG_TO_FUNCT_MAPPER[arg](study)

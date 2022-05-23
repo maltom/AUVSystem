@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import math
 import os
 import os.path as path
 import rospy
@@ -6,17 +7,29 @@ import threading
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Vector3
 
 REGULATOR_POSITION_TOPIC = "/AUVInternalSystem/Position/globalEstimatedPosition"
-OBSERVATION_TIME = 30
+SET_POSITION_TOPIC = "/AUVInternalSystem/DevPC/arbitrarlySetGlobalPosition"
+OBSERVATION_TIME = 60
+
+COLUMNS = ["timestamp", "x", "y", "z", "roll", "pitch", "yaw",
+           "px", "py", "pz", "proll", "ppitch", "pyaw"
+           ]
 
 class RegulatorObserver:
     def __init__(self) -> None:
         print("Initializing regulator observer")
-        self.log = np.empty((7,))
+        self.log = np.empty((len(COLUMNS),))
         self.observing = False
         self.observation_start_time = None
+
+        self.pub = rospy.Publisher(SET_POSITION_TOPIC, Twist, queue_size=10)
+        msg = Twist()
+        msg.linear = Vector3(0, 0, 0)
+        msg.angular = Vector3(0, 0, 0)
+        self.msg = msg
+
         rospy.init_node('RegulatorObserver', anonymous=True)
         self.rate = rospy.Rate(1)
 
@@ -25,9 +38,17 @@ class RegulatorObserver:
             timestamp = datetime.now().timestamp()
             position_vector = [data.linear.x, data.linear.y, data.linear.z]
             rotation_vector = [data.angular.x, data.angular.y, data.angular.z]
+
+            predicted_position = [self.msg.linear.x, self.msg.linear.y, self.msg.linear.z]
+            predicted_rotation = [self.msg.angular.x, self.msg.angular.y, self.msg.angular.z]
+
             if any(['nan' in str(x) for x in [*position_vector, *rotation_vector]]):
                 self.end_observation()
-            self.log = np.vstack((self.log, np.array([timestamp, *position_vector, *rotation_vector])))
+            self.log = np.vstack((self.log, np.array([timestamp, *position_vector, *rotation_vector,
+                                                      *predicted_position, *predicted_rotation])))
+
+    def publish(self):
+        self.pub.publish(self.msg)
 
     def listener(self):
         print("Starting ros subscriber")
@@ -36,6 +57,7 @@ class RegulatorObserver:
 
     def manage_observer(self):
         while not rospy.is_shutdown():
+            self.publish()
             if self.observing:
                 self.observe()
             else:
@@ -46,7 +68,14 @@ class RegulatorObserver:
         time_elapsed: timedelta = datetime.now() - self.observation_start_time
         seconds_elapsed = time_elapsed.total_seconds()
         print(f"Observation time elapsed {seconds_elapsed}")
-        if seconds_elapsed >= 30:
+
+        new_pos = True
+        if seconds_elapsed >= OBSERVATION_TIME / 2 and new_pos:
+            self.msg.linear = Vector3(1, 0, 1)
+            self.msg.angular = Vector3(0, math.pi / 2, 0)
+            new_pos = False
+
+        if seconds_elapsed >= OBSERVATION_TIME:
             self.end_observation()
 
     def end_observation(self):
@@ -54,11 +83,14 @@ class RegulatorObserver:
         self.observing = False
         self.observation_start_time = None
         try:
-            data = pd.DataFrame(self.log, columns=["timestamp", "x", "y", "z", "roll", "pitch", "yaw"])
+            data = pd.DataFrame(self.log, columns=COLUMNS)
         except ValueError:
-            data = pd.DataFrame(np.full((7, 1), np.nan).transpose(), columns=["timestamp", "x", "y", "z", "roll", "pitch", "yaw"])
+            data = pd.DataFrame(np.full((len(COLUMNS), 1), np.nan).transpose(), columns=COLUMNS)
+        self.msg.linear = Vector3(1, 0, 1)
+        self.msg.angular = Vector3(0, math.pi / 2, 0)
         data.to_csv("observation_log.csv", index=False)
-        self.log = np.empty((7,))
+        print(f"Num of rows in data: {len(data)}")
+        self.log = np.empty((len(COLUMNS),))
 
     def check_requests(self):
         mypath = os.getcwd()

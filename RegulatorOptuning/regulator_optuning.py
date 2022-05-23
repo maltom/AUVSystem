@@ -1,6 +1,7 @@
 import os
 import psutil
 import optuna
+from optuna.samplers import RandomSampler
 import json
 import time
 import pandas as pd
@@ -15,26 +16,26 @@ Optuned parameters:
 Q_MATRIX_PARAMS = [f"Q{i}" for i in range(12)]
 R_MATRIX_PARAMS = [f"R{i}" for i in range(6)]
 Q_MATRIX_PARAMS_RANGES = {
-    "Q0": (-2500, 15000),
-    "Q1": (-7500, 2500),
-    "Q2": (-12000, -2500),
-    "Q3": (-7500, 0),
-    "Q4": (-7500, 0),
-    "Q5": (5000, 15000),
-    "Q6": (-10000, 0),
-    "Q7": (-12000, 7500),
-    "Q8": (-12000, 10000),
-    "Q9": (-15000, 2500),
-    "Q10": (0, 12000),
-    "Q11": (-15000, 5000)
+    "Q0": (-10000, 10000),
+    "Q1": (-10000, 10000),
+    "Q2": (-10000, 10000),
+    "Q3": (-10000, 10000),
+    "Q4": (-10000, 10000),
+    "Q5": (-10000, 10000),
+    "Q6": (-10000, 10000),
+    "Q7": (-10000, 10000),
+    "Q8": (-10000, 10000),
+    "Q9": (-10000, 10000),
+    "Q10": (-10000, 10000),
+    "Q11": (-10000, 10000)
 }
 R_MATRIX_PARAMS_RANGES = {
-    "R0": (-12000, 10000),
-    "R1": (-5000, 5000),
-    "R2": (-12000, 0),
-    "R3": (-15000, -2500),
-    "R4": (0, 15000),
-    "R5": (-15000, -2500)
+    "R0": (-10000, 10000),
+    "R1": (-10000, 10000),
+    "R2": (-10000, 10000),
+    "R3": (-10000, 10000),
+    "R4": (-10000, 10000),
+    "R5": (-10000, 10000),
 }
 
 
@@ -96,15 +97,20 @@ def objective(trial: optuna.Trial):
         print(f"start {timestart}")
         print(f"stop {timestop}")
         print(f"timespan {timespan}")
-        penalty = (1 - (timespan / 30)) * 100000
-        if timespan >= 30:
+        penalty = (1 - (timespan / 60)) * 100000
+        if timespan >= 60:
             penalty = 0
         print(f"penalty {penalty}")
         score += penalty
     else:
         return 100000
 
-    score += observation_log.drop("timestamp", axis=1).apply(lambda x: (x ** 2).mean() ** .5).sum()
+    observation_log.drop("timestamp", axis=1, inplace=True)
+    measured = observation_log.iloc[:, list(range(0, 6))]
+    predicted = observation_log.iloc[:, list(range(6, 12))]
+    difference = pd.DataFrame(measured.values - predicted.values)
+
+    score += difference.apply(lambda x: (x ** 2).mean() ** .5).sum()
 
     if score < 0:
         raise ValueError("Score can't be < 0")
@@ -112,7 +118,7 @@ def objective(trial: optuna.Trial):
 
 
 if __name__ == '__main__':
-    study_name = "Regulator Optuning Test"
+    study_name = "Regulator Optuning"
     storage_name = "sqlite:///example.db"
-    study = optuna.create_study(study_name=study_name, storage=storage_name, load_if_exists=True)
+    study = optuna.create_study(study_name=study_name, storage=storage_name, load_if_exists=True) #sampler=RandomSampler()
     study.optimize(objective)

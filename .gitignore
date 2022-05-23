@@ -13,3 +13,7 @@ Makefile
 **/devel
 /.VSCodeCounter
 *.JPG
+**__pycache__**
+/.idea
+observation_request.txt
+observation_log.csv
