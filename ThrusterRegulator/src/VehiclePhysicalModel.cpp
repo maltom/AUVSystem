@@ -94,6 +94,7 @@ VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState 
 	    -( yg * W - yb * B ) * cos( theta ) * cos( phi ) + ( zg * W - zb * B ) * cos( theta ) * sin( phi ),
 	    ( zg * W - zb * B ) * sin( theta ) + ( xg * W - xb * B ) * cos( theta ) * cos( phi ),
 	    -( xg * W - xb * B ) * cos( theta ) * sin( phi ) - ( yg * W - yb * B ) * sin( theta );
+
 	return restoringForces;
 }
 

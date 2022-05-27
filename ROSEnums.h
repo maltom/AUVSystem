@@ -60,6 +60,11 @@ namespace Topics
 		static const std::string arbitrarlyPushMission       = Folders::DevPCSubFolder + "/arbitrarlyPushMission";
 		static const std::string arbitrarlyPushSpecificState = Folders::DevPCSubFolder + "/arbitrarlyPushSpecificState";
 
+		static const std::string arbitrarlySetGripperHorizontally
+		    = Folders::DevPCSubFolder + "/arbitrarlySetGripperHorizontally";
+		static const std::string arbitrarlySetGripperVertically
+		    = Folders::DevPCSubFolder + "/arbitrarlySetGripperVertically";
+		static const std::string arbitrarlyClenchGripper = Folders::DevPCSubFolder + "/arbitrarlyClenchGripper";
 	} // namespace DevPC
 
 	namespace Health
@@ -100,6 +105,9 @@ namespace MessageTypes
 
 	using States     = std_msgs::Int32;
 	using StateNames = std_msgs::String;
+
+	using GripperAngle  = std_msgs::Float64;
+	using GripperClench = std_msgs::Int32;
 	// using OccupancyGrid
 	// this type depends on number of nodes. max number of nodes for Int32 is 32, can be increased to Int64
 	using HealthReport = std_msgs::Int32;
