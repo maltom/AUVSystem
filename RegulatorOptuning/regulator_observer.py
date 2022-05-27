@@ -86,8 +86,8 @@ class RegulatorObserver:
             data = pd.DataFrame(self.log, columns=COLUMNS)
         except ValueError:
             data = pd.DataFrame(np.full((len(COLUMNS), 1), np.nan).transpose(), columns=COLUMNS)
-        self.msg.linear = Vector3(1, 0, 1)
-        self.msg.angular = Vector3(0, math.pi / 2, 0)
+        self.msg.linear = Vector3(0, 0, 0)
+        self.msg.angular = Vector3(0, 0, 0)
         data.to_csv("observation_log.csv", index=False)
         print(f"Num of rows in data: {len(data)}")
         self.log = np.empty((len(COLUMNS),))

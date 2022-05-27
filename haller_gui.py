@@ -6,7 +6,7 @@ import cv2
 import json
 import tkinter as tk
 from tkinter import LEFT, ttk
-from std_msgs.msg import Float32MultiArray, MultiArrayDimension, MultiArrayLayout, Int32
+from std_msgs.msg import Float32MultiArray, MultiArrayDimension, MultiArrayLayout, Int32, Float64
 from geometry_msgs.msg import Twist, Vector3
 from sensor_msgs.msg import Image as ImageMsg
 from PIL import Image, ImageTk
@@ -21,6 +21,9 @@ SERVOS_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetServos'
 GLOBAL_POSITION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetGlobalPosition'
 THRUST_ALLOCATION_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetThrustForce'
 TORPEDO_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlyLaunchTorpedo'
+GRIPPER_HORIZONTAL_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetGripperHorizontally'
+GRIPPER_VERTICAL_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlySetGripperVertically'
+GRIPPER_CLENCH_TOPIC = '/AUVInternalSystem/DevPC/arbitrarlyClenchGripper'
 CAMERA_IMAGE_TOPIC = '/auvCameraImage'
 AUV_SYSTEM_DIR = re.search(".*AUVSystem", os.getcwd())[0]
 AUV_CONFIG_DIR = None
@@ -153,6 +156,27 @@ class ControlsFrame:
             self.torpedo_controls_frame, text="RIGHT"
         )
         self.launch_right_torpedo_btn.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.gloabl_gripper_controls = {}
+        self.gloabl_gripper_frame = tk.Frame(temp)
+        self.gloabl_gripper_frame.pack(side=tk.LEFT)
+        self.input_controls(["Grip H", "Grip V"], self.gloabl_gripper_controls, self.gloabl_gripper_frame)
+        send_btn_frame = tk.Frame(self.gloabl_gripper_frame)
+        send_btn_frame.pack()
+        self.gripper_send_h_btn = tk.Button(send_btn_frame, text="Send Horizontal")
+        self.gripper_send_h_btn.pack(side=tk.LEFT)
+        self.gripper_send_v_btn = tk.Button(send_btn_frame, text="Send Vertical")
+        self.gripper_send_v_btn.pack(side=tk.RIGHT)
+        clench_frame = tk.Frame(self.gloabl_gripper_frame)
+        clench_frame.pack()
+        self.gripper_clench_btn = tk.Button(
+            clench_frame, text="CLENCH GRIPPER"
+        )
+        self.gripper_clench_btn.pack(side=tk.LEFT, fill=tk.Y)
+        self.gripper_clench_status = 1
+        self.gripper_clench_label = tk.Label(clench_frame, text=self.gripper_clench_status)
+        self.gripper_clench_label.pack(side=tk.RIGHT, fill=tk.Y)
+
 
     def input_controls(self, names, lookup, root):
         for c in names:
@@ -178,7 +202,7 @@ class ControlsFrame:
             }
 
     def update(self):
-        for lookup in [self.individual_controls, self.global_twist_set, self.global_thrust_controls]:
+        for lookup in [self.individual_controls, self.global_twist_set, self.global_thrust_controls, self.gloabl_gripper_controls]:
             for entry in lookup.values():
                 entry_val = entry['entry_control'].get()
                 if entry_val == "":
@@ -236,12 +260,32 @@ class RosHandler:
         self.torpedo_launch_Sender = rospy.Publisher(
             TORPEDO_TOPIC, Int32, queue_size=10
         )
+        self.gripper_clench_Sender = rospy.Publisher(
+            GRIPPER_CLENCH_TOPIC, Int32, queue_size=10
+        )
+        self.gripper_horizontal_sender = rospy.Publisher(
+            GRIPPER_HORIZONTAL_TOPIC, Float64, queue_size=10
+        )
+        self.gripper_vertical_sender = rospy.Publisher(
+            GRIPPER_VERTICAL_TOPIC, Float64, queue_size=10
+        )
+
         self.controls_frame.launch_left_torpedo_btn.configure(
             command=lambda: self.send_torpedo_launch(1))
         self.controls_frame.launch_right_torpedo_btn.configure(
             command=lambda: self.send_torpedo_launch(2))
         self.controls_frame.send_thrust_alloc_btn.configure(
             command=self.send_thrust_alloc)
+
+        self.controls_frame.gripper_clench_btn.configure(
+            command=self.send_gripper_clench)
+        self.controls_frame.gripper_send_h_btn.configure(
+            command=lambda: self.send_set_gripper("H")
+        )
+        self.controls_frame.gripper_send_v_btn.configure(
+            command=lambda: self.send_set_gripper("V")
+        )
+        
 
         self.thr_dim = MultiArrayDimension("dim", 5, 5)
         self.thr_lay = MultiArrayLayout([self.thr_dim], 0)
@@ -292,6 +336,26 @@ class RosHandler:
         torpedo_msg = Int32()
         torpedo_msg.data = idx
         self.torpedo_launch_Sender.publish(torpedo_msg)
+
+    def send_gripper_clench(self):
+        clench_msg = Int32()
+        self.controls_frame.gripper_clench_status = int(not self.controls_frame.gripper_clench_status)
+        clench_msg.data = self.controls_frame.gripper_clench_status
+        self.controls_frame.gripper_clench_label.configure(text=self.controls_frame.gripper_clench_status)
+        self.gripper_clench_Sender.publish(clench_msg)
+
+    def send_set_gripper(self, orientation):
+        sender = None
+        if orientation == "V":
+            sender = self.gripper_vertical_sender
+        elif orientation == "H":
+            sender = self.gripper_horizontal_sender
+
+        variable = self.controls_frame.gloabl_gripper_controls[f"Set Grip {orientation}: "]['variable']
+        value = float(variable.get())
+        gripper_msg = Float64()
+        gripper_msg.data = value
+        sender.publish(gripper_msg)
 
 
 class HallerGui:
