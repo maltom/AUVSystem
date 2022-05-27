@@ -94,11 +94,7 @@ VectorXd VehiclePhysicalModel::getRestoringForces( const VectorXd& currentState 
 	    -( yg * W - yb * B ) * cos( theta ) * cos( phi ) + ( zg * W - zb * B ) * cos( theta ) * sin( phi ),
 	    ( zg * W - zb * B ) * sin( theta ) + ( xg * W - xb * B ) * cos( theta ) * cos( phi ),
 	    -( xg * W - xb * B ) * cos( theta ) * sin( phi ) - ( yg * W - yb * B ) * sin( theta );
-	std::cout << restoringForces << "\nWeight: " << W << "\nBuyoancy:" << B << "\nSum:" << W - B << "\nVectorSum:"
-	          << std::sqrt( std::pow( restoringForces( 0 ), 2 ) + std::pow( restoringForces( 1 ), 2 )
-	                        + std::pow( restoringForces( 2 ), 2 ) )
-	          << "\n"
-	          << std::endl;
+
 	return restoringForces;
 }
 

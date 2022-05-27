@@ -106,7 +106,7 @@ namespace MessageTypes
 	using States     = std_msgs::Int32;
 	using StateNames = std_msgs::String;
 
-	using GripperAngle  = std_msgs::Float32;
+	using GripperAngle  = std_msgs::Float64;
 	using GripperClench = std_msgs::Int32;
 	// using OccupancyGrid
 	// this type depends on number of nodes. max number of nodes for Int32 is 32, can be increased to Int64
