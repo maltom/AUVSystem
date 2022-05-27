@@ -60,11 +60,11 @@ namespace Topics
 		static const std::string arbitrarlyPushMission       = Folders::DevPCSubFolder + "/arbitrarlyPushMission";
 		static const std::string arbitrarlyPushSpecificState = Folders::DevPCSubFolder + "/arbitrarlyPushSpecificState";
 
-		static const std::string arbitrarlyPushSpecificState
+		static const std::string arbitrarlySetGripperHorizontally
 		    = Folders::DevPCSubFolder + "/arbitrarlySetGripperHorizontally";
-		static const std::string arbitrarlyPushSpecificState
+		static const std::string arbitrarlySetGripperVertically
 		    = Folders::DevPCSubFolder + "/arbitrarlySetGripperVertically";
-		static const std::string arbitrarlyPushSpecificState = Folders::DevPCSubFolder + "/arbitrarlyClenchGripper";
+		static const std::string arbitrarlyClenchGripper = Folders::DevPCSubFolder + "/arbitrarlyClenchGripper";
 	} // namespace DevPC
 
 	namespace Health
