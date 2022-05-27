@@ -37,6 +37,8 @@ namespace deadReckoning
 
 const std::string status{ "status" };
 const std::string typeOfReport{ "type" };
+const std::string responseTo{ "response_to" };
+const std::string success{ "success" };
 
 } // namespace dvlKeys
 
@@ -123,10 +125,10 @@ struct Frame
 		deadReckoning,
 		velocity
 	};
-	
+
 	explicit Frame( UnprocessedFrame incomingFrame )
 	{
-		this->content = std::move( incomingFrame );
+		this->content     = std::move( incomingFrame );
 		this->currentType = Type::unprocessed;
 	}
 

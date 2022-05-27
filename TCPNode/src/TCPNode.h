@@ -31,8 +31,7 @@ public:
 		advertiseTopics();
 #ifndef NODVL
 		tcpClient->startClient();
-		// TODO: zrobić coś z tym
-		// this->resetDeadReckoning();
+		this->resetDeadReckoning();
 
 #endif
 	}
