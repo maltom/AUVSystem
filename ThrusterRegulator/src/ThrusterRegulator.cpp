@@ -1,6 +1,7 @@
 #include "ThrusterRegulator.h"
 
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <limits>
 #include <vector>
@@ -32,7 +33,7 @@ void ThrusterRegulator::processInMainLoop()
 		//           << this->positionToReach << "\nthruster sig:\n"
 		//           << this->thrustValues_u <<"\n---------"<< std::endl;
 
-		this->lqrRegulator.calculateError( this->currentPosition, this->positionToReach );
+		this->lqrRegulator.calculateError( this->currentState, this->positionToReach );
 		// std::cout << "Q:\n"
 		//           << static_cast< MatrixXd >( lqrRegulator.Q ) << "\nR:\n"
 		//           << static_cast< MatrixXd >( lqrRegulator.R ) << "\nA:\n"
@@ -133,14 +134,34 @@ void ThrusterRegulator::loadRegulatorParameters( configFiles::fileID config )
 void ThrusterRegulator::updateCurrentPositionAndAngularSpeed(
     const AUVROS::MessageTypes::DVLDeadReckoning& newPosition )
 {
-	auto newTimeStamp = newPosition.data.at( 6 );
-	auto deltaT       = newTimeStamp - this->timeStamp;
+	auto newTimeStamp = std::chrono::steady_clock::now();
+	auto deltaT       = std::chrono::duration< double >( newTimeStamp - this->timeStamp ).count();
 	this->timeStamp   = newTimeStamp;
-
+	currentPosition( 3 ) *= ( math::piNumber / 180.0 );
+	currentPosition( 4 ) *= ( math::piNumber / 180.0 );
+	currentPosition( 5 ) *= ( math::piNumber / 180.0 );
 	// angular speed
-	this->currentSpeed( 3 ) = ( newPosition.data.at( 3 ) - this->currentSpeed( 3 ) ) / deltaT;
-	this->currentSpeed( 4 ) = ( newPosition.data.at( 4 ) - this->currentSpeed( 4 ) ) / deltaT;
-	this->currentSpeed( 5 ) = ( newPosition.data.at( 5 ) - this->currentSpeed( 5 ) ) / deltaT;
+	this->currentSpeed( 3 ) = ( newPosition.data.at( 3 ) - this->currentPosition( 3 ) ) / deltaT;
+	this->currentSpeed( 4 ) = ( newPosition.data.at( 4 ) - this->currentPosition( 4 ) ) / deltaT;
+	this->currentSpeed( 5 ) = ( newPosition.data.at( 5 ) - this->currentPosition( 5 ) ) / deltaT;
+
+	// std::cout << "Pozycja:\n"
+	//           << currentPosition( 0 ) << "\n"
+	//           << currentPosition( 1 ) << "\n"
+	//           << currentPosition( 2 ) << "\n"
+	//           << currentPosition( 3 ) << "\n"
+	//           << currentPosition( 4 ) << "\n"
+	//           << currentPosition( 5 ) << "\n"
+	//           << std::endl;
+
+	// std::cout << "Pryndkosc:\n"
+	//           << currentSpeed( 0 ) << "\n"
+	//           << currentSpeed( 1 ) << "\n"
+	//           << currentSpeed( 2 ) << "\n"
+	//           << currentSpeed( 3 ) << "\n"
+	//           << currentSpeed( 4 ) << "\n"
+	//           << currentSpeed( 5 ) << "\n"
+	//           << std::endl;
 
 	// position
 	this->currentPosition( 0 ) = newPosition.data.at( 0 );
@@ -178,17 +199,11 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	    = model.getModelThrusters().AzimuthalThrustersDifferentialConfig;
 	// delta u which means how fast the force can grow in 1 timestep
 	const auto& deltaU = model.getModelThrusters().deltaU;
-	// normalized - [0:1]
-
 	// change from [-1:1] to newtons
 	uPrev *= maxThrust;
 
 	// for now - only one pair of azimuthal thrusters is considered here working in the same plane and axis
 	auto numberOfDims = model.getModelServos().azimuthalThrusterDimensionsOfInfluence.at( 0 ).second.size();
-
-	// Vector of desired forces and moments only in azimuthal dimensions
-	VectorXd azimuthalDesiredForces_tau = VectorXd::Zero( numberOfDims, 1 );
-	const auto& influences              = model.getModelServos().azimuthalThrusterDimensionsOfInfluence.at( 0 ).second;
 
 	// Diagonal matrix H which is main matrix in quadprog problem. x^T * H * X + f*X
 	VectorXd diag_H = VectorXd::Zero( 13 );
@@ -240,7 +255,7 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 	lowerServoAnglesBoundary = temporaryVector.asDiagonal();
 	upperServoAnglesBoundary = -lowerServoAnglesBoundary;
 
-	temp_Ci << upperBoundary, lowerBoundary, lowerServoAnglesBoundary, upperServoAnglesBoundary;
+	temp_Ci << lowerBoundary, upperBoundary, lowerServoAnglesBoundary, upperServoAnglesBoundary;
 	Ci = temp_Ci.transpose();
 
 	const auto infinity = std::numeric_limits< double >::max();
@@ -261,9 +276,9 @@ void allocateThrust2Azimuthal( VectorXd& thrustSignal_u,
 
 	QP::solve_quadprog( H, f, Aeq, Beq, Ci, ci0, quadProgSolution_x );
 	// std::cout<<"===========AFTER QUADPROG============\n";
-	//  std::cout << "========QUADPROG BEGIN=======================\n"
-	//            << quadProgSolution_x << "\n========QUADPROG END===========\n"
-	//            << std::endl;
+	// std::cout << "========QUADPROG BEGIN=======================\n"
+	//           << quadProgSolution_x << "\n========QUADPROG END===========\n"
+	//           << std::endl;
 
 	// std::cout << "====SERWA====\n"
 	// 		  << servoCurrentAngles.at( 0 ).first << "\n"

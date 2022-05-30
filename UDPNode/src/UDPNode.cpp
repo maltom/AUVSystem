@@ -207,7 +207,7 @@ void UDPNode::sendServosSignalToMicroController( const AUVROS::MessageTypes::Ser
 	frame.payloadSize  = length;
 	frame.payload[ 0 ] = hardware::servoMinMax.second - adjustServoValues( message.data[ 0 ] );
 	frame.payload[ 1 ] = adjustServoValues( message.data[ 1 ] );
-	std::cout << frame.payload[ 0 ] << "   " << frame.payload[ 1 ] << std::endl;
+	// std::cout << frame.payload[ 0 ] << "   " << frame.payload[ 1 ] << std::endl;
 	this->processOutgoingMessages( frame );
 }
 

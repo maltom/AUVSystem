@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <memory>
 
 #include <ct/optcon/optcon.h>
@@ -28,6 +29,7 @@ public:
 		model.adjustParametersForWorkingFrequency( this->regulatorWorkingFrequency );
 		subscribeTopics();
 		advertiseTopics();
+		this->timeStamp = std::chrono::steady_clock::now();
 	}
 	~ThrusterRegulator() {}
 
@@ -61,7 +63,7 @@ private:
 
 	// VectorXd dummyForces       = VectorXd::Zero( 6 );
 	// VectorXd dummyThrustSignal = VectorXd::Zero( 5 );
-	double timeStamp{ 0.0 };
+	std::chrono::_V2::steady_clock::time_point timeStamp;
 	float regulatorWorkingFrequency{ 10.0f };
 	unsigned regulatorTickSpan;
 	void processInMainLoop() override;
@@ -71,7 +73,6 @@ private:
 	void publishSignalsToHardware();
 	void loadRegulatorParameters( configFiles::fileID configID );
 
-	// TODO: change to SLAM
 	void updateCurrentPositionAndAngularSpeed( const AUVROS::MessageTypes::DVLDeadReckoning& newPosition );
 	void updateVelocity( const AUVROS::MessageTypes::DVLVelocity& newVelocity );
 	void updateTargetPosition( const AUVROS::MessageTypes::Position& newPos );

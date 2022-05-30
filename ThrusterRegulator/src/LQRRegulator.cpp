@@ -15,9 +15,9 @@ VectorXd LQRRegulator::calculateRegulatorFeedbackPose( const VectorXd& currentSt
 	return -K * currentState;
 }
 
-void LQRRegulator::calculateError( const VectorXd& currentPosition, const VectorXd& positionToReach )
+void LQRRegulator::calculateError( const VectorXd& currentState, const VectorXd& positionToReach )
 {
-	this->error = calculateNbar() * positionToReach + currentPosition;
+	this->error = calculateNbar() * positionToReach + calculateRegulatorFeedbackPose( currentState );
 }
 
 void LQRRegulator::calculateAStateMatrix( const VectorXd& currentState, const VehiclePhysicalModel& model )

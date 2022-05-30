@@ -135,7 +135,6 @@ void VehiclePhysicalModel::calculateAllThrusterConfigutationMatrix()
 		oneThrusterConfig( dimensionsIndex::z )
 		    = -std::sin( oneThrusterPositionAndRotation( dimensionsIndex::pitch ) + additionalPitchForAzimuthal )
 		    * std::cos( oneThrusterPositionAndRotation( dimensionsIndex::roll ) );
-
 		// moments
 		oneThrusterConfig( dimensionsIndex::roll )
 		    = oneThrusterConfig( dimensionsIndex::z ) * oneThrusterPositionAndRotation( dimensionsIndex::y )
@@ -148,6 +147,8 @@ void VehiclePhysicalModel::calculateAllThrusterConfigutationMatrix()
 		    - oneThrusterConfig( dimensionsIndex::x ) * oneThrusterPositionAndRotation( dimensionsIndex::y );
 
 		this->thrusterParams.AllThrustersConfigurationsMatrix.block< 6, 1 >( 0, i ) = oneThrusterConfig;
+
+		// std::cout << "Pednik: " << i + 1 << "\n" << oneThrusterConfig << std::endl;
 	}
 }
 

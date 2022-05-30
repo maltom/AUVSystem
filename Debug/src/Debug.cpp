@@ -75,7 +75,7 @@ void Debug::subscribeTopics()
 	    "State Machine", std::vector< std::string >( labels::states.begin(), labels::states.end() ), "init" );
 	this->rosSubscribers.emplace_back( this->rosNode->subscribe( AUVROS::Topics::States::currentStateName,
 	                                                             AUVROS::QueueSize::SmallQueue,
-	                                                             &Debug::displayEstimatedPositionStatus,
+	                                                             &Debug::displayCurrentStateStatus,
 	                                                             this ) );
 }
 
