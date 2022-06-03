@@ -137,7 +137,7 @@ enum NodeIDs
 	Debug,
 	ThrusterRegulator,
 	// TrajectoryPlanner,
-	// AdditionalCameraProcessor,
+	AdditionalCameraProcessor,
 	PositioningSLAM,
 
 	Last = PositioningSLAM,
@@ -145,8 +145,7 @@ enum NodeIDs
 };
 
 static const std::array< std::string, NodeIDs::Count > NodeNames{
-	"MainLogic",       "HealthCheck", "UDPNode",
-	"TCPNode",         "Debug",       "ThrusterRegulator", //"TrajectoryPlanner", //"AdditionalCameraProcessor",
+	"MainLogic",       "HealthCheck", "UDPNode", "TCPNode", "Debug", "ThrusterRegulator", "AdditionalCameraProcessor",
 	"PositioningSLAM",
 };
 
